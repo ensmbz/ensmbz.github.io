@@ -343,3 +343,24 @@ Promise.all([readPhotos(), loadSharedPhotos()]).then(([photos]) => {
   addedPhotos = photos.map((photo) => ({ ...photo, local: true }));
   render();
 });
+
+// The Discord /site command changes this shared value in Supabase. Poll so an
+// already-open tab also switches to the pause screen without a manual refresh.
+const sitePaused = document.querySelector("#sitePaused");
+const siteControlUrl = `${supabaseSettings.url || "https://vuxenevtawplaklregbz.supabase.co"}/functions/v1/dynamic-function/site-control`;
+async function refreshSiteStatus() {
+  try {
+    const response = await fetch(siteControlUrl, { cache: "no-store" });
+    if (!response.ok) return;
+    const status = await response.json();
+    const paused = status.is_live === false;
+    sitePaused.hidden = !paused;
+    document.body.classList.toggle("is-site-paused", paused);
+    if (paused) loopAudio.pause();
+    else if (loopAudio.paused) startAudio();
+  } catch {
+    // Keep the site available if Supabase is temporarily unreachable.
+  }
+}
+refreshSiteStatus();
+window.setInterval(refreshSiteStatus, 20000);

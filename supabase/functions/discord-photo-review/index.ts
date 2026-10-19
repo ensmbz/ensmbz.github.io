@@ -1,6 +1,19 @@
 const encoder = new TextEncoder();
 const APP_NAME = "ENS MBZ Photo Review";
 const APPROVER_ROLE_ID = "1561872957670826135";
+const SITE_COMMAND = {
+  name: "site",
+  description: "Turn the ENS MBZ photo site on or off",
+  options: [{
+    type: 1,
+    name: "off",
+    description: "Pause the photo website",
+  }, {
+    type: 1,
+    name: "on",
+    description: "Turn the photo website back on",
+  }],
+};
 
 type PhotoRecord = {
   id: number | string;
@@ -71,6 +84,74 @@ function supabaseHeaders(key: string) {
     authorization: `Bearer ${key}`,
     "content-type": "application/json",
   };
+}
+
+async function setSiteLive(isLive: boolean): Promise<boolean> {
+  const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
+  const key = supabaseKey();
+  const response = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true`, {
+    method: "PATCH",
+    headers: { ...supabaseHeaders(key), prefer: "return=representation" },
+    body: JSON.stringify({ is_live: isLive, updated_at: new Date().toISOString() }),
+  });
+  if (!response.ok) {
+    console.error("Could not update site status", response.status, await response.text());
+    return false;
+  }
+  const rows = await response.json().catch(() => []);
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+async function handleSiteCommand(interaction: Record<string, any>): Promise<Response> {
+  const channelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
+  if (interaction.channel_id !== channelId || !interaction.guild_id) {
+    return json({ type: 4, data: { content: "Use /site in the private photo-review channel.", flags: 64 } });
+  }
+  const memberRoles: unknown = interaction.member?.roles;
+  if (!Array.isArray(memberRoles) || !memberRoles.includes(APPROVER_ROLE_ID)) {
+    return json({ type: 4, data: { content: "You need the Photo Approver role to control the site.", flags: 64 } });
+  }
+  const action = interaction.data?.options?.[0]?.name;
+  if (action !== "on" && action !== "off") {
+    return json({ type: 4, data: { content: "Choose /site on or /site off.", flags: 64 } });
+  }
+  const isLive = action === "on";
+  if (!await setSiteLive(isLive)) {
+    return json({ type: 4, data: { content: "I couldn't update the site. Check that the site_control SQL setup was applied.", flags: 64 } });
+  }
+  return json({ type: 4, data: { content: isLive ? "✅ The website is back on." : "⏸️ The website is paused.", flags: 64 } });
+}
+
+async function registerSiteCommand(): Promise<Response> {
+  const token = requiredEnv("DISCORD_BOT_TOKEN");
+  const appId = requiredEnv("DISCORD_APPLICATION_ID");
+  const channelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
+  const channelResponse = await fetch(`https://discord.com/api/v10/channels/${channelId}`, {
+    headers: { authorization: `Bot ${token}` },
+  });
+  const channel = await channelResponse.json().catch(() => ({}));
+  if (!channelResponse.ok || !channel.guild_id) {
+    console.error("Could not find review channel to register /site", channelResponse.status);
+    return json({ error: "Could not find the Discord photo-review channel." }, 502);
+  }
+  const endpoint = `https://discord.com/api/v10/applications/${appId}/guilds/${channel.guild_id}/commands`;
+  const listed = await fetch(endpoint, { headers: { authorization: `Bot ${token}` } });
+  if (!listed.ok) {
+    console.error("Could not list Discord commands", listed.status, await listed.text());
+    return json({ error: "Discord would not list the bot's server commands." }, 502);
+  }
+  const commands = await listed.json().catch(() => []);
+  const existing = Array.isArray(commands) ? commands.find((item: any) => item.name === "site") : null;
+  const response = await fetch(existing ? `${endpoint}/${existing.id}` : endpoint, {
+    method: existing ? "PATCH" : "POST",
+    headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+    body: JSON.stringify(SITE_COMMAND),
+  });
+  if (!response.ok) {
+    console.error("Could not register Discord /site command", response.status, await response.text());
+    return json({ error: "Discord could not register /site. Check that the bot has applications.commands permission." }, 502);
+  }
+  return json({ ok: true, command: "/site", guild_id: channel.guild_id });
 }
 
 async function postPendingPhoto(record: PhotoRecord): Promise<Response> {
@@ -241,6 +322,27 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
 }
 
 Deno.serve(async (request: Request) => {
+  const pathname = new URL(request.url).pathname;
+  if (pathname.endsWith("/site-control") && request.method === "GET") {
+    try {
+      const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
+      const key = supabaseKey();
+      const status = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true&select=is_live`, {
+        headers: supabaseHeaders(key),
+      });
+      if (!status.ok) return json({ error: "Could not read site status" }, 503);
+      const rows = await status.json().catch(() => []);
+      if (!Array.isArray(rows) || !rows.length) return json({ error: "Site status is not configured" }, 503);
+      return json({ is_live: rows[0].is_live === true }, 200);
+    } catch (error) {
+      console.error("Could not read site status", error);
+      return json({ error: "Could not read site status" }, 503);
+    }
+  }
+  if (pathname.endsWith("/register-site-command") && request.method === "POST") {
+    try { return await registerSiteCommand(); }
+    catch (error) { console.error("Could not register /site", error); return json({ error: "Could not register /site." }, 500); }
+  }
   if (request.method !== "POST") return json({ error: "POST required" }, 405);
   const body = await request.text();
   if (body.length > 1_000_000) return json({ error: "Request too large" }, 413);
@@ -251,6 +353,7 @@ Deno.serve(async (request: Request) => {
     if (interaction.application_id !== requiredEnv("DISCORD_APPLICATION_ID")) return json({ error: "Wrong application" }, 401);
     if (interaction.type === 1) return json({ type: 1 });
     if (interaction.type === 3) return await handleButton(interaction);
+    if (interaction.type === 2 && interaction.data?.name === "site") return await handleSiteCommand(interaction);
     return json({ type: 4, data: { content: "This interaction is not supported.", flags: 64 } });
   } catch (error) {
     console.error("Photo review function failed", error);

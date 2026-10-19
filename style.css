@@ -58,6 +58,26 @@
   footer { row-gap: 12px; }
 }
 
+/* Full-screen display controlled by the Discord /site on|off command. */
+.site-paused[hidden] { display: none !important; }
+.site-paused {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+}
+.site-paused-card { width: min(100%, 520px); }
+.site-paused-card img { object-fit: contain; margin: 0 auto 26px; border-radius: 50%; background: white; }
+.site-paused-card .eyebrow { justify-content: center; margin-bottom: 22px; }
+.site-paused-card h1 { font-size: clamp(58px, 12vw, 90px); line-height: .88; }
+.site-paused-card > p:last-child { color: #68675e; font-size: 14px; line-height: 1.6; margin: 24px auto 0; }
+body.is-site-paused { overflow: hidden; }
+
 /* ENS MBZ identity logo */
 .wordmark-icon {
   display: block;
