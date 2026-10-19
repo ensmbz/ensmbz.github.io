@@ -1,5 +1,6 @@
 const encoder = new TextEncoder();
 const APP_NAME = "ENS MBZ Photo Review";
+const APPROVER_ROLE_ID = "1561872957670826135";
 
 type PhotoRecord = {
   id: number | string;
@@ -35,12 +36,14 @@ function hexToBytes(hex: string, byteLength: number): Uint8Array | null {
   return bytes;
 }
 
-function buttonComponents(id: string, disabled = false) {
+function buttonComponents(id: string, state: "pending" | "reviewed" | "deleted" = "pending") {
+  const isDeleted = state === "deleted";
   return [{
     type: 1,
     components: [
-      { type: 2, style: 3, label: "Approve", custom_id: `ensmbz:approve:${id}`, disabled },
-      { type: 2, style: 4, label: "Decline", custom_id: `ensmbz:decline:${id}`, disabled },
+      { type: 2, style: 3, label: "Approve", custom_id: `ensmbz:approve:${id}`, disabled: state !== "pending" },
+      { type: 2, style: 4, label: "Decline", custom_id: `ensmbz:decline:${id}`, disabled: state !== "pending" },
+      { type: 2, style: 4, label: "Delete photo", custom_id: `ensmbz:delete:${id}`, disabled: isDeleted },
     ],
   }];
 }
@@ -140,12 +143,71 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
     return json({ type: 4, data: { content: "Use the buttons in the private photo-review channel.", flags: 64 } });
   }
 
-  const match = /^ensmbz:(approve|decline):(\d{1,19})$/.exec(String(interaction.data?.custom_id || ""));
+  const memberRoles: unknown = interaction.member?.roles;
+  if (!Array.isArray(memberRoles) || !memberRoles.includes(APPROVER_ROLE_ID)) {
+    return json({ type: 4, data: { content: "You need the Photo Approver role to review submissions.", flags: 64 } });
+  }
+
+  const match = /^ensmbz:(approve|decline|delete):(\d{1,19})$/.exec(String(interaction.data?.custom_id || ""));
   if (!match) return json({ type: 4, data: { content: "That review action is not valid.", flags: 64 } });
   const [, action, id] = match;
-  const approved = action === "approve";
   const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
   const key = supabaseKey();
+
+  if (action === "delete") {
+    const rowUrl = `${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(id)}&select=id,name,image_url`;
+    const selected = await fetch(rowUrl, { headers: supabaseHeaders(key) });
+    if (!selected.ok) {
+      console.error("Could not find photo before deletion", selected.status, await selected.text());
+      return json({ type: 4, data: { content: "Could not load this photo for deletion. Try again.", flags: 64 } });
+    }
+    const rows = await selected.json().catch(() => []);
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return json({ type: 4, data: { content: "This photo was already deleted or could not be found.", flags: 64 } });
+    }
+    let objectPath: string;
+    try {
+      const imageUrl = new URL(String(rows[0].image_url));
+      const storageMatch = /^\/storage\/v1\/object\/(?:public|sign)\/zayed-photos\/(.+)$/.exec(imageUrl.pathname);
+      if (!storageMatch) throw new Error("Photo is not stored in the zayed-photos bucket");
+      objectPath = decodeURIComponent(storageMatch[1]);
+    } catch (error) {
+      console.error("Could not map photo URL to Storage object", error);
+      return json({ type: 4, data: { content: "Could not identify this photo in storage, so nothing was deleted.", flags: 64 } });
+    }
+
+    const removedRow = await fetch(`${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: { ...supabaseHeaders(key), prefer: "return=representation" },
+    });
+    if (!removedRow.ok) {
+      console.error("Could not remove photo from gallery", removedRow.status, await removedRow.text());
+      return json({ type: 4, data: { content: "Could not remove this photo from the gallery. Try again.", flags: 64 } });
+    }
+    const deletedRows = await removedRow.json().catch(() => []);
+    if (!Array.isArray(deletedRows) || deletedRows.length === 0) {
+      return json({ type: 4, data: { content: "This photo was already deleted or could not be found.", flags: 64 } });
+    }
+
+    const removedFile = await fetch(`${projectUrl}/storage/v1/object/zayed-photos/${objectPath.split("/").map(encodeURIComponent).join("/")}`, {
+      method: "DELETE",
+      headers: { apikey: key, authorization: `Bearer ${key}` },
+    });
+    const reviewerId = interaction.member?.user?.id || interaction.user?.id;
+    const cleanupNote = removedFile.ok ? " The uploaded file was removed too." : " The gallery entry is gone, but storage cleanup failed; check Supabase Storage.";
+    if (!removedFile.ok) console.error("Gallery row deleted but Storage cleanup failed", removedFile.status, await removedFile.text());
+    return json({
+      type: 7,
+      data: {
+        content: `🗑️ Photo deleted from the website.${cleanupNote}${reviewerId ? ` Deleted by <@${reviewerId}>.` : ""}`,
+        embeds: [],
+        components: buttonComponents(id, "deleted"),
+        allowed_mentions: { parse: [] },
+      },
+    });
+  }
+
+  const approved = action === "approve";
   const update = await fetch(
     `${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(id)}&status=eq.pending`,
     {
@@ -167,18 +229,12 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
     ? "✅ Approved — this photo is now on the website."
     : "🚫 Declined — this photo will not appear on the website.";
   const reviewerId = interaction.member?.user?.id || interaction.user?.id;
-  const components = Array.isArray(interaction.message?.components)
-    ? interaction.message.components.map((row: any) => ({
-      ...row,
-      components: Array.isArray(row.components) ? row.components.map((component: any) => ({ ...component, disabled: true })) : [],
-    }))
-    : [];
   return json({
     type: 7,
     data: {
       content: `${actionText}${reviewerId ? ` Reviewed by <@${reviewerId}>.` : ""}`,
       embeds: Array.isArray(interaction.message?.embeds) ? interaction.message.embeds : [],
-      components,
+      components: buttonComponents(id, "reviewed"),
       allowed_mentions: { parse: [] },
     },
   });

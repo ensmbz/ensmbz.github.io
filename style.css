@@ -57,3 +57,51 @@
   .about-strip button { margin-left: 50px; }
   footer { row-gap: 12px; }
 }
+
+/* ENS MBZ identity logo */
+.wordmark-icon {
+  display: block;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  background: white;
+  color: transparent;
+}
+.sunburst {
+  width: 104px;
+  height: 104px;
+  padding: 0;
+  background: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  object-fit: contain;
+  clip-path: none;
+  box-shadow: 0 5px 20px #18201d24;
+}
+.hero-logo-frame {
+  background: white;
+}
+.hero-logo-frame img {
+  object-fit: contain;
+  object-position: center;
+  padding: 10px;
+  filter: none;
+}
+.about-mark {
+  display: block;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  background: white;
+}
+.disc-center img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
