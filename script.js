@@ -8,6 +8,12 @@ const input = document.querySelector("#photoInput");
 const count = document.querySelector("#photoCount");
 const section = document.querySelector(".gallery-section");
 const dialog = document.querySelector("#photoDialog");
+const supabaseSettings = window.SUPABASE_CONFIG || {};
+const supabaseReady = Boolean(supabaseSettings.url && supabaseSettings.publishableKey && window.supabase);
+const supabaseClient = supabaseReady
+  ? window.supabase.createClient(supabaseSettings.url, supabaseSettings.publishableKey)
+  : null;
+let sharedPhotos = [];
 const dbPromise = new Promise((resolve) => {
   if (!("indexedDB" in window)) return resolve(null);
   const request = indexedDB.open("max-files-gallery", 1);
@@ -46,7 +52,7 @@ async function deletePhoto(id) {
 }
 function render() {
   grid.replaceChildren();
-  const photos = [...basePhotos, ...addedPhotos];
+  const photos = [...basePhotos, ...sharedPhotos, ...addedPhotos];
   count.textContent = `${String(photos.length).padStart(2, "0")} OBJECT${photos.length === 1 ? "" : "S"}`;
   if (!photos.length) {
     const empty = document.createElement("div");
@@ -99,7 +105,7 @@ function render() {
     title.textContent = photo.title;
     const caption = document.createElement("div");
     caption.className = "photo-caption";
-    caption.textContent = photo.local ? `${photo.caption} Added by ${photo.uploader}.` : photo.caption;
+    caption.textContent = photo.uploader ? `${photo.caption} Added by ${photo.uploader}.` : photo.caption;
     text.append(title, caption);
     const tag = document.createElement("span");
     tag.className = "photo-tag";
@@ -112,6 +118,12 @@ function render() {
 
 const contributeDialog = document.querySelector("#contributeDialog");
 const contributeForm = document.querySelector("#contributeForm");
+const storageNote = document.querySelector("#storageNote");
+if (supabaseReady && supabaseClient) {
+  storageNote.textContent = "Photos are submitted to the shared gallery and appear after Zayed approves them.";
+} else {
+  storageNote.textContent = "Shared uploads are not connected yet. Photos you add are saved in this browser on this device.";
+}
 document.querySelector("#addPhotos").addEventListener("click", () => contributeDialog.showModal());
 document.querySelector("#contributeClose").addEventListener("click", () => contributeDialog.close());
 contributeDialog.addEventListener("click", (event) => { if (event.target === contributeDialog) contributeDialog.close(); });
@@ -122,19 +134,35 @@ contributeForm.addEventListener("submit", async (event) => {
   const error = document.querySelector("#formError");
   if (!uploader) { error.textContent = "Please enter your name before submitting."; return; }
   if (!files.length) { error.textContent = "Please choose at least one image."; return; }
-  if (files.some((file) => file.size > 15 * 1024 * 1024)) { error.textContent = "Each photo must be smaller than 15 MB."; return; }
+  if (files.some((file) => file.size > 5 * 1024 * 1024)) { error.textContent = "Each photo must be smaller than 5 MB."; return; }
   error.textContent = "";
   try {
     for (const file of files) {
-      const photo = { id: crypto.randomUUID(), blob: file, title: file.name.replace(/\.[^.]+$/, "") || "A new masterpiece", caption: "Freshly added to the collection.", tag: "NEW ARRIVAL", uploader, local: true };
-      await savePhoto(photo);
-      addedPhotos.push(photo);
+      const title = file.name.replace(/\.[^.]+$/, "") || "A new masterpiece";
+      if (supabaseReady && supabaseClient) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const path = `${crypto.randomUUID()}-${safeName}`;
+        const { error: uploadError } = await supabaseClient.storage.from("zayed-photos").upload(path, file, { upsert: false, contentType: file.type || "image/jpeg" });
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabaseClient.storage.from("zayed-photos").getPublicUrl(path);
+        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, image_url: urlData.publicUrl, approved: false });
+        if (insertError) throw insertError;
+      } else {
+        const photo = { id: crypto.randomUUID(), blob: file, title, caption: "Freshly added to the collection.", tag: "NEW ARRIVAL", uploader, local: true };
+        await savePhoto(photo);
+        addedPhotos.push(photo);
+      }
     }
     contributeForm.reset();
     contributeDialog.close();
+    if (supabaseReady) {
+      storageNote.textContent = "Photo submitted! It will join the shared gallery after approval.";
+    }
     render();
-  } catch {
-    error.textContent = "This browser couldn't save the photo. Try a smaller image or another browser.";
+  } catch (uploadError) {
+    error.textContent = supabaseReady
+      ? `Upload failed: ${uploadError.message || "check the Supabase bucket and policies, then try again."}`
+      : "This browser couldn't save the photo. Try a smaller image or another browser.";
   }
 });
 for (const eventName of ["dragenter", "dragover"]) section.addEventListener(eventName, (event) => { event.preventDefault(); section.classList.add("dragging"); });
@@ -172,4 +200,24 @@ startAudio();
 document.addEventListener("pointerdown", () => { if (loopAudio.paused) startAudio(); }, { once: true });
 document.addEventListener("keydown", () => { if (loopAudio.paused) startAudio(); }, { once: true });
 
-readPhotos().then((photos) => { addedPhotos = photos.map((photo) => ({ ...photo, local: true })); render(); });
+async function loadSharedPhotos() {
+  if (!supabaseReady || !supabaseClient) return;
+  const { data, error } = await supabaseClient.from("photo_submissions")
+    .select("id,name,image_url,created_at")
+    .eq("approved", true)
+    .order("created_at", { ascending: false });
+  if (error) {
+    storageNote.textContent = "The shared gallery could not load. Check the Supabase table and access policies.";
+    return;
+  }
+  sharedPhotos = (data || []).map((row) => ({
+    id: `shared-${row.id}`, src: row.image_url, title: "A community masterpiece",
+    caption: "Freshly added to the collection.", tag: "COMMUNITY", uploader: row.name
+  }));
+  render();
+}
+
+Promise.all([readPhotos(), loadSharedPhotos()]).then(([photos]) => {
+  addedPhotos = photos.map((photo) => ({ ...photo, local: true }));
+  render();
+});

@@ -45,7 +45,7 @@
       <p class="gallery-note">Museum rule #1: there are no bad angles, only interesting evidence.</p>
       <div class="photo-grid" id="photoGrid" aria-live="polite"></div>
       <div class="drop-hint" id="dropHint"><span>↘</span> Got more? Drop photos anywhere in the gallery or tap “Add your photos”.</div>
-      <p class="storage-note">Photos you add are saved in this browser on this device. To put them on the public website, add the image files to its <code>assets</code> folder and update the gallery.</p>
+      <p class="storage-note" id="storageNote">Photos submitted here appear in the shared gallery after approval.</p>
     </section>
 
     <section class="intermission" id="about">
@@ -70,6 +70,8 @@
   </dialog>
   <dialog id="photoDialog" class="photo-dialog"><button class="dialog-close" id="dialogClose" aria-label="Close photo" type="button">×</button><img id="dialogImage" alt="Expanded gallery photograph"><p id="dialogCaption"></p></dialog>
   <audio id="loopAudio" src="assets/dry-fart.mp3" autoplay loop preload="auto"></audio>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
 </html>
