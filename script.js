@@ -1,5 +1,5 @@
 const basePhotos = [
-  { id: "base-0823", src: "assets/IMG_0823.PNG", title: "Zayed vs. lunch", caption: "The rice has more brain cells. Probably.", tag: "RICE INCIDENT" },
+  { id: "base-0823", src: "assets/IMG_0823.PNG", title: "ENS MBZ vs. lunch", caption: "The rice has more brain cells. Probably.", tag: "RICE INCIDENT" },
   { id: "base-0822", src: "assets/IMG_0822.PNG", title: "The thinking close-up", caption: "Searching for the last brain cell…", tag: "LOADING..." },
   { id: "base-0821", src: "assets/IMG_0821.PNG", title: "Backseat philosopher", caption: "Has thoughts. We assume.", tag: "ROAD EDITION" }
 ];
@@ -120,7 +120,7 @@ const contributeDialog = document.querySelector("#contributeDialog");
 const contributeForm = document.querySelector("#contributeForm");
 const storageNote = document.querySelector("#storageNote");
 if (supabaseReady && supabaseClient) {
-  storageNote.textContent = "Photos are submitted to the shared gallery and appear after Zayed approves them.";
+  storageNote.textContent = "Photos are submitted to the shared gallery and appear after ENS MBZ approves them.";
 } else {
   storageNote.textContent = "Shared uploads are not connected yet. Photos you add are saved in this browser on this device.";
 }
@@ -171,12 +171,12 @@ document.querySelector("#dialogClose").addEventListener("click", () => dialog.cl
 dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
 
 const quips = [
-  "THE CURATOR WOULD LIKE YOU TO KNOW: ZAYED IS A CERTIFIED GOOFBALL.",
-  "BREAKING: ZAYED HAS LOST AN ARGUMENT TO A DOOR THAT SAYS PUSH.",
-  "EXPERTS AGREE: ZAYED'S LAST BRAIN CELL IS WORKING OVERTIME.",
-  "THIS JUST IN: ZAYED HAS BEEN CONFUSED BY A SPOON AGAIN.",
-  "PLEASE KEEP HANDS INSIDE THE INTERNET. ZAYED IS DRIVING.",
-  "ZAYED IS PROOF THAT CONFIDENCE AND CLUELESSNESS CAN COEXIST."
+  "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
+  "BREAKING: ENS MBZ HAS LOST AN ARGUMENT TO A DOOR THAT SAYS PUSH.",
+  "EXPERTS AGREE: ENS MBZ'S LAST BRAIN CELL IS WORKING OVERTIME.",
+  "THIS JUST IN: ENS MBZ HAS BEEN CONFUSED BY A SPOON AGAIN.",
+  "PLEASE KEEP HANDS INSIDE THE INTERNET. ENS MBZ IS DRIVING.",
+  "ENS MBZ IS PROOF THAT CONFIDENCE AND CLUELESSNESS CAN COEXIST."
 ];
 let previousQuip = 0;
 document.querySelector("#quipButton").addEventListener("click", () => {
