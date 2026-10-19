@@ -1,0 +1,2 @@
+[functions.discord-photo-review]
+verify_jwt = false
