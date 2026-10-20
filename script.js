@@ -311,16 +311,26 @@ document.querySelector("#quipButton").addEventListener("click", () => {
 // Autoplay the supplied sound effect and keep it looping. If the browser
 // blocks audible autoplay, retry on the visitor's first page interaction.
 const loopAudio = document.querySelector("#loopAudio");
+const pauseAudio = document.querySelector("#pauseAudio");
+let siteIsPaused = false;
 loopAudio.volume = 0.45;
+pauseAudio.volume = 0.45;
 async function startAudio() {
+  const selectedAudio = siteIsPaused ? pauseAudio : loopAudio;
+  const otherAudio = siteIsPaused ? loopAudio : pauseAudio;
+  otherAudio.pause();
   try {
-    await loopAudio.play();
-    document.querySelector(".music-art").classList.add("playing");
+    await selectedAudio.play();
+    document.querySelector(".music-art")?.classList.toggle("playing", !siteIsPaused);
   } catch { /* Browser autoplay policy may require a visitor interaction. */ }
 }
 startAudio();
-document.addEventListener("pointerdown", () => { if (loopAudio.paused) startAudio(); }, { once: true });
-document.addEventListener("keydown", () => { if (loopAudio.paused) startAudio(); }, { once: true });
+document.addEventListener("pointerdown", () => {
+  if ((siteIsPaused ? pauseAudio : loopAudio).paused) startAudio();
+});
+document.addEventListener("keydown", () => {
+  if ((siteIsPaused ? pauseAudio : loopAudio).paused) startAudio();
+});
 
 async function loadSharedPhotos() {
   if (!supabaseReady || !supabaseClient) return;
@@ -354,10 +364,10 @@ async function refreshSiteStatus() {
     if (!response.ok) return;
     const status = await response.json();
     const paused = status.is_live === false;
+    siteIsPaused = paused;
     sitePaused.hidden = !paused;
     document.body.classList.toggle("is-site-paused", paused);
-    if (paused) loopAudio.pause();
-    else if (loopAudio.paused) startAudio();
+    if ((paused ? pauseAudio : loopAudio).paused) startAudio();
   } catch {
     // Keep the site available if Supabase is temporarily unreachable.
   }
