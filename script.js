@@ -13,21 +13,21 @@ const translations = {
     heroDescription: "A collection of moments, expressions, and one unexpected meeting with lunch. Certified goofball. Questionable decisions. Excellent photo collection.",
     tourLink: "TAKE THE TOUR", scribbleOne: "brain cell<br>loading...", scribbleTwo: "← swipe<br>for evidence",
     scrollExhibition: "SCROLL FOR THE EXHIBITION", figureLabel: "FIG. 001 — ∞", collection: "THE PERMANENT COLLECTION",
-    galleryTitle: 'THE GALLERY<span class="period">.</span>', addPhotos: "ADD YOUR PHOTOS", galleryNote: "Museum rule #1: there are no bad angles, only interesting evidence.",
-    dropHint: 'Got more? Drop photos anywhere in the gallery or tap “Add your photos”.', soundtrackEyebrow: "PLEASE ENJOY ENS MBZ'S VERY SERIOUS SOUNDTRACK",
+    galleryTitle: 'THE GALLERY<span class="period">.</span>', addPhotos: "ADD PHOTOS OR VIDEOS", galleryNote: "Museum rule #1: there are no bad angles, only interesting evidence.",
+    dropHint: 'Got more? Drop photos or videos anywhere in the gallery or tap “Add your photos”.', soundtrackEyebrow: "PLEASE ENJOY ENS MBZ'S VERY SERIOUS SOUNDTRACK",
     themeStamp: "ENS MBZ'S<br>OFFICIAL<br>THEME", jingleTitle: "THE OFFICIAL<br>ENS MBZ <em>JINGLE.</em>",
     jingleDescription: "ENS MBZ's signature sound effect, on an endless loop. Your browser may require a tap anywhere on the page before it allows audio.",
-    jingleStatus: "♪ DRY FART · ON REPEAT", jingleMutedStatus: "♪ DRY FART · MUTED", formEyebrow: "ADD TO THE ENS MBZ ARCHIVE", formTitle: 'SUBMIT A PHOTO<span class="period">.</span>',
-    nameLabel: 'YOUR NAME <span>(required)</span>', namePlaceholder: "Who is submitting this?", filesLabel: 'PHOTOS TO ADD <span>(required · choose from photos or camera)</span>',
-    choosePhotos: "CHOOSE PHOTOS", noPhotosSelected: "No photos selected", photoSelected: "photo selected", photosSelected: "photos selected",
-    formHelp: "Your name will appear next to the photos. Submissions are saved in this browser on this device.",
-    submitButton: "ADD TO THE GALLERY ↗", close: "Close", storageShared: "Photos are submitted to the shared gallery and appear after ENS MBZ approves them.",
-    storageLocal: "Shared uploads are not connected yet. Photos you add are saved in this browser on this device.",
+    jingleStatus: "♪ DRY FART · ON REPEAT", jingleMutedStatus: "♪ DRY FART · MUTED", formEyebrow: "ADD TO THE ENS MBZ ARCHIVE", formTitle: 'SUBMIT MEDIA<span class="period">.</span>',
+    nameLabel: 'YOUR NAME <span>(required)</span>', namePlaceholder: "Who is submitting this?", filesLabel: 'PHOTOS OR VIDEOS <span>(required · photos up to 5 MB, videos up to 50 MB)</span>',
+    chooseMedia: "CHOOSE PHOTOS OR VIDEOS", noMediaSelected: "No media selected", mediaSelected: "item selected", mediaSelectedMany: "items selected",
+    formHelp: "Your name will appear next to the photos or videos. MP4 works best; use the video controls to hear its audio. Submissions appear after approval.",
+    submitButton: "ADD TO THE GALLERY ↗", close: "Close", storageShared: "Photos and videos are submitted to the shared gallery and appear after ENS MBZ approves them.",
+    storageLocal: "Shared uploads are not connected yet. Media you add is saved in this browser on this device.",
     objectOne: "OBJECT", objectMany: "OBJECTS", emptyGallery: "THE GALLERY IS TAKING A NAP. ADD A PHOTO TO WAKE IT UP.",
     number: "NO.", addedBy: "Added by", newArrival: "NEW ARRIVAL", expand: "Expand", remove: "Remove",
-    requiredName: "Please enter your name before submitting.", chooseImage: "Please choose at least one image.", sizeLimit: "Each photo must be smaller than 5 MB.",
-    photosSubmitted: "photos submitted", photoSubmitted: "photo submitted", afterApproval: "New photos join the shared gallery after approval.",
-    uploadFailed: "Upload failed", checkBucket: "check the Supabase bucket and policies, then try again.", localSaveFailed: "This browser couldn't save the photo. Try a smaller image or another browser.",
+    requiredName: "Please enter your name before submitting.", chooseImage: "Please choose at least one photo or video.", sizeLimit: "Photos must be under 5 MB and videos under 50 MB.",
+    photosSubmitted: "items submitted", photoSubmitted: "item submitted", afterApproval: "New photos and videos join the shared gallery after approval.",
+    uploadFailed: "Upload failed", checkBucket: "check the Supabase bucket size limit and policies, then try again.", localSaveFailed: "This browser couldn't save the media. Try a smaller file or another browser.",
     galleryLoadFailed: "The shared gallery could not load. Check the Supabase table and access policies.",
     quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
     footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية",
@@ -41,21 +41,21 @@ const translations = {
     heroDescription: "مجموعة من اللحظات والتعابير ولقاء غير متوقع مع الغداء. خفة ظل معتمدة، وقرارات مثيرة للجدل، ومجموعة صور ممتازة.",
     tourLink: "ابدأ الجولة", scribbleOne: "خلية دماغية<br>جارٍ التحميل...", scribbleTwo: "← اسحب<br>لرؤية الأدلة",
     scrollExhibition: "مرّر لاستكشاف المعرض", figureLabel: "الصورة ٠٠١ — ∞", collection: "المجموعة الدائمة",
-    galleryTitle: 'المعرض<span class="period">.</span>', addPhotos: "أضف صورك", galleryNote: "قاعدة المتحف الأولى: لا توجد زوايا سيئة، بل أدلة مثيرة للاهتمام.",
-    dropHint: 'هل لديك المزيد؟ أفلِت الصور في أي مكان بالمعرض أو اضغط «أضف صورك».', soundtrackEyebrow: "استمتعوا بالموسيقى الرسمية والجدية جداً لـ ENS MBZ",
+    galleryTitle: 'المعرض<span class="period">.</span>', addPhotos: "أضف صوراً أو فيديو", galleryNote: "قاعدة المتحف الأولى: لا توجد زوايا سيئة، بل أدلة مثيرة للاهتمام.",
+    dropHint: 'هل لديك المزيد؟ أفلِت الصور أو الفيديوهات في أي مكان بالمعرض أو اضغط «أضف صورك».', soundtrackEyebrow: "استمتعوا بالموسيقى الرسمية والجدية جداً لـ ENS MBZ",
     themeStamp: "النشيد<br>الرسمي<br>لـ ENS MBZ", jingleTitle: 'النشيد الرسمي<br>لـ ENS MBZ<span class="period">.</span>',
     jingleDescription: "المؤثر الصوتي المميز لـ ENS MBZ، في تكرار مستمر. قد يحتاج المتصفح إلى نقرة على الصفحة قبل تشغيل الصوت.",
-    jingleStatus: "♪ صوت الضرطة · يتكرر", jingleMutedStatus: "♪ صوت الضرطة · مكتوم", formEyebrow: "أضف إلى أرشيف ENS MBZ", formTitle: 'أرسل صورة<span class="period">.</span>',
-    nameLabel: 'اسمك <span>(مطلوب)</span>', namePlaceholder: "من يرسل الصورة؟", filesLabel: 'الصور المراد إضافتها <span>(مطلوبة · اختر من الصور أو الكاميرا)</span>',
-    choosePhotos: "اختر الصور", noPhotosSelected: "لم يتم اختيار صور", photoSelected: "صورة مختارة", photosSelected: "صور مختارة",
-    formHelp: "سيظهر اسمك بجانب الصور. تُحفظ المشاركات في هذا المتصفح على هذا الجهاز.",
-    submitButton: "أضف إلى المعرض ↗", close: "إغلاق", storageShared: "تُرسل الصور إلى المعرض المشترك وتظهر بعد موافقة ENS MBZ عليها.",
-    storageLocal: "الرفع المشترك غير متصل حالياً. تُحفظ الصور التي تضيفها في هذا المتصفح على هذا الجهاز.",
+    jingleStatus: "♪ صوت الضرطة · يتكرر", jingleMutedStatus: "♪ صوت الضرطة · مكتوم", formEyebrow: "أضف إلى أرشيف ENS MBZ", formTitle: 'أرسل صوراً أو فيديو<span class="period">.</span>',
+    nameLabel: 'اسمك <span>(مطلوب)</span>', namePlaceholder: "من يرسل الصور أو الفيديو؟", filesLabel: 'صور أو فيديوهات <span>(مطلوب · الصور حتى ٥ م.ب. والفيديو حتى ٥٠ م.ب.)</span>',
+    chooseMedia: "اختر صوراً أو فيديوهات", noMediaSelected: "لم يتم اختيار ملفات", mediaSelected: "ملف تم اختياره", mediaSelectedMany: "ملفات تم اختيارها",
+    formHelp: "سيظهر اسمك بجانب الصور أو الفيديوهات. صيغة MP4 هي الأفضل؛ استخدم أدوات الفيديو لتشغيل الصوت. تظهر المشاركات بعد الموافقة.",
+    submitButton: "أضف إلى المعرض ↗", close: "إغلاق", storageShared: "تُرسل الصور والفيديوهات إلى المعرض المشترك وتظهر بعد موافقة ENS MBZ عليها.",
+    storageLocal: "الرفع المشترك غير متصل حالياً. تُحفظ الوسائط التي تضيفها في هذا المتصفح على هذا الجهاز.",
     objectOne: "صورة", objectMany: "صور", emptyGallery: "المعرض يأخذ قيلولة. أضف صورة لإيقاظه.",
     number: "رقم", addedBy: "أضافها", newArrival: "إضافة جديدة", expand: "تكبير", remove: "إزالة",
-    requiredName: "يرجى كتابة اسمك قبل الإرسال.", chooseImage: "يرجى اختيار صورة واحدة على الأقل.", sizeLimit: "يجب أن يكون حجم كل صورة أقل من ٥ ميغابايت.",
-    photosSubmitted: "صور تم إرسالها", photoSubmitted: "صورة تم إرسالها", afterApproval: "تُضاف الصور الجديدة إلى المعرض المشترك بعد الموافقة عليها.",
-    uploadFailed: "تعذّر رفع الصور", checkBucket: "تحقق من إعدادات Supabase ثم حاول مرة أخرى.", localSaveFailed: "تعذّر حفظ الصورة في هذا المتصفح. جرّب صورة أصغر أو متصفحاً آخر.",
+    requiredName: "يرجى كتابة اسمك قبل الإرسال.", chooseImage: "يرجى اختيار صورة أو فيديو واحد على الأقل.", sizeLimit: "يجب أن تكون الصور أصغر من ٥ م.ب. والفيديوهات أصغر من ٥٠ م.ب.",
+    photosSubmitted: "ملفات تم إرسالها", photoSubmitted: "ملف تم إرساله", afterApproval: "تُضاف الصور والفيديوهات الجديدة إلى المعرض المشترك بعد الموافقة عليها.",
+    uploadFailed: "تعذّر رفع الملف", checkBucket: "تحقق من حد حجم الملفات في Supabase وسياسات التخزين ثم حاول مجدداً.", localSaveFailed: "تعذّر حفظ الوسائط في هذا المتصفح. جرّب ملفاً أصغر أو متصفحاً آخر.",
     galleryLoadFailed: "تعذّر تحميل المعرض المشترك. تحقق من جدول Supabase وسياسات الوصول.",
     quipButton: "أطلق مزحة أخرى ↻", initialQuip: "يرجى العلم: ENS MBZ مشاغب معتمد.",
     footerNote: "متحف صغير على الإنترنت. ومشاغب كبير.", backTop: "العودة للأعلى ↑", languageButton: "English",
@@ -71,6 +71,10 @@ const arabicBasePhotoText = {
   "base-0822": { title: "لقطة التفكير العميق", caption: "نبحث عن آخر خلية دماغية...", tag: "جارٍ التحميل" },
   "base-0821": { title: "فيلسوف المقعد الخلفي", caption: "لديه أفكار. على ما يبدو.", tag: "نسخة الطريق" },
 };
+const videoFilePattern = /\.(mp4|m4v|mov|webm|ogv)$/i;
+function isVideoFile(file) {
+  return ["video/mp4", "video/webm", "video/quicktime", "video/ogg", "video/x-m4v"].includes(file.type.toLowerCase()) || videoFilePattern.test(file.name);
+}
 function photoText(photo, field) {
   return currentLanguage === "ar" ? (arabicBasePhotoText[photo.id]?.[field] || photo[field]) : photo[field];
 }
@@ -137,29 +141,47 @@ function render() {
   photos.forEach((photo, index) => {
     const card = document.createElement("article");
     card.className = "photo-card";
-    const imageButton = document.createElement("button");
-    imageButton.className = "photo-image";
-    imageButton.type = "button";
-    imageButton.setAttribute("aria-label", `${tr("expand")} ${photoText(photo, "title")}`);
-    const image = document.createElement("img");
-    image.src = photo.src || URL.createObjectURL(photo.blob);
-    image.alt = photoText(photo, "title");
-    image.loading = index < 3 ? "eager" : "lazy";
-    imageButton.append(image);
+    const mediaSrc = photo.src || (photo.blob ? URL.createObjectURL(photo.blob) : "");
+    const isVideo = photo.mediaType === "video" || photo.media_type === "video" || (photo.blob && isVideoFile(photo.blob)) || videoFilePattern.test(mediaSrc);
+    const mediaFrame = document.createElement(isVideo ? "div" : "button");
+    mediaFrame.className = "photo-image";
+    if (isVideo) {
+      const video = document.createElement("video");
+      video.className = "photo-video";
+      video.src = mediaSrc;
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.setAttribute("aria-label", photoText(photo, "title"));
+      mediaFrame.append(video);
+    } else {
+      mediaFrame.type = "button";
+      mediaFrame.setAttribute("aria-label", `${tr("expand")} ${photoText(photo, "title")}`);
+      const image = document.createElement("img");
+      image.src = mediaSrc;
+      image.alt = photoText(photo, "title");
+      image.loading = index < 3 ? "eager" : "lazy";
+      mediaFrame.append(image);
+      mediaFrame.addEventListener("click", () => {
+        const dialogImage = document.querySelector("#dialogImage");
+        const dialogVideo = document.querySelector("#dialogVideo");
+        dialogVideo.pause();
+        dialogVideo.hidden = true;
+        dialogImage.hidden = false;
+        dialogImage.src = image.src;
+        dialogImage.alt = photoText(photo, "title");
+        document.querySelector("#dialogCaption").textContent = `${photoText(photo, "title")} — ${photoText(photo, "caption")}`;
+        dialog.showModal();
+      });
+    }
     const number = document.createElement("span");
     number.className = "photo-index";
     const localizedIndex = currentLanguage === "ar"
       ? new Intl.NumberFormat("ar-AE", { minimumIntegerDigits: 3 }).format(index + 1)
       : String(index + 1).padStart(3, "0");
     number.textContent = `${tr("number")} ${localizedIndex}`;
-    imageButton.append(number);
-    imageButton.addEventListener("click", () => {
-      document.querySelector("#dialogImage").src = image.src;
-      document.querySelector("#dialogImage").alt = photoText(photo, "title");
-      document.querySelector("#dialogCaption").textContent = `${photoText(photo, "title")} — ${photoText(photo, "caption")}`;
-      dialog.showModal();
-    });
-    card.append(imageButton);
+    mediaFrame.append(number);
+    card.append(mediaFrame);
     if (photo.local) {
       const remove = document.createElement("button");
       remove.type = "button";
@@ -203,8 +225,8 @@ const choosePhotosButton = document.querySelector("#choosePhotosButton");
 const photoSelectionStatus = document.querySelector("#photoSelectionStatus");
 function updatePhotoSelectionStatus() {
   const selectedCount = input.files?.length || 0;
-  if (!selectedCount) photoSelectionStatus.textContent = tr("noPhotosSelected");
-  else photoSelectionStatus.textContent = `${selectedCount} ${selectedCount === 1 ? tr("photoSelected") : tr("photosSelected")}`;
+  if (!selectedCount) photoSelectionStatus.textContent = tr("noMediaSelected");
+  else photoSelectionStatus.textContent = `${selectedCount} ${selectedCount === 1 ? tr("mediaSelected") : tr("mediaSelectedMany")}`;
 }
 choosePhotosButton.addEventListener("click", () => input.click());
 input.addEventListener("change", updatePhotoSelectionStatus);
@@ -213,30 +235,31 @@ contributeDialog.addEventListener("click", (event) => { if (event.target === con
 contributeForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const uploader = document.querySelector("#submitterName").value.trim();
-  const files = [...input.files].filter((file) => file.type.startsWith("image/") || /\.(avif|bmp|gif|heic|heif|jpe?g|png|svg|tiff?|webp)$/i.test(file.name));
+  const files = [...input.files].filter((file) => file.type.startsWith("image/") || isVideoFile(file) || /\.(avif|bmp|gif|heic|heif|jpe?g|png|svg|tiff?|webp)$/i.test(file.name));
   const error = document.querySelector("#formError");
   if (!uploader) { error.textContent = tr("requiredName"); return; }
   if (!files.length) { error.textContent = tr("chooseImage"); return; }
-  if (files.some((file) => file.size > 5 * 1024 * 1024)) { error.textContent = tr("sizeLimit"); return; }
+  if (files.some((file) => file.size > (isVideoFile(file) ? 50 : 5) * 1024 * 1024)) { error.textContent = tr("sizeLimit"); return; }
   error.textContent = "";
   try {
     let submitted = 0;
     for (const file of files) {
       const title = file.name.replace(/\.[^.]+$/, "") || "A new masterpiece";
+      const mediaType = isVideoFile(file) ? "video" : "image";
       if (supabaseReady && supabaseClient) {
-        const extension = file.name.match(/\.[a-zA-Z0-9]{1,10}$/)?.[0]?.toLowerCase() || ".jpg";
-        const path = `photos/${crypto.randomUUID()}${extension}`;
-        const { error: uploadError } = await supabaseClient.storage.from("zayed-photos").upload(path, file, { upsert: false, contentType: file.type || "image/jpeg" });
+        const extension = file.name.match(/\.[a-zA-Z0-9]{1,10}$/)?.[0]?.toLowerCase() || (mediaType === "video" ? ".mp4" : ".jpg");
+        const path = `${mediaType === "video" ? "videos" : "photos"}/${crypto.randomUUID()}${extension}`;
+        const { error: uploadError } = await supabaseClient.storage.from("zayed-photos").upload(path, file, { upsert: false, contentType: file.type || (mediaType === "video" ? "video/mp4" : "image/jpeg") });
         if (uploadError) throw uploadError;
         const { data: urlData } = supabaseClient.storage.from("zayed-photos").getPublicUrl(path);
-        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, image_url: urlData.publicUrl, approved: false });
+        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, image_url: urlData.publicUrl, media_type: mediaType, approved: false });
         if (insertError) {
           await supabaseClient.storage.from("zayed-photos").remove([path]);
           throw insertError;
         }
         submitted++;
       } else {
-        const photo = { id: crypto.randomUUID(), blob: file, title, caption: "Freshly added to the collection.", tag: "NEW ARRIVAL", uploader, local: true };
+        const photo = { id: crypto.randomUUID(), blob: file, mediaType, title, caption: "Freshly added to the collection.", tag: "NEW ARRIVAL", uploader, local: true };
         await savePhoto(photo);
         addedPhotos.push(photo);
         submitted++;
@@ -260,6 +283,12 @@ for (const eventName of ["dragenter", "dragover"]) section.addEventListener(even
 for (const eventName of ["dragleave", "drop"]) section.addEventListener(eventName, (event) => { event.preventDefault(); if (eventName === "drop") { input.files = event.dataTransfer.files; input.dispatchEvent(new Event("change")); } section.classList.remove("dragging"); });
 document.querySelector("#dialogClose").addEventListener("click", () => dialog.close());
 dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+dialog.addEventListener("close", () => {
+  const video = document.querySelector("#dialogVideo");
+  video.pause();
+  video.removeAttribute("src");
+  video.load();
+});
 
 const quips = {
   en: [
@@ -379,7 +408,7 @@ document.addEventListener("keydown", () => {
 async function loadSharedPhotos() {
   if (!supabaseReady || !supabaseClient) return;
   const { data, error } = await supabaseClient.from("photo_submissions")
-    .select("id,name,image_url,created_at")
+    .select("id,name,image_url,media_type,created_at")
     .eq("approved", true)
     .order("created_at", { ascending: false });
   if (error) {
@@ -387,7 +416,7 @@ async function loadSharedPhotos() {
     return;
   }
   sharedPhotos = (data || []).map((row) => ({
-    id: `shared-${row.id}`, src: row.image_url, title: "A community masterpiece",
+    id: `shared-${row.id}`, src: row.image_url, mediaType: row.media_type || "image", title: "A community masterpiece",
     caption: "Freshly added to the collection.", tag: "COMMUNITY", uploader: row.name
   }));
   render();

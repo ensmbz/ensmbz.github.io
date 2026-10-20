@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=archive-delete-audio-toggle-1">
+  <link rel="stylesheet" href="style.css?v=video-audio-support-1">
 </head>
 <body>
   <div class="site-paused" id="sitePaused" hidden role="status" aria-live="polite">
@@ -63,22 +63,22 @@
   <dialog id="contributeDialog" class="contribute-dialog">
     <button class="dialog-close" id="contributeClose" aria-label="Close photo submission" data-i18n-aria-label="close" type="button">×</button>
     <form id="contributeForm">
-      <p class="eyebrow" data-i18n="formEyebrow">ADD TO THE ENS MBZ ARCHIVE</p><h2 data-i18n-html="formTitle">SUBMIT A PHOTO<span class="period">.</span></h2>
+      <p class="eyebrow" data-i18n="formEyebrow">ADD TO THE ENS MBZ ARCHIVE</p><h2 data-i18n-html="formTitle">SUBMIT MEDIA<span class="period">.</span></h2>
       <label for="submitterName" data-i18n-html="nameLabel">YOUR NAME <span>(required)</span></label><input id="submitterName" name="name" type="text" maxlength="40" autocomplete="name" placeholder="Who is submitting this?" data-i18n-placeholder="namePlaceholder" required>
-      <label id="photoFieldLabel" data-i18n-html="filesLabel">PHOTOS TO ADD <span>(required · choose from photos or camera)</span></label>
-      <input id="photoInput" name="photos" type="file" accept="image/*" multiple hidden aria-labelledby="photoFieldLabel">
-      <button class="photo-picker-button" id="choosePhotosButton" type="button"><span>＋</span><span data-i18n="choosePhotos">CHOOSE PHOTOS</span></button>
-      <p class="photo-selection-status" id="photoSelectionStatus" aria-live="polite" data-i18n="noPhotosSelected">No photos selected</p>
+      <label id="photoFieldLabel" data-i18n-html="filesLabel">PHOTOS OR VIDEOS <span>(required · photos up to 5 MB, videos up to 50 MB)</span></label>
+      <input id="photoInput" name="media" type="file" accept="image/*,video/*" multiple hidden aria-labelledby="photoFieldLabel">
+      <button class="photo-picker-button" id="choosePhotosButton" type="button"><span>＋</span><span data-i18n="chooseMedia">CHOOSE PHOTOS OR VIDEOS</span></button>
+      <p class="photo-selection-status" id="photoSelectionStatus" aria-live="polite" data-i18n="noMediaSelected">No media selected</p>
       <p class="form-help" data-i18n="formHelp">Your name will appear next to the photos. Submissions are saved in this browser on this device.</p>
       <p class="form-error" id="formError" role="alert"></p>
       <button class="submit-button" type="submit" data-i18n="submitButton">ADD TO THE GALLERY ↗</button>
     </form>
   </dialog>
-  <dialog id="photoDialog" class="photo-dialog"><button class="dialog-close" id="dialogClose" aria-label="Close photo" data-i18n-aria-label="close" type="button">×</button><img id="dialogImage" alt="Expanded gallery photograph"><p id="dialogCaption"></p></dialog>
+  <dialog id="photoDialog" class="photo-dialog"><button class="dialog-close" id="dialogClose" aria-label="Close photo" data-i18n-aria-label="close" type="button">×</button><img id="dialogImage" alt="Expanded gallery photograph"><video id="dialogVideo" controls playsinline preload="metadata" hidden></video><p id="dialogCaption"></p></dialog>
   <audio id="loopAudio" src="assets/dry-fart.mp3" loop preload="auto"></audio>
   <audio id="pauseAudio" src="assets/404.mp3" loop preload="none"></audio>
   <script src="supabase-config.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=archive-delete-audio-toggle-1"></script>
+  <script src="script.js?v=video-audio-support-1"></script>
 </body>
 </html>

@@ -29,6 +29,7 @@ type PhotoRecord = {
   id: number | string;
   name: string;
   image_url: string;
+  media_type?: "image" | "video";
   approved: boolean;
 };
 
@@ -339,12 +340,18 @@ async function postPendingPhoto(record: PhotoRecord): Promise<Response> {
   const channelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
   const token = requiredEnv("DISCORD_BOT_TOKEN");
   const safeName = record.name.replace(/[\r\n<>]/g, " ").slice(0, 60);
+  const isVideo = record.media_type === "video";
+  const submissionEmbed = isVideo
+    ? { title: APP_NAME, description: "Video submission — open the link in the message to play it with audio.", footer: { text: `Submission #${record.id}` } }
+    : { title: APP_NAME, image: { url: record.image_url }, footer: { text: `Submission #${record.id}` } };
   const posted = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
     method: "POST",
     headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
     body: JSON.stringify({
-      content: `📷 **New photo for review** · Submission #${record.id} · Added by ${safeName}`,
-      embeds: [{ title: APP_NAME, image: { url: record.image_url }, footer: { text: `Submission #${record.id}` } }],
+      content: isVideo
+        ? `🎞️ **New video for review** · Submission #${record.id} · Added by ${safeName}\n${record.image_url}`
+        : `📷 **New photo for review** · Submission #${record.id} · Added by ${safeName}`,
+      embeds: [submissionEmbed],
       components: buttonComponents(String(record.id)),
       allowed_mentions: { parse: [] },
     }),
@@ -370,12 +377,18 @@ async function postApprovedPhoto(record: PhotoRecord): Promise<boolean> {
   const channelId = requiredEnv("DISCORD_PHOTO_ARCHIVE_CHANNEL_ID");
   const token = requiredEnv("DISCORD_BOT_TOKEN");
   const safeName = record.name.replace(/[\r\n<>]/g, " ").slice(0, 60);
+  const isVideo = record.media_type === "video";
+  const approvedEmbed = isVideo
+    ? { title: APP_NAME, description: "Approved video — open the link in the message to play it with audio.", footer: { text: `Submission #${record.id}` } }
+    : { title: APP_NAME, image: { url: record.image_url }, footer: { text: `Submission #${record.id}` } };
   const posted = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
     method: "POST",
     headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
     body: JSON.stringify({
-      content: `📷 **Approved photo** · Submission #${record.id} · Added by ${safeName}`,
-      embeds: [{ title: APP_NAME, image: { url: record.image_url }, footer: { text: `Submission #${record.id}` } }],
+      content: isVideo
+        ? `🎞️ **Approved video** · Submission #${record.id} · Added by ${safeName}\n${record.image_url}`
+        : `📷 **Approved photo** · Submission #${record.id} · Added by ${safeName}`,
+      embeds: [approvedEmbed],
       components: archiveComponents(String(record.id)),
       allowed_mentions: { parse: [] },
     }),
@@ -471,7 +484,7 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
   const key = supabaseKey();
 
   if (action === "delete") {
-    const rowUrl = `${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(id)}&select=id,name,image_url,discord_archive_message_id`;
+    const rowUrl = `${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(id)}&select=id,name,image_url,media_type,discord_archive_message_id`;
     const selected = await fetch(rowUrl, { headers: supabaseHeaders(key) });
     if (!selected.ok) {
       console.error("Could not find photo before deletion", selected.status, await selected.text());
@@ -526,7 +539,7 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
     return json({
       type: 7,
       data: {
-        content: `🗑️ Photo deleted from the website.${cleanupNote}${archiveCleanupNote}${reviewerId ? ` Deleted by <@${reviewerId}>.` : ""}`,
+        content: `🗑️ Media deleted from the website.${cleanupNote}${archiveCleanupNote}${reviewerId ? ` Deleted by <@${reviewerId}>.` : ""}`,
         embeds: [],
         components: archiveComponents(id, true),
         allowed_mentions: { parse: [] },

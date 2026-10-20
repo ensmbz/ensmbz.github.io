@@ -147,6 +147,10 @@ body.is-site-paused { overflow: hidden; }
 .photo-picker-button span:first-child { font-size: 19px; line-height: 1; }
 .photo-selection-status { min-height: 16px; margin: -3px 0 4px; color: #77766e; font: 10px/1.5 var(--mono); }
 .contribute-dialog input[type=file][hidden] { display: none; }
+.photo-image { display: block; width: 100%; padding: 0; border: 0; }
+.photo-video { display: block; width: 100%; height: 100%; object-fit: contain; background: #171e1a; }
+.photo-dialog video { display: block; max-width: calc(90vw - 30px); max-height: 77vh; background: #171e1a; }
+.photo-dialog [hidden] { display: none !important; }
 
 html[dir="rtl"] body,
 html[dir="rtl"] button,
