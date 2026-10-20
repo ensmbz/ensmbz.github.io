@@ -26,8 +26,7 @@ const translations = {
     objectOne: "OBJECT", objectMany: "OBJECTS", emptyGallery: "THE GALLERY IS TAKING A NAP. ADD A PHOTO TO WAKE IT UP.",
     number: "NO.", addedBy: "Added by", newArrival: "NEW ARRIVAL", expand: "Expand", remove: "Remove",
     requiredName: "Please enter your name before submitting.", chooseImage: "Please choose at least one image.", sizeLimit: "Each photo must be smaller than 5 MB.",
-    duplicates: "Those photos already appear in the gallery or look like existing photos. No duplicates were added.",
-    photosSubmitted: "photos submitted", photoSubmitted: "photo submitted", duplicateSkipped: "duplicate(s) skipped", afterApproval: "New photos join the shared gallery after approval.",
+    photosSubmitted: "photos submitted", photoSubmitted: "photo submitted", afterApproval: "New photos join the shared gallery after approval.",
     uploadFailed: "Upload failed", checkBucket: "check the Supabase bucket and policies, then try again.", localSaveFailed: "This browser couldn't save the photo. Try a smaller image or another browser.",
     galleryLoadFailed: "The shared gallery could not load. Check the Supabase table and access policies.",
     quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
@@ -55,8 +54,7 @@ const translations = {
     objectOne: "صورة", objectMany: "صور", emptyGallery: "المعرض يأخذ قيلولة. أضف صورة لإيقاظه.",
     number: "رقم", addedBy: "أضافها", newArrival: "إضافة جديدة", expand: "تكبير", remove: "إزالة",
     requiredName: "يرجى كتابة اسمك قبل الإرسال.", chooseImage: "يرجى اختيار صورة واحدة على الأقل.", sizeLimit: "يجب أن يكون حجم كل صورة أقل من ٥ ميغابايت.",
-    duplicates: "هذه الصور موجودة في المعرض أو تشبه صوراً موجودة. لم تتم إضافة نسخ مكررة.",
-    photosSubmitted: "صور تم إرسالها", photoSubmitted: "صورة تم إرسالها", duplicateSkipped: "نسخ مكررة تم تخطيها", afterApproval: "تُضاف الصور الجديدة إلى المعرض المشترك بعد الموافقة عليها.",
+    photosSubmitted: "صور تم إرسالها", photoSubmitted: "صورة تم إرسالها", afterApproval: "تُضاف الصور الجديدة إلى المعرض المشترك بعد الموافقة عليها.",
     uploadFailed: "تعذّر رفع الصور", checkBucket: "تحقق من إعدادات Supabase ثم حاول مرة أخرى.", localSaveFailed: "تعذّر حفظ الصورة في هذا المتصفح. جرّب صورة أصغر أو متصفحاً آخر.",
     galleryLoadFailed: "تعذّر تحميل المعرض المشترك. تحقق من جدول Supabase وسياسات الوصول.",
     quipButton: "أطلق مزحة أخرى ↻", initialQuip: "يرجى العلم: ENS MBZ مشاغب معتمد.",
@@ -95,92 +93,6 @@ const dbPromise = new Promise((resolve) => {
   request.onerror = () => resolve(null);
 });
 let addedPhotos = [];
-let basePhotoHashesPromise;
-
-async function hashPhoto(file) {
-  const bytes = await file.arrayBuffer();
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-async function perceptualHashPhoto(file) {
-  const bitmap = await createImageBitmap(file);
-  try {
-    const canvas = document.createElement("canvas");
-    canvas.width = 32;
-    canvas.height = 32;
-    const context = canvas.getContext("2d", { willReadFrequently: true });
-    if (!context) throw new Error("This browser cannot check photo duplicates.");
-    context.fillStyle = "#fff";
-    context.fillRect(0, 0, 32, 32);
-    context.drawImage(bitmap, 0, 0, 32, 32);
-    const { data } = context.getImageData(0, 0, 32, 32);
-    const gray = new Float64Array(32 * 32);
-    for (let i = 0; i < gray.length; i++) {
-      const p = i * 4;
-      gray[i] = 0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2];
-    }
-
-    const cosine = Array.from({ length: 8 }, (_, frequency) =>
-      Float64Array.from({ length: 32 }, (_, position) => Math.cos(((2 * position + 1) * frequency * Math.PI) / 64)));
-    const coefficients = new Float64Array(64);
-    let index = 0;
-    for (let v = 0; v < 8; v++) {
-      for (let u = 0; u < 8; u++) {
-        let sum = 0;
-        for (let y = 0; y < 32; y++) {
-          const yWeight = cosine[v][y];
-          for (let x = 0; x < 32; x++) sum += gray[y * 32 + x] * cosine[u][x] * yWeight;
-        }
-        coefficients[index++] = sum;
-      }
-    }
-
-    const lowFrequencies = [...coefficients.slice(1)].sort((a, b) => a - b);
-    const median = lowFrequencies[Math.floor(lowFrequencies.length / 2)];
-    let hash = "";
-    for (let i = 0; i < coefficients.length; i += 4) {
-      let nibble = 0;
-      for (let bit = 0; bit < 4; bit++) nibble = (nibble << 1) | (coefficients[i + bit] > median ? 1 : 0);
-      hash += nibble.toString(16);
-    }
-    return hash;
-  } finally {
-    bitmap.close?.();
-  }
-}
-
-function perceptualHashesMatch(left, right, threshold = 6) {
-  if (!/^[0-9a-f]{16}$/i.test(left || "") || !/^[0-9a-f]{16}$/i.test(right || "")) return false;
-  let distance = 0;
-  for (let i = 0; i < 16; i++) {
-    let bits = Number.parseInt(left[i], 16) ^ Number.parseInt(right[i], 16);
-    while (bits) { distance++; bits &= bits - 1; }
-    if (distance > threshold) return false;
-  }
-  return true;
-}
-
-async function hasBasePhotoDuplicate(visualHash) {
-  if (!basePhotoHashesPromise) {
-    basePhotoHashesPromise = Promise.all(basePhotos.map(async (photo) => {
-      try {
-        const response = await fetch(photo.src);
-        if (!response.ok) return null;
-        return await perceptualHashPhoto(await response.blob());
-      } catch {
-        return null;
-      }
-    }));
-  }
-  const hashes = await basePhotoHashesPromise;
-  return hashes.some((hash) => perceptualHashesMatch(hash, visualHash));
-}
-
-function isDuplicatePhotoError(error) {
-  return error?.code === "23505" || error?.statusCode === "409" || /already exists|duplicate/i.test(error?.message || "");
-}
-
 async function readPhotos() {
   const db = await dbPromise;
   if (!db) return [];
@@ -309,65 +221,33 @@ contributeForm.addEventListener("submit", async (event) => {
   error.textContent = "";
   try {
     let submitted = 0;
-    let duplicates = 0;
     for (const file of files) {
       const title = file.name.replace(/\.[^.]+$/, "") || "A new masterpiece";
-      const contentHash = await hashPhoto(file);
-      const visualHash = await perceptualHashPhoto(file);
-      if (await hasBasePhotoDuplicate(visualHash)) { duplicates++; continue; }
       if (supabaseReady && supabaseClient) {
-        const { data: isDuplicate, error: duplicateCheckError } = await supabaseClient.rpc("is_duplicate_photo", {
-          candidate_hash: visualHash,
-          candidate_content_hash: contentHash,
-          max_distance: 6,
-        });
-        if (duplicateCheckError) throw new Error("Duplicate checking is not set up yet. Please tell the site owner to apply the Supabase photo-deduplication migration.");
-        if (isDuplicate) { duplicates++; continue; }
-
-        // Keep the exact-content path for compatibility and let Supabase also
-        // compare visual hashes to catch resized or recompressed copies.
         const extension = file.name.match(/\.[a-zA-Z0-9]{1,10}$/)?.[0]?.toLowerCase() || ".jpg";
-        const path = `photos/${contentHash}${extension}`;
+        const path = `photos/${crypto.randomUUID()}${extension}`;
         const { error: uploadError } = await supabaseClient.storage.from("zayed-photos").upload(path, file, { upsert: false, contentType: file.type || "image/jpeg" });
-        if (uploadError) {
-          if (isDuplicatePhotoError(uploadError)) { duplicates++; continue; }
-          throw uploadError;
-        }
+        if (uploadError) throw uploadError;
         const { data: urlData } = supabaseClient.storage.from("zayed-photos").getPublicUrl(path);
-        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, image_url: urlData.publicUrl, approved: false, content_hash: contentHash, perceptual_hash: visualHash });
+        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, image_url: urlData.publicUrl, approved: false });
         if (insertError) {
           await supabaseClient.storage.from("zayed-photos").remove([path]);
-          if (insertError.code === "23505" || /duplicate photo/i.test(insertError.message || "")) { duplicates++; continue; }
           throw insertError;
         }
         submitted++;
       } else {
-        let isLocalDuplicate = false;
-        for (const photo of addedPhotos) {
-          const oldVisualHash = photo.perceptualHash || (photo.blob ? await perceptualHashPhoto(photo.blob) : null);
-          if (photo.contentHash === contentHash || perceptualHashesMatch(oldVisualHash, visualHash)) {
-            isLocalDuplicate = true;
-            break;
-          }
-        }
-        if (isLocalDuplicate) { duplicates++; continue; }
-        const photo = { id: crypto.randomUUID(), blob: file, contentHash, perceptualHash: visualHash, title, caption: "Freshly added to the collection.", tag: "NEW ARRIVAL", uploader, local: true };
+        const photo = { id: crypto.randomUUID(), blob: file, title, caption: "Freshly added to the collection.", tag: "NEW ARRIVAL", uploader, local: true };
         await savePhoto(photo);
         addedPhotos.push(photo);
         submitted++;
       }
-    }
-    if (!submitted && duplicates) {
-      error.textContent = tr("duplicates");
-      return;
     }
     contributeForm.reset();
     updatePhotoSelectionStatus();
     contributeDialog.close();
     if (supabaseReady) {
       const submittedText = `${submitted} ${submitted === 1 ? tr("photoSubmitted") : tr("photosSubmitted")}`;
-      const duplicateText = duplicates ? `; ${duplicates} ${tr("duplicateSkipped")}` : "";
-      storageNote.textContent = `${submittedText}${duplicateText}. ${tr("afterApproval")}`;
+      storageNote.textContent = `${submittedText}. ${tr("afterApproval")}`;
     }
     render();
   } catch (uploadError) {

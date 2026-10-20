@@ -1,6 +1,12 @@
 const encoder = new TextEncoder();
 const APP_NAME = "ENS MBZ Photo Review";
 const APPROVER_ROLE_ID = "1561872957670826135";
+const SITE_CONTROL_ROLE_ID = "1561871834545266798";
+const CORS_HEADERS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-headers": "authorization, x-client-info, apikey, content-type",
+  "access-control-allow-methods": "GET, POST, OPTIONS",
+};
 const SITE_COMMAND = {
   name: "site",
   description: "Turn the ENS MBZ photo site on or off",
@@ -32,7 +38,7 @@ type DatabaseWebhook = {
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8" },
+    headers: { ...CORS_HEADERS, "content-type": "application/json; charset=utf-8" },
   });
 }
 
@@ -59,6 +65,26 @@ function buttonComponents(id: string, state: "pending" | "reviewed" | "deleted" 
       { type: 2, style: 4, label: "Delete photo", custom_id: `ensmbz:delete:${id}`, disabled: isDeleted },
     ],
   }];
+}
+
+function archiveComponents(id: string, deleted = false) {
+  return [{
+    type: 1,
+    components: [{ type: 2, style: 4, label: deleted ? "Deleted" : "Delete photo", custom_id: `ensmbz:delete:${id}`, disabled: deleted }],
+  }];
+}
+
+function siteCommandAction(options: unknown): "on" | "off" | null {
+  if (!Array.isArray(options)) return null;
+  for (const option of options) {
+    if (!option || typeof option !== "object") continue;
+    if ((option as Record<string, unknown>).name === "on" || (option as Record<string, unknown>).name === "off") {
+      return (option as Record<string, unknown>).name as "on" | "off";
+    }
+    const nested = siteCommandAction((option as Record<string, unknown>).options);
+    if (nested) return nested;
+  }
+  return null;
 }
 
 function supabaseKey(): string {
@@ -108,18 +134,46 @@ async function handleSiteCommand(interaction: Record<string, any>): Promise<Resp
     return json({ type: 4, data: { content: "Use /site in the private photo-review channel.", flags: 64 } });
   }
   const memberRoles: unknown = interaction.member?.roles;
-  if (!Array.isArray(memberRoles) || !memberRoles.includes(APPROVER_ROLE_ID)) {
-    return json({ type: 4, data: { content: "You need the Photo Approver role to control the site.", flags: 64 } });
+  if (!Array.isArray(memberRoles) || !memberRoles.includes(SITE_CONTROL_ROLE_ID)) {
+    return json({ type: 4, data: { content: "You need the King role to control the site.", flags: 64 } });
   }
-  const action = interaction.data?.options?.[0]?.name;
+  const action = siteCommandAction(interaction.data?.options) ??
+    (interaction.data?.name === "on" || interaction.data?.name === "off" ? interaction.data.name : null);
   if (action !== "on" && action !== "off") {
     return json({ type: 4, data: { content: "Choose /site on or /site off.", flags: 64 } });
   }
   const isLive = action === "on";
-  if (!await setSiteLive(isLive)) {
-    return json({ type: 4, data: { content: "I couldn't update the site. Check that the site_control SQL setup was applied.", flags: 64 } });
+  const applicationId = String(interaction.application_id || "");
+  const token = String(interaction.token || "");
+  if (!applicationId || !token) {
+    return json({ type: 4, data: { content: "Discord did not provide a response token. Try the command again.", flags: 64 } });
   }
-  return json({ type: 4, data: { content: isLive ? "✅ The website is back on." : "⏸️ The website is paused.", flags: 64 } });
+
+  const finishCommand = async () => {
+    let content: string;
+    try {
+      const updated = await setSiteLive(isLive);
+      content = updated
+        ? (isLive ? "✅ The website is back on." : "⏸️ The website is paused.")
+        : "I couldn't update the site. Check that the site_control SQL setup was applied.";
+    } catch (error) {
+      console.error("Could not update site status", error);
+      content = "I couldn't update the site. Check the Supabase function secrets and site_control setup.";
+    }
+
+    const edited = await fetch(`https://discord.com/api/v10/webhooks/${applicationId}/${token}/messages/@original`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ content }),
+    });
+    if (!edited.ok) console.error("Could not send the /site result to Discord", edited.status, await edited.text());
+  };
+  const backgroundTask = finishCommand().catch((error) => console.error("Could not finish /site command", error));
+  const runtime = (globalThis as typeof globalThis & { EdgeRuntime?: { waitUntil: (promise: Promise<unknown>) => void } }).EdgeRuntime;
+  if (runtime) runtime.waitUntil(backgroundTask);
+  else await backgroundTask;
+
+  return json({ type: 5, data: { flags: 64 } });
 }
 
 async function registerSiteCommand(): Promise<Response> {
@@ -188,6 +242,36 @@ async function postPendingPhoto(record: PhotoRecord): Promise<Response> {
   return json({ ok: true });
 }
 
+async function postApprovedPhoto(record: PhotoRecord): Promise<boolean> {
+  const channelId = requiredEnv("DISCORD_PHOTO_ARCHIVE_CHANNEL_ID");
+  const token = requiredEnv("DISCORD_BOT_TOKEN");
+  const safeName = record.name.replace(/[\r\n<>]/g, " ").slice(0, 60);
+  const posted = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+    method: "POST",
+    headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({
+      content: `📷 **Approved photo** · Submission #${record.id} · Added by ${safeName}`,
+      embeds: [{ title: APP_NAME, image: { url: record.image_url }, footer: { text: `Submission #${record.id}` } }],
+      components: archiveComponents(String(record.id)),
+      allowed_mentions: { parse: [] },
+    }),
+  });
+  const message = await posted.json().catch(() => ({}));
+  if (!posted.ok || !message.id) {
+    console.error("Could not post approved photo to archive", posted.status);
+    return false;
+  }
+  const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
+  const key = supabaseKey();
+  const saved = await fetch(`${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(String(record.id))}`, {
+    method: "PATCH",
+    headers: { ...supabaseHeaders(key), prefer: "return=minimal" },
+    body: JSON.stringify({ discord_archive_message_id: String(message.id) }),
+  });
+  if (!saved.ok) console.error("Could not save archive message ID", saved.status);
+  return true;
+}
+
 async function handleDatabaseWebhook(request: Request, body: string): Promise<Response> {
   const secret = Deno.env.get("DB_WEBHOOK_SECRET");
   if (!secret || request.headers.get("x-review-hook") !== secret) {
@@ -219,24 +303,33 @@ async function verifyDiscordSignature(request: Request, body: string): Promise<b
 
 async function handleButton(interaction: Record<string, any>): Promise<Response> {
   const appId = requiredEnv("DISCORD_APPLICATION_ID");
-  const channelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
-  if (interaction.application_id !== appId || interaction.channel_id !== channelId || !interaction.guild_id) {
-    return json({ type: 4, data: { content: "Use the buttons in the private photo-review channel.", flags: 64 } });
-  }
-
-  const memberRoles: unknown = interaction.member?.roles;
-  if (!Array.isArray(memberRoles) || !memberRoles.includes(APPROVER_ROLE_ID)) {
-    return json({ type: 4, data: { content: "You need the Photo Approver role to review submissions.", flags: 64 } });
+  const reviewChannelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
+  const archiveChannelId = Deno.env.get("DISCORD_PHOTO_ARCHIVE_CHANNEL_ID")?.trim();
+  const inArchive = Boolean(archiveChannelId && interaction.channel_id === archiveChannelId);
+  const inReview = interaction.channel_id === reviewChannelId;
+  if (interaction.application_id !== appId || (!inReview && !inArchive) || !interaction.guild_id) {
+    return json({ type: 4, data: { content: "Use the buttons in the private photo-review or photo-archive channel.", flags: 64 } });
   }
 
   const match = /^ensmbz:(approve|decline|delete):(\d{1,19})$/.exec(String(interaction.data?.custom_id || ""));
-  if (!match) return json({ type: 4, data: { content: "That review action is not valid.", flags: 64 } });
+  if (!match) return json({ type: 4, data: { content: "That photo action is not valid.", flags: 64 } });
   const [, action, id] = match;
+  const memberRoles: unknown = interaction.member?.roles;
+  const hasRole = (roleId: string) => Array.isArray(memberRoles) && memberRoles.includes(roleId);
+  if (inArchive && (action !== "delete" || !hasRole(SITE_CONTROL_ROLE_ID))) {
+    return json({ type: 4, data: { content: "You need the King role to delete archived photos.", flags: 64 } });
+  }
+  if (inReview && action === "delete" && !hasRole(APPROVER_ROLE_ID) && !hasRole(SITE_CONTROL_ROLE_ID)) {
+    return json({ type: 4, data: { content: "You need the King or Photo Approver role to delete photos.", flags: 64 } });
+  }
+  if (inReview && action !== "delete" && !hasRole(APPROVER_ROLE_ID)) {
+    return json({ type: 4, data: { content: "You need the Photo Approver role to review submissions.", flags: 64 } });
+  }
   const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
   const key = supabaseKey();
 
   if (action === "delete") {
-    const rowUrl = `${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(id)}&select=id,name,image_url`;
+    const rowUrl = `${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(id)}&select=id,name,image_url,discord_archive_message_id`;
     const selected = await fetch(rowUrl, { headers: supabaseHeaders(key) });
     if (!selected.ok) {
       console.error("Could not find photo before deletion", selected.status, await selected.text());
@@ -275,14 +368,25 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
       headers: { apikey: key, authorization: `Bearer ${key}` },
     });
     const reviewerId = interaction.member?.user?.id || interaction.user?.id;
+    let archiveCleanupNote = "";
+    if (!inArchive && rows[0].discord_archive_message_id && archiveChannelId) {
+      const archiveRemoval = await fetch(`https://discord.com/api/v10/channels/${archiveChannelId}/messages/${encodeURIComponent(String(rows[0].discord_archive_message_id))}`, {
+        method: "DELETE",
+        headers: { authorization: `Bot ${requiredEnv("DISCORD_BOT_TOKEN")}` },
+      });
+      if (!archiveRemoval.ok && archiveRemoval.status !== 404) {
+        archiveCleanupNote = " The archive post could not be removed; delete it manually in #photo-archive.";
+        console.error("Could not remove deleted photo from archive", archiveRemoval.status, await archiveRemoval.text());
+      }
+    }
     const cleanupNote = removedFile.ok ? " The uploaded file was removed too." : " The gallery entry is gone, but storage cleanup failed; check Supabase Storage.";
     if (!removedFile.ok) console.error("Gallery row deleted but Storage cleanup failed", removedFile.status, await removedFile.text());
     return json({
       type: 7,
       data: {
-        content: `🗑️ Photo deleted from the website.${cleanupNote}${reviewerId ? ` Deleted by <@${reviewerId}>.` : ""}`,
+        content: `🗑️ Photo deleted from the website.${cleanupNote}${archiveCleanupNote}${reviewerId ? ` Deleted by <@${reviewerId}>.` : ""}`,
         embeds: [],
-        components: buttonComponents(id, "deleted"),
+        components: inArchive ? archiveComponents(id, true) : buttonComponents(id, "deleted"),
         allowed_mentions: { parse: [] },
       },
     });
@@ -309,11 +413,16 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
   const actionText = approved
     ? "✅ Approved — this photo is now on the website."
     : "🚫 Declined — this photo will not appear on the website.";
+  const archived = approved ? await postApprovedPhoto(rows[0] as PhotoRecord).catch((error) => {
+    console.error("Approved photo could not be archived", error);
+    return false;
+  }) : false;
   const reviewerId = interaction.member?.user?.id || interaction.user?.id;
+  const archiveNote = approved && !archived ? " ⚠️ It is on the website, but could not be posted to #photo-archive." : "";
   return json({
     type: 7,
     data: {
-      content: `${actionText}${reviewerId ? ` Reviewed by <@${reviewerId}>.` : ""}`,
+        content: `${actionText}${archiveNote}${reviewerId ? ` Reviewed by <@${reviewerId}>.` : ""}`,
       embeds: Array.isArray(interaction.message?.embeds) ? interaction.message.embeds : [],
       components: buttonComponents(id, "reviewed"),
       allowed_mentions: { parse: [] },
@@ -322,6 +431,7 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
 }
 
 Deno.serve(async (request: Request) => {
+  if (request.method === "OPTIONS") return new Response("ok", { headers: CORS_HEADERS });
   const pathname = new URL(request.url).pathname;
   if (pathname.endsWith("/site-control") && request.method === "GET") {
     try {
@@ -353,7 +463,14 @@ Deno.serve(async (request: Request) => {
     if (interaction.application_id !== requiredEnv("DISCORD_APPLICATION_ID")) return json({ error: "Wrong application" }, 401);
     if (interaction.type === 1) return json({ type: 1 });
     if (interaction.type === 3) return await handleButton(interaction);
-    if (interaction.type === 2 && interaction.data?.name === "site") return await handleSiteCommand(interaction);
+    if (interaction.type === 2 && (
+      interaction.data?.name === "site" ||
+      interaction.data?.name === "on" ||
+      interaction.data?.name === "off" ||
+      siteCommandAction(interaction.data?.options)
+    )) {
+      return await handleSiteCommand(interaction);
+    }
     return json({ type: 4, data: { content: "This interaction is not supported.", flags: 64 } });
   } catch (error) {
     console.error("Photo review function failed", error);
