@@ -3,6 +3,77 @@ const basePhotos = [
   { id: "base-0822", src: "assets/IMG_0822.PNG", title: "The thinking close-up", caption: "Searching for the last brain cell…", tag: "LOADING..." },
   { id: "base-0821", src: "assets/IMG_0821.PNG", title: "Backseat philosopher", caption: "Has thoughts. We assume.", tag: "ROAD EDITION" }
 ];
+const translations = {
+  en: {
+    pauseEyebrow: "ENS MBZ PHOTO MUSEUM", pauseTitle: 'TAKING A<br>BREAK<span class="period">.</span>',
+    pausedMessage: "The site owner has paused the museum. Please check back later.",
+    ticker: "★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★",
+    navGallery: "THE GALLERY", navAbout: "ABOUT THIS MASTERPIECE", autoAudio: "AUTO-LOOP AUDIO",
+    heroEyebrow: "ENS MBZ ARCHIVE · THINKING NOT REQUIRED", heroTitle: 'THE<br><span class="headline-last">ENS MBZ</span> MUSEUM<span class="period">.</span>',
+    heroDescription: "A collection of moments, expressions, and one unexpected meeting with lunch. Certified goofball. Questionable decisions. Excellent photo collection.",
+    tourLink: "TAKE THE TOUR", scribbleOne: "brain cell<br>loading...", scribbleTwo: "← swipe<br>for evidence",
+    scrollExhibition: "SCROLL FOR THE EXHIBITION", figureLabel: "FIG. 001 — ∞", collection: "THE PERMANENT COLLECTION",
+    galleryTitle: 'THE GALLERY<span class="period">.</span>', addPhotos: "ADD YOUR PHOTOS", galleryNote: "Museum rule #1: there are no bad angles, only interesting evidence.",
+    dropHint: 'Got more? Drop photos anywhere in the gallery or tap “Add your photos”.', soundtrackEyebrow: "PLEASE ENJOY ENS MBZ'S VERY SERIOUS SOUNDTRACK",
+    themeStamp: "ENS MBZ'S<br>OFFICIAL<br>THEME", jingleTitle: "THE OFFICIAL<br>ENS MBZ <em>JINGLE.</em>",
+    jingleDescription: "ENS MBZ's signature sound effect, on an endless loop. Your browser may require a tap anywhere on the page before it allows audio.",
+    jingleStatus: "♪ DRY FART · ON REPEAT", formEyebrow: "ADD TO THE ENS MBZ ARCHIVE", formTitle: 'SUBMIT A PHOTO<span class="period">.</span>',
+    nameLabel: 'YOUR NAME <span>(required)</span>', namePlaceholder: "Who is submitting this?", filesLabel: 'PHOTO FILES <span>(required · choose from photos or camera)</span>',
+    formHelp: "Your name will appear next to the photos. Submissions are saved in this browser on this device.",
+    submitButton: "ADD TO THE GALLERY ↗", close: "Close", storageShared: "Photos are submitted to the shared gallery and appear after ENS MBZ approves them.",
+    storageLocal: "Shared uploads are not connected yet. Photos you add are saved in this browser on this device.",
+    objectOne: "OBJECT", objectMany: "OBJECTS", emptyGallery: "THE GALLERY IS TAKING A NAP. ADD A PHOTO TO WAKE IT UP.",
+    number: "NO.", addedBy: "Added by", newArrival: "NEW ARRIVAL", expand: "Expand", remove: "Remove",
+    requiredName: "Please enter your name before submitting.", chooseImage: "Please choose at least one image.", sizeLimit: "Each photo must be smaller than 5 MB.",
+    duplicates: "Those photos already appear in the gallery or look like existing photos. No duplicates were added.",
+    photosSubmitted: "photos submitted", photoSubmitted: "photo submitted", duplicateSkipped: "duplicate(s) skipped", afterApproval: "New photos join the shared gallery after approval.",
+    uploadFailed: "Upload failed", checkBucket: "check the Supabase bucket and policies, then try again.", localSaveFailed: "This browser couldn't save the photo. Try a smaller image or another browser.",
+    galleryLoadFailed: "The shared gallery could not load. Check the Supabase table and access policies.",
+    quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
+    footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية (الإمارات)",
+  },
+  ar: {
+    pauseEyebrow: "متحف صور المدرسة الإماراتية في مدينة زايد", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
+    pausedMessage: "أوقف مالك الموقع المتحف مؤقتاً. تفقّد الموقع لاحقاً.",
+    ticker: "★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★",
+    navGallery: "المعرض", navAbout: "عن هذه التحفة", autoAudio: "صوت متكرر تلقائياً",
+    heroEyebrow: "أرشيف المدرسة الإماراتية · التفكير غير مطلوب", heroTitle: 'متحف<br><span class="headline-last">ENS MBZ</span><span class="period">.</span>',
+    heroDescription: "مجموعة من اللحظات والتعابير ولقاء غير متوقع مع الغداء. خفة ظل معتمدة، وقرارات مثيرة للجدل، ومجموعة صور ممتازة.",
+    tourLink: "ابدأ الجولة", scribbleOne: "خلية دماغية<br>جارٍ التحميل...", scribbleTwo: "← اسحب<br>لرؤية الأدلة",
+    scrollExhibition: "مرّر لاستكشاف المعرض", figureLabel: "الصورة ٠٠١ — ∞", collection: "المجموعة الدائمة",
+    galleryTitle: 'المعرض<span class="period">.</span>', addPhotos: "أضف صورك", galleryNote: "قاعدة المتحف الأولى: لا توجد زوايا سيئة، بل أدلة مثيرة للاهتمام.",
+    dropHint: 'هل لديك المزيد؟ أفلِت الصور في أي مكان بالمعرض أو اضغط «أضف صورك».', soundtrackEyebrow: "استمتعوا بالموسيقى الرسمية والجدية جداً لـ ENS MBZ",
+    themeStamp: "النشيد<br>الرسمي<br>لـ ENS MBZ", jingleTitle: 'النشيد الرسمي<br>لـ ENS MBZ<span class="period">.</span>',
+    jingleDescription: "المؤثر الصوتي المميز لـ ENS MBZ، في تكرار مستمر. قد يحتاج المتصفح إلى نقرة على الصفحة قبل تشغيل الصوت.",
+    jingleStatus: "♪ صوت ضرطة · يتكرر", formEyebrow: "أضف إلى أرشيف ENS MBZ", formTitle: 'أرسل صورة<span class="period">.</span>',
+    nameLabel: 'اسمك <span>(مطلوب)</span>', namePlaceholder: "من يرسل الصورة؟", filesLabel: 'ملفات الصور <span>(مطلوبة · اختر من الصور أو الكاميرا)</span>',
+    formHelp: "سيظهر اسمك بجانب الصور. تُحفظ المشاركات في هذا المتصفح على هذا الجهاز.",
+    submitButton: "أضف إلى المعرض ↗", close: "إغلاق", storageShared: "تُرسل الصور إلى المعرض المشترك وتظهر بعد موافقة ENS MBZ عليها.",
+    storageLocal: "الرفع المشترك غير متصل حالياً. تُحفظ الصور التي تضيفها في هذا المتصفح على هذا الجهاز.",
+    objectOne: "صورة", objectMany: "صور", emptyGallery: "المعرض يأخذ قيلولة. أضف صورة لإيقاظه.",
+    number: "رقم", addedBy: "أضافها", newArrival: "إضافة جديدة", expand: "تكبير", remove: "إزالة",
+    requiredName: "يرجى كتابة اسمك قبل الإرسال.", chooseImage: "يرجى اختيار صورة واحدة على الأقل.", sizeLimit: "يجب أن يكون حجم كل صورة أقل من ٥ ميغابايت.",
+    duplicates: "هذه الصور موجودة في المعرض أو تشبه صوراً موجودة. لم تتم إضافة نسخ مكررة.",
+    photosSubmitted: "صور تم إرسالها", photoSubmitted: "صورة تم إرسالها", duplicateSkipped: "نسخ مكررة تم تخطيها", afterApproval: "تُضاف الصور الجديدة إلى المعرض المشترك بعد الموافقة عليها.",
+    uploadFailed: "تعذّر رفع الصور", checkBucket: "تحقق من إعدادات Supabase ثم حاول مرة أخرى.", localSaveFailed: "تعذّر حفظ الصورة في هذا المتصفح. جرّب صورة أصغر أو متصفحاً آخر.",
+    galleryLoadFailed: "تعذّر تحميل المعرض المشترك. تحقق من جدول Supabase وسياسات الوصول.",
+    quipButton: "أطلق مزحة أخرى ↻", initialQuip: "يرجى العلم: ENS MBZ مشاغب معتمد.",
+    footerNote: "متحف صغير على الإنترنت. ومشاغب كبير.", backTop: "العودة للأعلى ↑", languageButton: "English",
+  },
+};
+let currentLanguage = (() => {
+  try { return localStorage.getItem("ensmbz-language") === "ar" ? "ar" : "en"; }
+  catch { return "en"; }
+})();
+function tr(key) { return translations[currentLanguage][key] ?? translations.en[key] ?? key; }
+const arabicBasePhotoText = {
+  "base-0823": { title: "ENS MBZ في مواجهة الغداء", caption: "الأرز فيه خلايا دماغية أكثر. غالباً.", tag: "حادثة الأرز" },
+  "base-0822": { title: "لقطة التفكير العميق", caption: "نبحث عن آخر خلية دماغية...", tag: "جارٍ التحميل" },
+  "base-0821": { title: "فيلسوف المقعد الخلفي", caption: "لديه أفكار. على ما يبدو.", tag: "نسخة الطريق" },
+};
+function photoText(photo, field) {
+  return currentLanguage === "ar" ? (arabicBasePhotoText[photo.id]?.[field] || photo[field]) : photo[field];
+}
 const grid = document.querySelector("#photoGrid");
 const input = document.querySelector("#photoInput");
 const count = document.querySelector("#photoCount");
@@ -138,11 +209,14 @@ async function deletePhoto(id) {
 function render() {
   grid.replaceChildren();
   const photos = [...basePhotos, ...sharedPhotos, ...addedPhotos];
-  count.textContent = `${String(photos.length).padStart(2, "0")} OBJECT${photos.length === 1 ? "" : "S"}`;
+  const localizedCount = currentLanguage === "ar"
+    ? new Intl.NumberFormat("ar-AE", { minimumIntegerDigits: 2 }).format(photos.length)
+    : String(photos.length).padStart(2, "0");
+  count.textContent = `${localizedCount} ${photos.length === 1 ? tr("objectOne") : tr("objectMany")}`;
   if (!photos.length) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
-    empty.textContent = "THE GALLERY IS TAKING A NAP. ADD A PHOTO TO WAKE IT UP.";
+    empty.textContent = tr("emptyGallery");
     grid.append(empty);
     return;
   }
@@ -152,20 +226,23 @@ function render() {
     const imageButton = document.createElement("button");
     imageButton.className = "photo-image";
     imageButton.type = "button";
-    imageButton.setAttribute("aria-label", `Expand ${photo.title}`);
+    imageButton.setAttribute("aria-label", `${tr("expand")} ${photoText(photo, "title")}`);
     const image = document.createElement("img");
     image.src = photo.src || URL.createObjectURL(photo.blob);
-    image.alt = photo.title;
+    image.alt = photoText(photo, "title");
     image.loading = index < 3 ? "eager" : "lazy";
     imageButton.append(image);
     const number = document.createElement("span");
     number.className = "photo-index";
-    number.textContent = `NO. ${String(index + 1).padStart(3, "0")}`;
+    const localizedIndex = currentLanguage === "ar"
+      ? new Intl.NumberFormat("ar-AE", { minimumIntegerDigits: 3 }).format(index + 1)
+      : String(index + 1).padStart(3, "0");
+    number.textContent = `${tr("number")} ${localizedIndex}`;
     imageButton.append(number);
     imageButton.addEventListener("click", () => {
       document.querySelector("#dialogImage").src = image.src;
-      document.querySelector("#dialogImage").alt = photo.title;
-      document.querySelector("#dialogCaption").textContent = `${photo.title} — ${photo.caption}`;
+      document.querySelector("#dialogImage").alt = photoText(photo, "title");
+      document.querySelector("#dialogCaption").textContent = `${photoText(photo, "title")} — ${photoText(photo, "caption")}`;
       dialog.showModal();
     });
     card.append(imageButton);
@@ -174,7 +251,7 @@ function render() {
       remove.type = "button";
       remove.className = "remove-photo";
       remove.textContent = "×";
-      remove.setAttribute("aria-label", `Remove ${photo.title}`);
+      remove.setAttribute("aria-label", `${tr("remove")} ${photoText(photo, "title")}`);
       remove.addEventListener("click", async () => {
         await deletePhoto(photo.id);
         addedPhotos = addedPhotos.filter((item) => item.id !== photo.id);
@@ -187,14 +264,15 @@ function render() {
     const text = document.createElement("div");
     const title = document.createElement("div");
     title.className = "photo-title";
-    title.textContent = photo.title;
+    title.textContent = photoText(photo, "title");
     const caption = document.createElement("div");
     caption.className = "photo-caption";
-    caption.textContent = photo.uploader ? `${photo.caption} Added by ${photo.uploader}.` : photo.caption;
+    const captionText = photoText(photo, "caption");
+    caption.textContent = photo.uploader ? `${captionText} ${tr("addedBy")} ${photo.uploader}.` : captionText;
     text.append(title, caption);
     const tag = document.createElement("span");
     tag.className = "photo-tag";
-    tag.textContent = photo.tag || "NEW ARRIVAL";
+    tag.textContent = photoText(photo, "tag") || tr("newArrival");
     info.append(text, tag);
     card.append(info);
     grid.append(card);
@@ -204,11 +282,8 @@ function render() {
 const contributeDialog = document.querySelector("#contributeDialog");
 const contributeForm = document.querySelector("#contributeForm");
 const storageNote = document.querySelector("#storageNote");
-if (supabaseReady && supabaseClient) {
-  storageNote.textContent = "Photos are submitted to the shared gallery and appear after ENS MBZ approves them.";
-} else {
-  storageNote.textContent = "Shared uploads are not connected yet. Photos you add are saved in this browser on this device.";
-}
+const storageMessageKey = supabaseReady && supabaseClient ? "storageShared" : "storageLocal";
+storageNote.textContent = tr(storageMessageKey);
 document.querySelector("#addPhotos").addEventListener("click", () => contributeDialog.showModal());
 document.querySelector("#contributeClose").addEventListener("click", () => contributeDialog.close());
 contributeDialog.addEventListener("click", (event) => { if (event.target === contributeDialog) contributeDialog.close(); });
@@ -217,9 +292,9 @@ contributeForm.addEventListener("submit", async (event) => {
   const uploader = document.querySelector("#submitterName").value.trim();
   const files = [...input.files].filter((file) => file.type.startsWith("image/") || /\.(avif|bmp|gif|heic|heif|jpe?g|png|svg|tiff?|webp)$/i.test(file.name));
   const error = document.querySelector("#formError");
-  if (!uploader) { error.textContent = "Please enter your name before submitting."; return; }
-  if (!files.length) { error.textContent = "Please choose at least one image."; return; }
-  if (files.some((file) => file.size > 5 * 1024 * 1024)) { error.textContent = "Each photo must be smaller than 5 MB."; return; }
+  if (!uploader) { error.textContent = tr("requiredName"); return; }
+  if (!files.length) { error.textContent = tr("chooseImage"); return; }
+  if (files.some((file) => file.size > 5 * 1024 * 1024)) { error.textContent = tr("sizeLimit"); return; }
   error.textContent = "";
   try {
     let submitted = 0;
@@ -272,19 +347,21 @@ contributeForm.addEventListener("submit", async (event) => {
       }
     }
     if (!submitted && duplicates) {
-      error.textContent = "Those photos already appear in the gallery or look like existing photos. No duplicates were added.";
+      error.textContent = tr("duplicates");
       return;
     }
     contributeForm.reset();
     contributeDialog.close();
     if (supabaseReady) {
-      storageNote.textContent = `${submitted} photo${submitted === 1 ? "" : "s"} submitted${duplicates ? `; ${duplicates} duplicate${duplicates === 1 ? "" : "s"} skipped` : ""}. New photos join the shared gallery after approval.`;
+      const submittedText = `${submitted} ${submitted === 1 ? tr("photoSubmitted") : tr("photosSubmitted")}`;
+      const duplicateText = duplicates ? `; ${duplicates} ${tr("duplicateSkipped")}` : "";
+      storageNote.textContent = `${submittedText}${duplicateText}. ${tr("afterApproval")}`;
     }
     render();
   } catch (uploadError) {
     error.textContent = supabaseReady
-      ? `Upload failed: ${uploadError.message || "check the Supabase bucket and policies, then try again."}`
-      : "This browser couldn't save the photo. Try a smaller image or another browser.";
+      ? `${tr("uploadFailed")}: ${uploadError.message || tr("checkBucket")}`
+      : tr("localSaveFailed");
   }
 });
 for (const eventName of ["dragenter", "dragover"]) section.addEventListener(eventName, (event) => { event.preventDefault(); section.classList.add("dragging"); });
@@ -292,27 +369,72 @@ for (const eventName of ["dragleave", "drop"]) section.addEventListener(eventNam
 document.querySelector("#dialogClose").addEventListener("click", () => dialog.close());
 dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
 
-const quips = [
-  "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
-  "BREAKING: ENS MBZ HAS LOST AN ARGUMENT TO A DOOR THAT SAYS PUSH.",
-  "EXPERTS AGREE: ENS MBZ'S LAST BRAIN CELL IS WORKING OVERTIME.",
-  "THIS JUST IN: ENS MBZ HAS BEEN CONFUSED BY A SPOON AGAIN.",
-  "PLEASE KEEP HANDS INSIDE THE INTERNET. ENS MBZ IS DRIVING.",
-  "ENS MBZ IS PROOF THAT CONFIDENCE AND CLUELESSNESS CAN COEXIST."
-];
+const quips = {
+  en: [
+    "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
+    "BREAKING: ENS MBZ HAS LOST AN ARGUMENT TO A DOOR THAT SAYS PUSH.",
+    "EXPERTS AGREE: ENS MBZ'S LAST BRAIN CELL IS WORKING OVERTIME.",
+    "THIS JUST IN: ENS MBZ HAS BEEN CONFUSED BY A SPOON AGAIN.",
+    "PLEASE KEEP HANDS INSIDE THE INTERNET. ENS MBZ IS DRIVING.",
+    "ENS MBZ IS PROOF THAT CONFIDENCE AND CLUELESSNESS CAN COEXIST."
+  ],
+  ar: [
+    "يرجى العلم: ENS MBZ مشاغب معتمد.",
+    "عاجل: خسر ENS MBZ نقاشاً مع باب كُتب عليه «ادفع».",
+    "يتفق الخبراء: آخر خلية دماغية لدى ENS MBZ تعمل لساعات إضافية.",
+    "خبر عاجل: اختلط الأمر على ENS MBZ بسبب ملعقة مرة أخرى.",
+    "يرجى إبقاء الأيدي داخل الإنترنت. ENS MBZ هو السائق.",
+    "ENS MBZ دليل على أن الثقة والحيرة قد تجتمعان."
+  ],
+};
 let previousQuip = 0;
 document.querySelector("#quipButton").addEventListener("click", () => {
-  let next = Math.floor(Math.random() * quips.length);
-  if (next === previousQuip) next = (next + 1) % quips.length;
+  const options = quips[currentLanguage];
+  let next = Math.floor(Math.random() * options.length);
+  if (next === previousQuip) next = (next + 1) % options.length;
   previousQuip = next;
-  document.querySelector("#quip").textContent = quips[next];
+  document.querySelector("#quip").textContent = options[next];
 });
+
+function applyLanguage(language = currentLanguage) {
+  currentLanguage = language === "ar" ? "ar" : "en";
+  const isArabic = currentLanguage === "ar";
+  document.documentElement.lang = isArabic ? "ar-AE" : "en";
+  document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  for (const element of document.querySelectorAll("[data-i18n]")) {
+    const value = tr(element.dataset.i18n);
+    if (element.hasAttribute("data-i18n-html")) element.innerHTML = value;
+    else element.textContent = value;
+  }
+  for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
+    element.placeholder = tr(element.dataset.i18nPlaceholder);
+  }
+  for (const element of document.querySelectorAll("[data-i18n-aria-label]")) {
+    element.setAttribute("aria-label", tr(element.dataset.i18nAriaLabel));
+  }
+  for (const button of document.querySelectorAll("[data-language-toggle]")) {
+    button.textContent = tr("languageButton");
+    button.setAttribute("aria-label", isArabic ? "Switch to English" : "التبديل إلى العربية الإماراتية");
+    button.title = isArabic ? "Switch to English" : "التبديل إلى العربية الإماراتية";
+  }
+  document.title = isArabic ? "متحف ENS MBZ — ملفات ENS MBZ" : "ENS MBZ Museum — The ENS MBZ Files";
+  document.querySelector("#quipButton").setAttribute("aria-label", isArabic ? "أطلق مزحة أخرى عن ENS MBZ" : "Generate another ENS MBZ roast");
+  document.querySelector("#quip").textContent = tr("initialQuip");
+  storageNote.textContent = tr(storageMessageKey);
+  try { localStorage.setItem("ensmbz-language", currentLanguage); } catch { /* Language still changes for this page view. */ }
+  render();
+}
+for (const button of document.querySelectorAll("[data-language-toggle]")) {
+  button.addEventListener("click", () => applyLanguage(currentLanguage === "ar" ? "en" : "ar"));
+}
+applyLanguage();
 
 // Autoplay the supplied sound effect and keep it looping. If the browser
 // blocks audible autoplay, retry on the visitor's first page interaction.
 const loopAudio = document.querySelector("#loopAudio");
 const pauseAudio = document.querySelector("#pauseAudio");
 let siteIsPaused = false;
+let siteStatusKnown = false;
 loopAudio.volume = 0.45;
 pauseAudio.volume = 0.45;
 async function startAudio() {
@@ -324,12 +446,11 @@ async function startAudio() {
     document.querySelector(".music-art")?.classList.toggle("playing", !siteIsPaused);
   } catch { /* Browser autoplay policy may require a visitor interaction. */ }
 }
-startAudio();
 document.addEventListener("pointerdown", () => {
-  if ((siteIsPaused ? pauseAudio : loopAudio).paused) startAudio();
+  if (siteStatusKnown && (siteIsPaused ? pauseAudio : loopAudio).paused) startAudio();
 });
 document.addEventListener("keydown", () => {
-  if ((siteIsPaused ? pauseAudio : loopAudio).paused) startAudio();
+  if (siteStatusKnown && (siteIsPaused ? pauseAudio : loopAudio).paused) startAudio();
 });
 
 async function loadSharedPhotos() {
@@ -339,7 +460,7 @@ async function loadSharedPhotos() {
     .eq("approved", true)
     .order("created_at", { ascending: false });
   if (error) {
-    storageNote.textContent = "The shared gallery could not load. Check the Supabase table and access policies.";
+    storageNote.textContent = tr("galleryLoadFailed");
     return;
   }
   sharedPhotos = (data || []).map((row) => ({
@@ -365,6 +486,7 @@ async function refreshSiteStatus() {
     const status = await response.json();
     const paused = status.is_live === false;
     siteIsPaused = paused;
+    siteStatusKnown = true;
     sitePaused.hidden = !paused;
     document.body.classList.toggle("is-site-paused", paused);
     if ((paused ? pauseAudio : loopAudio).paused) startAudio();

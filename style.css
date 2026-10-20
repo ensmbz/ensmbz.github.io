@@ -125,3 +125,56 @@ body.is-site-paused { overflow: hidden; }
   object-fit: cover;
   border-radius: 50%;
 }
+
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.language-toggle { border: 1px solid var(--line); border-radius: 99px; background: transparent; padding: 10px 14px; font: 10px var(--mono); cursor: pointer; white-space: nowrap; }
+.language-toggle:hover { border-color: var(--orange); color: var(--orange); }
+.site-paused-card { position: relative; }
+.site-paused-card > .language-toggle { position: absolute; top: 0; right: 0; }
+.add-button { min-height: 58px; padding: 20px 27px; font-size: 13px; font-weight: 700; }
+.add-button span:first-child { font-size: 21px; }
+
+html[dir="rtl"] body,
+html[dir="rtl"] button,
+html[dir="rtl"] input,
+html[dir="rtl"] label { font-family: Tahoma, Arial, sans-serif; }
+html[dir="rtl"] .topbar nav,
+html[dir="rtl"] .topbar-actions,
+html[dir="rtl"] .gallery-tools,
+html[dir="rtl"] .photo-info,
+html[dir="rtl"] .hero-bottom,
+html[dir="rtl"] .about-strip,
+html[dir="rtl"] footer { direction: rtl; }
+html[dir="rtl"] .hero-copy,
+html[dir="rtl"] .section-heading,
+html[dir="rtl"] .gallery-note,
+html[dir="rtl"] .drop-hint,
+html[dir="rtl"] .intermission-copy,
+html[dir="rtl"] .about-strip,
+html[dir="rtl"] footer { text-align: right; }
+html[dir="rtl"] .hero-copy .eyebrow { flex-direction: row-reverse; }
+html[dir="rtl"] .hero-link { flex-direction: row-reverse; }
+html[dir="rtl"] .photo-tag { direction: rtl; }
+html[dir="rtl"] .topbar nav,
+html[dir="rtl"] .ticker,
+html[dir="rtl"] .hero-bottom,
+html[dir="rtl"] .photo-count,
+html[dir="rtl"] .audio-status,
+html[dir="rtl"] .language-toggle,
+html[dir="rtl"] .sound-toggle { font-family: Tahoma, Arial, sans-serif; letter-spacing: 0; }
+html[dir="rtl"] .site-paused-card { direction: rtl; }
+html[dir="rtl"] .site-paused-card > .language-toggle { right: auto; left: 0; }
+
+@media (max-width: 760px) {
+  .topbar { gap: 12px; }
+  .topbar nav { gap: 14px; }
+  .topbar-actions { gap: 7px; }
+}
+@media (max-width: 560px) {
+  .topbar { height: auto; min-height: 78px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 12px; }
+  .topbar nav { order: 3; width: 100%; justify-content: center; }
+  .topbar-actions { margin-left: auto; }
+  .add-button { min-height: 52px; padding: 16px 18px; font-size: 11px; }
+  .add-button span:first-child { font-size: 18px; }
+  .language-toggle { padding: 9px 11px; }
+}
