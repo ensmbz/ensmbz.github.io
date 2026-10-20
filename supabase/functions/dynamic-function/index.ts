@@ -323,7 +323,9 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
     return json({ type: 4, data: { content: "You need the King or Photo Approver role to delete photos.", flags: 64 } });
   }
   if (inReview && action !== "delete" && !hasRole(APPROVER_ROLE_ID)) {
-    return json({ type: 4, data: { content: "You need the Photo Approver role to review submissions.", flags: 64 } });
+    if (!hasRole(SITE_CONTROL_ROLE_ID)) {
+      return json({ type: 4, data: { content: "You need the King or Photo Approver role to review submissions.", flags: 64 } });
+    }
   }
   const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
   const key = supabaseKey();
