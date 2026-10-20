@@ -18,7 +18,8 @@ const translations = {
     themeStamp: "ENS MBZ'S<br>OFFICIAL<br>THEME", jingleTitle: "THE OFFICIAL<br>ENS MBZ <em>JINGLE.</em>",
     jingleDescription: "ENS MBZ's signature sound effect, on an endless loop. Your browser may require a tap anywhere on the page before it allows audio.",
     jingleStatus: "♪ DRY FART · ON REPEAT", formEyebrow: "ADD TO THE ENS MBZ ARCHIVE", formTitle: 'SUBMIT A PHOTO<span class="period">.</span>',
-    nameLabel: 'YOUR NAME <span>(required)</span>', namePlaceholder: "Who is submitting this?", filesLabel: 'PHOTO FILES <span>(required · choose from photos or camera)</span>',
+    nameLabel: 'YOUR NAME <span>(required)</span>', namePlaceholder: "Who is submitting this?", filesLabel: 'PHOTOS TO ADD <span>(required · choose from photos or camera)</span>',
+    choosePhotos: "CHOOSE PHOTOS", noPhotosSelected: "No photos selected", photoSelected: "photo selected", photosSelected: "photos selected",
     formHelp: "Your name will appear next to the photos. Submissions are saved in this browser on this device.",
     submitButton: "ADD TO THE GALLERY ↗", close: "Close", storageShared: "Photos are submitted to the shared gallery and appear after ENS MBZ approves them.",
     storageLocal: "Shared uploads are not connected yet. Photos you add are saved in this browser on this device.",
@@ -30,7 +31,7 @@ const translations = {
     uploadFailed: "Upload failed", checkBucket: "check the Supabase bucket and policies, then try again.", localSaveFailed: "This browser couldn't save the photo. Try a smaller image or another browser.",
     galleryLoadFailed: "The shared gallery could not load. Check the Supabase table and access policies.",
     quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
-    footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية (الإمارات)",
+    footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية",
   },
   ar: {
     pauseEyebrow: "متحف صور المدرسة الإماراتية في مدينة زايد", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
@@ -46,7 +47,8 @@ const translations = {
     themeStamp: "النشيد<br>الرسمي<br>لـ ENS MBZ", jingleTitle: 'النشيد الرسمي<br>لـ ENS MBZ<span class="period">.</span>',
     jingleDescription: "المؤثر الصوتي المميز لـ ENS MBZ، في تكرار مستمر. قد يحتاج المتصفح إلى نقرة على الصفحة قبل تشغيل الصوت.",
     jingleStatus: "♪ صوت ضرطة · يتكرر", formEyebrow: "أضف إلى أرشيف ENS MBZ", formTitle: 'أرسل صورة<span class="period">.</span>',
-    nameLabel: 'اسمك <span>(مطلوب)</span>', namePlaceholder: "من يرسل الصورة؟", filesLabel: 'ملفات الصور <span>(مطلوبة · اختر من الصور أو الكاميرا)</span>',
+    nameLabel: 'اسمك <span>(مطلوب)</span>', namePlaceholder: "من يرسل الصورة؟", filesLabel: 'الصور المراد إضافتها <span>(مطلوبة · اختر من الصور أو الكاميرا)</span>',
+    choosePhotos: "اختر الصور", noPhotosSelected: "لم يتم اختيار صور", photoSelected: "صورة مختارة", photosSelected: "صور مختارة",
     formHelp: "سيظهر اسمك بجانب الصور. تُحفظ المشاركات في هذا المتصفح على هذا الجهاز.",
     submitButton: "أضف إلى المعرض ↗", close: "إغلاق", storageShared: "تُرسل الصور إلى المعرض المشترك وتظهر بعد موافقة ENS MBZ عليها.",
     storageLocal: "الرفع المشترك غير متصل حالياً. تُحفظ الصور التي تضيفها في هذا المتصفح على هذا الجهاز.",
@@ -285,6 +287,15 @@ const storageNote = document.querySelector("#storageNote");
 const storageMessageKey = supabaseReady && supabaseClient ? "storageShared" : "storageLocal";
 storageNote.textContent = tr(storageMessageKey);
 document.querySelector("#addPhotos").addEventListener("click", () => contributeDialog.showModal());
+const choosePhotosButton = document.querySelector("#choosePhotosButton");
+const photoSelectionStatus = document.querySelector("#photoSelectionStatus");
+function updatePhotoSelectionStatus() {
+  const selectedCount = input.files?.length || 0;
+  if (!selectedCount) photoSelectionStatus.textContent = tr("noPhotosSelected");
+  else photoSelectionStatus.textContent = `${selectedCount} ${selectedCount === 1 ? tr("photoSelected") : tr("photosSelected")}`;
+}
+choosePhotosButton.addEventListener("click", () => input.click());
+input.addEventListener("change", updatePhotoSelectionStatus);
 document.querySelector("#contributeClose").addEventListener("click", () => contributeDialog.close());
 contributeDialog.addEventListener("click", (event) => { if (event.target === contributeDialog) contributeDialog.close(); });
 contributeForm.addEventListener("submit", async (event) => {
@@ -351,6 +362,7 @@ contributeForm.addEventListener("submit", async (event) => {
       return;
     }
     contributeForm.reset();
+    updatePhotoSelectionStatus();
     contributeDialog.close();
     if (supabaseReady) {
       const submittedText = `${submitted} ${submitted === 1 ? tr("photoSubmitted") : tr("photosSubmitted")}`;
@@ -414,7 +426,8 @@ function applyLanguage(language = currentLanguage) {
     element.setAttribute("aria-label", tr(element.dataset.i18nAriaLabel));
   }
   for (const button of document.querySelectorAll("[data-language-toggle]")) {
-    button.textContent = tr("languageButton");
+    button.querySelector("[data-language-label]").textContent = tr("languageButton");
+    button.querySelector("[data-language-icon]").textContent = isArabic ? "EN" : "🇦🇪";
     button.setAttribute("aria-label", isArabic ? "Switch to English" : "التبديل إلى العربية الإماراتية");
     button.title = isArabic ? "Switch to English" : "التبديل إلى العربية الإماراتية";
   }

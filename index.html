@@ -9,17 +9,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=uae-arabic-1">
+  <link rel="stylesheet" href="style.css?v=uae-arabic-2">
 </head>
 <body>
   <div class="site-paused" id="sitePaused" hidden role="status" aria-live="polite">
-    <div class="site-paused-card"><button class="language-toggle" type="button" data-language-toggle>العربية</button><img src="assets/ens-mbz-school-logo.jpg" alt="" width="64" height="64"><p class="eyebrow" data-i18n="pauseEyebrow">ENS MBZ PHOTO MUSEUM</p><h1 data-i18n-html="pauseTitle">TAKING A<br>BREAK<span class="period">.</span></h1><p data-i18n="pausedMessage">The site owner has paused the museum. Please check back later.</p></div>
+    <div class="site-paused-card"><button class="language-toggle" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button><img src="assets/ens-mbz-school-logo.jpg" alt="" width="64" height="64"><p class="eyebrow" data-i18n="pauseEyebrow">ENS MBZ PHOTO MUSEUM</p><h1 data-i18n-html="pauseTitle">TAKING A<br>BREAK<span class="period">.</span></h1><p data-i18n="pausedMessage">The site owner has paused the museum. Please check back later.</p></div>
   </div>
   <div class="ticker" aria-label="Breaking news"><div class="ticker-track" data-i18n="ticker">★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★</div></div>
   <header class="topbar">
     <a class="wordmark" href="#top" aria-label="The ENS MBZ Files home"><img class="wordmark-icon" src="assets/ens-mbz-school-logo.jpg" alt="" width="38" height="38"> THE ENS MBZ FILES</a>
     <nav><a href="#gallery" data-i18n="navGallery">THE GALLERY</a><a href="#about" data-i18n="navAbout">ABOUT THIS MASTERPIECE</a></nav>
-    <div class="topbar-actions"><button class="language-toggle" type="button" data-language-toggle>العربية</button><span class="sound-toggle"><span class="sound-dot"></span><span data-i18n="autoAudio">AUTO-LOOP AUDIO</span></span></div>
+    <div class="topbar-actions"><button class="language-toggle" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button><span class="sound-toggle"><span class="sound-dot"></span><span data-i18n="autoAudio">AUTO-LOOP AUDIO</span></span></div>
   </header>
 
   <main id="top">
@@ -65,7 +65,10 @@
     <form id="contributeForm">
       <p class="eyebrow" data-i18n="formEyebrow">ADD TO THE ENS MBZ ARCHIVE</p><h2 data-i18n-html="formTitle">SUBMIT A PHOTO<span class="period">.</span></h2>
       <label for="submitterName" data-i18n-html="nameLabel">YOUR NAME <span>(required)</span></label><input id="submitterName" name="name" type="text" maxlength="40" autocomplete="name" placeholder="Who is submitting this?" data-i18n-placeholder="namePlaceholder" required>
-      <label for="photoInput" data-i18n-html="filesLabel">PHOTO FILES <span>(required · choose from photos or camera)</span></label><input id="photoInput" name="photos" type="file" accept="image/*" multiple required>
+      <label id="photoFieldLabel" data-i18n-html="filesLabel">PHOTOS TO ADD <span>(required · choose from photos or camera)</span></label>
+      <input id="photoInput" name="photos" type="file" accept="image/*" multiple hidden aria-labelledby="photoFieldLabel">
+      <button class="photo-picker-button" id="choosePhotosButton" type="button"><span>＋</span><span data-i18n="choosePhotos">CHOOSE PHOTOS</span></button>
+      <p class="photo-selection-status" id="photoSelectionStatus" aria-live="polite" data-i18n="noPhotosSelected">No photos selected</p>
       <p class="form-help" data-i18n="formHelp">Your name will appear next to the photos. Submissions are saved in this browser on this device.</p>
       <p class="form-error" id="formError" role="alert"></p>
       <button class="submit-button" type="submit" data-i18n="submitButton">ADD TO THE GALLERY ↗</button>
@@ -76,6 +79,6 @@
   <audio id="pauseAudio" src="assets/404.mp3" loop preload="none"></audio>
   <script src="supabase-config.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=uae-arabic-2"></script>
+  <script src="script.js?v=uae-arabic-3"></script>
 </body>
 </html>

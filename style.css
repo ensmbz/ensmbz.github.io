@@ -127,12 +127,19 @@ body.is-site-paused { overflow: hidden; }
 }
 
 .topbar-actions { display: flex; align-items: center; gap: 12px; }
-.language-toggle { border: 1px solid var(--line); border-radius: 99px; background: transparent; padding: 10px 14px; font: 10px var(--mono); cursor: pointer; white-space: nowrap; }
-.language-toggle:hover { border-color: var(--orange); color: var(--orange); }
+.language-toggle { display: inline-flex; align-items: center; gap: 9px; border: 1px solid var(--ink); border-radius: 99px; background: var(--ink); color: var(--paper); padding: 7px 13px 7px 8px; font: 600 12px Tahoma, Arial, sans-serif; cursor: pointer; white-space: nowrap; box-shadow: 3px 3px 0 var(--lime); transition: transform .18s, background .18s, box-shadow .18s; }
+.language-toggle:hover { background: var(--orange); border-color: var(--orange); color: white; transform: translateY(-1px); box-shadow: 3px 4px 0 var(--lime); }
+.language-icon { display: grid; place-items: center; width: 25px; height: 25px; flex: 0 0 25px; border-radius: 50%; background: var(--lime); color: var(--ink); font: 700 10px Tahoma, Arial, sans-serif; }
+.language-label { line-height: 1; }
 .site-paused-card { position: relative; }
 .site-paused-card > .language-toggle { position: absolute; top: 0; right: 0; }
 .add-button { min-height: 58px; padding: 20px 27px; font-size: 13px; font-weight: 700; }
 .add-button span:first-child { font-size: 21px; }
+.photo-picker-button { display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; gap: 10px; min-height: 48px; padding: 13px 20px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); font: 600 11px var(--mono); letter-spacing: .04em; cursor: pointer; transition: background .18s, transform .18s; }
+.photo-picker-button:hover { background: var(--orange); transform: translateY(-1px); }
+.photo-picker-button span:first-child { font-size: 19px; line-height: 1; }
+.photo-selection-status { min-height: 16px; margin: -3px 0 4px; color: #77766e; font: 10px/1.5 var(--mono); }
+.contribute-dialog input[type=file][hidden] { display: none; }
 
 html[dir="rtl"] body,
 html[dir="rtl"] button,
@@ -177,4 +184,5 @@ html[dir="rtl"] .site-paused-card > .language-toggle { right: auto; left: 0; }
   .add-button { min-height: 52px; padding: 16px 18px; font-size: 11px; }
   .add-button span:first-child { font-size: 18px; }
   .language-toggle { padding: 9px 11px; }
+  .photo-picker-button { width: 100%; }
 }
