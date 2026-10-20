@@ -55,14 +55,12 @@ function hexToBytes(hex: string, byteLength: number): Uint8Array | null {
   return bytes;
 }
 
-function buttonComponents(id: string, state: "pending" | "reviewed" | "deleted" = "pending") {
-  const isDeleted = state === "deleted";
+function buttonComponents(id: string, state: "pending" | "reviewed" = "pending") {
   return [{
     type: 1,
     components: [
       { type: 2, style: 3, label: "Approve", custom_id: `ensmbz:approve:${id}`, disabled: state !== "pending" },
       { type: 2, style: 4, label: "Decline", custom_id: `ensmbz:decline:${id}`, disabled: state !== "pending" },
-      { type: 2, style: 4, label: "Delete photo", custom_id: `ensmbz:delete:${id}`, disabled: isDeleted },
     ],
   }];
 }
@@ -316,11 +314,27 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
   const [, action, id] = match;
   const memberRoles: unknown = interaction.member?.roles;
   const hasRole = (roleId: string) => Array.isArray(memberRoles) && memberRoles.includes(roleId);
+  if (inReview && action === "delete") {
+    const components = Array.isArray(interaction.message?.components)
+      ? interaction.message.components.map((row: Record<string, any>) => ({
+        ...row,
+        components: (Array.isArray(row.components) ? row.components : []).filter(
+          (component: Record<string, any>) => !String(component.custom_id || "").startsWith("ensmbz:delete:"),
+        ),
+      }))
+      : [];
+    return json({
+      type: 7,
+      data: {
+        content: "Photo deletion is only available in #photo-archive.",
+        embeds: Array.isArray(interaction.message?.embeds) ? interaction.message.embeds : [],
+        components,
+        allowed_mentions: { parse: [] },
+      },
+    });
+  }
   if (inArchive && (action !== "delete" || !hasRole(SITE_CONTROL_ROLE_ID))) {
     return json({ type: 4, data: { content: "You need the King role to delete archived photos.", flags: 64 } });
-  }
-  if (inReview && action === "delete" && !hasRole(APPROVER_ROLE_ID) && !hasRole(SITE_CONTROL_ROLE_ID)) {
-    return json({ type: 4, data: { content: "You need the King or Photo Approver role to delete photos.", flags: 64 } });
   }
   if (inReview && action !== "delete" && !hasRole(APPROVER_ROLE_ID)) {
     if (!hasRole(SITE_CONTROL_ROLE_ID)) {
@@ -388,7 +402,7 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
       data: {
         content: `🗑️ Photo deleted from the website.${cleanupNote}${archiveCleanupNote}${reviewerId ? ` Deleted by <@${reviewerId}>.` : ""}`,
         embeds: [],
-        components: inArchive ? archiveComponents(id, true) : buttonComponents(id, "deleted"),
+        components: archiveComponents(id, true),
         allowed_mentions: { parse: [] },
       },
     });

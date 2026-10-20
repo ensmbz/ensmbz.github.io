@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=uae-arabic-2">
+  <link rel="stylesheet" href="style.css?v=archive-delete-audio-toggle-1">
 </head>
 <body>
   <div class="site-paused" id="sitePaused" hidden role="status" aria-live="polite">
@@ -19,7 +19,7 @@
   <header class="topbar">
     <a class="wordmark" href="#top" aria-label="The ENS MBZ Files home"><img class="wordmark-icon" src="assets/ens-mbz-school-logo.jpg" alt="" width="38" height="38"> THE ENS MBZ FILES</a>
     <nav><a href="#gallery" data-i18n="navGallery">THE GALLERY</a><a href="#about" data-i18n="navAbout">ABOUT THIS MASTERPIECE</a></nav>
-    <div class="topbar-actions"><button class="language-toggle" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button><span class="sound-toggle"><span class="sound-dot"></span><span data-i18n="autoAudio">AUTO-LOOP AUDIO</span></span></div>
+    <div class="topbar-actions"><button class="language-toggle" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button><button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true"><span class="sound-dot" aria-hidden="true"></span><span id="soundToggleLabel">FART NOISES: ON</span></button></div>
   </header>
 
   <main id="top">
@@ -79,6 +79,6 @@
   <audio id="pauseAudio" src="assets/404.mp3" loop preload="none"></audio>
   <script src="supabase-config.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=photo-duplicates-removed-1"></script>
+  <script src="script.js?v=archive-delete-audio-toggle-1"></script>
 </body>
 </html>

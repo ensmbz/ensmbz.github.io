@@ -8,7 +8,7 @@ const translations = {
     pauseEyebrow: "ENS MBZ PHOTO MUSEUM", pauseTitle: 'TAKING A<br>BREAK<span class="period">.</span>',
     pausedMessage: "The site owner has paused the museum. Please check back later.",
     ticker: "★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★",
-    navGallery: "THE GALLERY", navAbout: "ABOUT THIS MASTERPIECE", autoAudio: "AUTO-LOOP AUDIO",
+    navGallery: "THE GALLERY", navAbout: "ABOUT THIS MASTERPIECE", soundOn: "FART NOISES: ON", soundOff: "FART NOISES: OFF",
     heroEyebrow: "ENS MBZ ARCHIVE · THINKING NOT REQUIRED", heroTitle: 'THE<br><span class="headline-last">ENS MBZ</span> MUSEUM<span class="period">.</span>',
     heroDescription: "A collection of moments, expressions, and one unexpected meeting with lunch. Certified goofball. Questionable decisions. Excellent photo collection.",
     tourLink: "TAKE THE TOUR", scribbleOne: "brain cell<br>loading...", scribbleTwo: "← swipe<br>for evidence",
@@ -17,7 +17,7 @@ const translations = {
     dropHint: 'Got more? Drop photos anywhere in the gallery or tap “Add your photos”.', soundtrackEyebrow: "PLEASE ENJOY ENS MBZ'S VERY SERIOUS SOUNDTRACK",
     themeStamp: "ENS MBZ'S<br>OFFICIAL<br>THEME", jingleTitle: "THE OFFICIAL<br>ENS MBZ <em>JINGLE.</em>",
     jingleDescription: "ENS MBZ's signature sound effect, on an endless loop. Your browser may require a tap anywhere on the page before it allows audio.",
-    jingleStatus: "♪ DRY FART · ON REPEAT", formEyebrow: "ADD TO THE ENS MBZ ARCHIVE", formTitle: 'SUBMIT A PHOTO<span class="period">.</span>',
+    jingleStatus: "♪ DRY FART · ON REPEAT", jingleMutedStatus: "♪ DRY FART · MUTED", formEyebrow: "ADD TO THE ENS MBZ ARCHIVE", formTitle: 'SUBMIT A PHOTO<span class="period">.</span>',
     nameLabel: 'YOUR NAME <span>(required)</span>', namePlaceholder: "Who is submitting this?", filesLabel: 'PHOTOS TO ADD <span>(required · choose from photos or camera)</span>',
     choosePhotos: "CHOOSE PHOTOS", noPhotosSelected: "No photos selected", photoSelected: "photo selected", photosSelected: "photos selected",
     formHelp: "Your name will appear next to the photos. Submissions are saved in this browser on this device.",
@@ -36,7 +36,7 @@ const translations = {
     pauseEyebrow: "متحف صور المدرسة الإماراتية في مدينة زايد", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
     pausedMessage: "أوقف مالك الموقع المتحف مؤقتاً. تفقّد الموقع لاحقاً.",
     ticker: "★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★",
-    navGallery: "المعرض", navAbout: "عن هذه التحفة", autoAudio: "صوت متكرر تلقائياً",
+    navGallery: "المعرض", navAbout: "عن هذه التحفة", soundOn: "صوت الضرطة: يعمل", soundOff: "صوت الضرطة: متوقف",
     heroEyebrow: "أرشيف المدرسة الإماراتية · التفكير غير مطلوب", heroTitle: 'متحف<br><span class="headline-last">ENS MBZ</span><span class="period">.</span>',
     heroDescription: "مجموعة من اللحظات والتعابير ولقاء غير متوقع مع الغداء. خفة ظل معتمدة، وقرارات مثيرة للجدل، ومجموعة صور ممتازة.",
     tourLink: "ابدأ الجولة", scribbleOne: "خلية دماغية<br>جارٍ التحميل...", scribbleTwo: "← اسحب<br>لرؤية الأدلة",
@@ -45,7 +45,7 @@ const translations = {
     dropHint: 'هل لديك المزيد؟ أفلِت الصور في أي مكان بالمعرض أو اضغط «أضف صورك».', soundtrackEyebrow: "استمتعوا بالموسيقى الرسمية والجدية جداً لـ ENS MBZ",
     themeStamp: "النشيد<br>الرسمي<br>لـ ENS MBZ", jingleTitle: 'النشيد الرسمي<br>لـ ENS MBZ<span class="period">.</span>',
     jingleDescription: "المؤثر الصوتي المميز لـ ENS MBZ، في تكرار مستمر. قد يحتاج المتصفح إلى نقرة على الصفحة قبل تشغيل الصوت.",
-    jingleStatus: "♪ صوت ضرطة · يتكرر", formEyebrow: "أضف إلى أرشيف ENS MBZ", formTitle: 'أرسل صورة<span class="period">.</span>',
+    jingleStatus: "♪ صوت الضرطة · يتكرر", jingleMutedStatus: "♪ صوت الضرطة · مكتوم", formEyebrow: "أضف إلى أرشيف ENS MBZ", formTitle: 'أرسل صورة<span class="period">.</span>',
     nameLabel: 'اسمك <span>(مطلوب)</span>', namePlaceholder: "من يرسل الصورة؟", filesLabel: 'الصور المراد إضافتها <span>(مطلوبة · اختر من الصور أو الكاميرا)</span>',
     choosePhotos: "اختر الصور", noPhotosSelected: "لم يتم اختيار صور", photoSelected: "صورة مختارة", photosSelected: "صور مختارة",
     formHelp: "سيظهر اسمك بجانب الصور. تُحفظ المشاركات في هذا المتصفح على هذا الجهاز.",
@@ -319,20 +319,49 @@ function applyLanguage(language = currentLanguage) {
   render();
 }
 for (const button of document.querySelectorAll("[data-language-toggle]")) {
-  button.addEventListener("click", () => applyLanguage(currentLanguage === "ar" ? "en" : "ar"));
+  button.addEventListener("click", () => {
+    applyLanguage(currentLanguage === "ar" ? "en" : "ar");
+    updateSoundToggle();
+  });
 }
 applyLanguage();
 
-// Autoplay the supplied sound effect and keep it looping. If the browser
-// blocks audible autoplay, retry on the visitor's first page interaction.
+// Loop the supplied sound effect unless a visitor turns it off.
 const loopAudio = document.querySelector("#loopAudio");
 const pauseAudio = document.querySelector("#pauseAudio");
+const soundToggle = document.querySelector("#soundToggle");
+const soundToggleLabel = document.querySelector("#soundToggleLabel");
 let siteIsPaused = false;
 let siteStatusKnown = false;
+let fartSoundsEnabled = (() => {
+  try { return localStorage.getItem("ensmbz-fart-sounds") !== "off"; }
+  catch { return true; }
+})();
 loopAudio.volume = 0.45;
 pauseAudio.volume = 0.45;
+function updateSoundToggle() {
+  const labelKey = fartSoundsEnabled ? "soundOn" : "soundOff";
+  soundToggle.setAttribute("aria-pressed", String(fartSoundsEnabled));
+  soundToggle.setAttribute("aria-label", tr(labelKey));
+  soundToggleLabel.textContent = tr(labelKey);
+  document.querySelector(".audio-status").textContent = tr(fartSoundsEnabled ? "jingleStatus" : "jingleMutedStatus");
+}
+soundToggle.addEventListener("click", () => {
+  fartSoundsEnabled = !fartSoundsEnabled;
+  try { localStorage.setItem("ensmbz-fart-sounds", fartSoundsEnabled ? "on" : "off"); } catch { /* Keep the preference for this page view. */ }
+  updateSoundToggle();
+  loopAudio.pause();
+  document.querySelector(".music-art")?.classList.remove("playing");
+  if (fartSoundsEnabled && siteStatusKnown && !siteIsPaused) startAudio();
+});
+updateSoundToggle();
 async function startAudio() {
-  const selectedAudio = siteIsPaused ? pauseAudio : loopAudio;
+  const selectedAudio = siteIsPaused ? pauseAudio : (fartSoundsEnabled ? loopAudio : null);
+  if (!selectedAudio) {
+    loopAudio.pause();
+    document.querySelector(".music-art")?.classList.remove("playing");
+    return;
+  }
   const otherAudio = siteIsPaused ? loopAudio : pauseAudio;
   otherAudio.pause();
   try {
@@ -341,10 +370,10 @@ async function startAudio() {
   } catch { /* Browser autoplay policy may require a visitor interaction. */ }
 }
 document.addEventListener("pointerdown", () => {
-  if (siteStatusKnown && (siteIsPaused ? pauseAudio : loopAudio).paused) startAudio();
+  if (siteStatusKnown && (siteIsPaused ? pauseAudio : loopAudio).paused && (siteIsPaused || fartSoundsEnabled)) startAudio();
 });
 document.addEventListener("keydown", () => {
-  if (siteStatusKnown && (siteIsPaused ? pauseAudio : loopAudio).paused) startAudio();
+  if (siteStatusKnown && (siteIsPaused ? pauseAudio : loopAudio).paused && (siteIsPaused || fartSoundsEnabled)) startAudio();
 });
 
 async function loadSharedPhotos() {
