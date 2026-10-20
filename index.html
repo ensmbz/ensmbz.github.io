@@ -9,9 +9,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=clean-gallery-1">
+  <link rel="stylesheet" href="style.css?v=community-1">
 </head>
 <body>
+  <dialog id="languageDialog" class="language-dialog" aria-labelledby="languageDialogTitle">
+    <div class="language-dialog-card"><img src="assets/ens-mbz-school-logo.jpg" alt="" width="58" height="58"><p class="eyebrow">ENS MBZ</p><h2 id="languageDialogTitle">CHOOSE YOUR LANGUAGE<span class="period">.</span></h2><p>اختر لغتك</p><div class="language-options"><button type="button" data-language-choice="en">English</button><button type="button" data-language-choice="ar">العربية الإماراتية</button></div></div>
+  </dialog>
   <div class="site-paused" id="sitePaused" hidden role="status" aria-live="polite">
     <div class="site-paused-card"><button class="language-toggle" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button><img src="assets/ens-mbz-school-logo.jpg" alt="" width="64" height="64"><p class="eyebrow" data-i18n="pauseEyebrow">ENS MBZ PHOTO MUSEUM</p><h1 data-i18n-html="pauseTitle">TAKING A<br>BREAK<span class="period">.</span></h1><p data-i18n="pausedMessage">The site owner has paused the museum. Please check back later.</p></div>
   </div>
@@ -59,6 +62,7 @@
     <form id="contributeForm">
       <p class="eyebrow" data-i18n="formEyebrow">ADD TO THE ENS MBZ ARCHIVE</p><h2 data-i18n-html="formTitle">SUBMIT MEDIA<span class="period">.</span></h2>
       <label for="submitterName" data-i18n-html="nameLabel">YOUR NAME <span>(required)</span></label><input id="submitterName" name="name" type="text" maxlength="40" autocomplete="name" placeholder="Who is submitting this?" data-i18n-placeholder="namePlaceholder" required>
+      <label for="postDescription" data-i18n-html="descriptionLabel">DESCRIPTION <span>(optional)</span></label><textarea id="postDescription" name="description" maxlength="280" rows="3" placeholder="Tell people about this post" data-i18n-placeholder="descriptionPlaceholder"></textarea>
       <label id="photoFieldLabel" data-i18n-html="filesLabel">PHOTOS OR VIDEOS <span>(required · photos up to 5 MB, videos up to 50 MB)</span></label>
       <input id="photoInput" name="media" type="file" accept="image/*,video/*" multiple hidden aria-labelledby="photoFieldLabel">
       <button class="photo-picker-button" id="choosePhotosButton" type="button"><span>＋</span><span data-i18n="chooseMedia">CHOOSE PHOTOS OR VIDEOS</span></button>
@@ -68,10 +72,17 @@
       <button class="submit-button" type="submit" data-i18n="submitButton">ADD TO THE GALLERY ↗</button>
     </form>
   </dialog>
+  <dialog id="commentsDialog" class="comments-dialog" aria-labelledby="commentsTitle">
+    <button class="dialog-close" id="commentsClose" aria-label="Close comments" data-i18n-aria-label="close" type="button">×</button>
+    <p class="eyebrow" data-i18n="commentsEyebrow">THE CONVERSATION</p><h2 id="commentsTitle" data-i18n-html="commentsTitle">COMMENTS<span class="period">.</span></h2>
+    <p class="comments-for" id="commentsFor"></p><div class="comments-list" id="commentsList" aria-live="polite"></div>
+    <form id="commentForm" class="comment-form"><label for="commentName" data-i18n="commentNameLabel">YOUR NAME</label><input id="commentName" maxlength="40" required data-i18n-placeholder="namePlaceholder" placeholder="Who is submitting this?"><label for="commentBody" data-i18n="commentLabel">COMMENT</label><textarea id="commentBody" maxlength="400" rows="3" required data-i18n-placeholder="commentPlaceholder" placeholder="Keep it nice."></textarea><p class="form-error" id="commentError" role="alert"></p><button class="submit-button" id="commentSubmit" type="submit" data-i18n="commentSubmit">POST COMMENT</button></form>
+    <details class="takedown-request"><summary data-i18n="takedownSummary">REQUEST THIS POST BE TAKEN DOWN</summary><form id="takedownForm" class="comment-form"><label for="takedownName" data-i18n="commentNameLabel">YOUR NAME</label><input id="takedownName" maxlength="40" required data-i18n-placeholder="namePlaceholder" placeholder="Who is submitting this?"><label for="takedownReason" data-i18n="takedownReasonLabel">WHY SHOULD IT BE REMOVED?</label><textarea id="takedownReason" maxlength="500" rows="3" required data-i18n-placeholder="takedownPlaceholder" placeholder="Tell the moderators why."></textarea><p class="form-error" id="takedownError" role="alert"></p><button class="request-button" id="takedownSubmit" type="submit" data-i18n="takedownSubmit">SEND REQUEST</button></form></details>
+  </dialog>
   <dialog id="photoDialog" class="photo-dialog"><button class="dialog-close" id="dialogClose" aria-label="Close photo" data-i18n-aria-label="close" type="button">×</button><img id="dialogImage" alt="Expanded gallery photograph"><video id="dialogVideo" controls playsinline preload="metadata" hidden></video><p id="dialogCaption"></p></dialog>
   <audio id="pauseAudio" src="assets/404.mp3" loop preload="none"></audio>
   <script src="supabase-config.js?v=r2-media-1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=submit-lock-1"></script>
+  <script src="script.js?v=community-1"></script>
 </body>
 </html>

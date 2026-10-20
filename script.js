@@ -11,6 +11,7 @@ const translations = {
     galleryTitle: 'THE GALLERY<span class="period">.</span>', addPhotos: "ADD PHOTOS OR VIDEOS", galleryNote: "Museum rule #1: there are no bad angles, only interesting evidence.",
     dropHint: 'Got more? Drop photos or videos anywhere in the gallery or tap “Add your photos”.', formEyebrow: "ADD TO THE ENS MBZ ARCHIVE", formTitle: 'SUBMIT MEDIA<span class="period">.</span>',
     nameLabel: 'YOUR NAME <span>(required)</span>', namePlaceholder: "Who is submitting this?", filesLabel: 'PHOTOS OR VIDEOS <span>(required · photos up to 5 MB, videos up to 50 MB)</span>',
+    descriptionLabel: 'DESCRIPTION <span>(optional)</span>', descriptionPlaceholder: "Tell people about this post",
     chooseMedia: "CHOOSE PHOTOS OR VIDEOS", noMediaSelected: "No media selected", mediaSelected: "item selected", mediaSelectedMany: "items selected",
     formHelp: "Your name will appear next to the photos or videos. MP4 works best; use the video controls to hear its audio. Submissions appear after approval.",
     submitButton: "ADD TO THE GALLERY ↗", submitting: "ADDING…", close: "Close", storageShared: "Photos and videos are submitted to the shared gallery and appear after ENS MBZ approves them.",
@@ -23,6 +24,7 @@ const translations = {
     galleryLoadFailed: "The shared gallery could not load. Check the Supabase table and access policies.",
     quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
     footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية",
+    commentsButton: "COMMENTS", commentsEyebrow: "THE CONVERSATION", commentsTitle: 'COMMENTS<span class="period">.</span>', commentsEmpty: "No comments yet. Start the conversation.", commentsUnavailable: "Comments are unavailable right now.", commentNameLabel: "YOUR NAME", commentLabel: "COMMENT", commentPlaceholder: "Keep it nice.", commentSubmit: "POST COMMENT", commentPosting: "POSTING…", commentRequired: "Please enter your name and a comment.", commentPosted: "Your comment was posted.", commentFailed: "Your comment could not be posted. Please try again.", takedownSummary: "REQUEST THIS POST BE TAKEN DOWN", takedownReasonLabel: "WHY SHOULD IT BE REMOVED?", takedownPlaceholder: "Tell the moderators why.", takedownSubmit: "SEND REQUEST", takedownSending: "SENDING…", takedownRequired: "Please enter your name and a reason.", takedownSent: "Your request was sent to the moderators.", takedownFailed: "Your request could not be sent. Please try again.",
   },
   ar: {
     pauseEyebrow: "متحف صور المدرسة الإماراتية في مدينة زايد", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
@@ -36,6 +38,7 @@ const translations = {
     galleryTitle: 'المعرض<span class="period">.</span>', addPhotos: "أضف صوراً أو فيديو", galleryNote: "قاعدة المتحف الأولى: لا توجد زوايا سيئة، بل أدلة مثيرة للاهتمام.",
     dropHint: 'هل لديك المزيد؟ أفلِت الصور أو الفيديوهات في أي مكان بالمعرض أو اضغط «أضف صورك».', formEyebrow: "أضف إلى أرشيف ENS MBZ", formTitle: 'أرسل صوراً أو فيديو<span class="period">.</span>',
     nameLabel: 'اسمك <span>(مطلوب)</span>', namePlaceholder: "من يرسل الصور أو الفيديو؟", filesLabel: 'صور أو فيديوهات <span>(مطلوب · الصور حتى ٥ م.ب. والفيديو حتى ٥٠ م.ب.)</span>',
+    descriptionLabel: 'الوصف <span>(اختياري)</span>', descriptionPlaceholder: "أخبر الناس عن هذه المشاركة",
     chooseMedia: "اختر صوراً أو فيديوهات", noMediaSelected: "لم يتم اختيار ملفات", mediaSelected: "ملف تم اختياره", mediaSelectedMany: "ملفات تم اختيارها",
     formHelp: "سيظهر اسمك بجانب الصور أو الفيديوهات. صيغة MP4 هي الأفضل؛ استخدم أدوات الفيديو لتشغيل الصوت. تظهر المشاركات بعد الموافقة.",
     submitButton: "أضف إلى المعرض ↗", submitting: "جارٍ الإضافة…", close: "إغلاق", storageShared: "تُرسل الصور والفيديوهات إلى المعرض المشترك وتظهر بعد موافقة ENS MBZ عليها.",
@@ -48,6 +51,7 @@ const translations = {
     galleryLoadFailed: "تعذّر تحميل المعرض المشترك. تحقق من جدول Supabase وسياسات الوصول.",
     quipButton: "أطلق مزحة أخرى ↻", initialQuip: "يرجى العلم: ENS MBZ مشاغب معتمد.",
     footerNote: "متحف صغير على الإنترنت. ومشاغب كبير.", backTop: "العودة للأعلى ↑", languageButton: "English",
+    commentsButton: "التعليقات", commentsEyebrow: "المحادثة", commentsTitle: 'التعليقات<span class="period">.</span>', commentsEmpty: "لا توجد تعليقات بعد. ابدأ المحادثة.", commentsUnavailable: "التعليقات غير متاحة حالياً.", commentNameLabel: "اسمك", commentLabel: "تعليق", commentPlaceholder: "اكتب بلطف.", commentSubmit: "نشر التعليق", commentPosting: "جارٍ النشر…", commentRequired: "يرجى كتابة اسمك وتعليقك.", commentPosted: "تم نشر تعليقك.", commentFailed: "تعذر نشر تعليقك. حاول مرة أخرى.", takedownSummary: "اطلب إزالة هذه المشاركة", takedownReasonLabel: "لماذا يجب إزالتها؟", takedownPlaceholder: "أخبر المشرفين بالسبب.", takedownSubmit: "إرسال الطلب", takedownSending: "جارٍ الإرسال…", takedownRequired: "يرجى كتابة اسمك وسبب الطلب.", takedownSent: "تم إرسال طلبك إلى المشرفين.", takedownFailed: "تعذر إرسال طلبك. حاول مرة أخرى.",
   },
 };
 let currentLanguage = (() => {
@@ -193,6 +197,14 @@ function render() {
     tag.textContent = photoText(photo, "tag") || tr("newArrival");
     info.append(text, tag);
     card.append(info);
+    if (photo.remoteId) {
+      const comments = document.createElement("button");
+      comments.type = "button";
+      comments.className = "comments-button";
+      comments.textContent = tr("commentsButton");
+      comments.addEventListener("click", () => openComments(photo));
+      card.append(comments);
+    }
     grid.append(card);
   });
 }
@@ -220,6 +232,7 @@ contributeForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (isSubmitting) return;
   const uploader = document.querySelector("#submitterName").value.trim();
+  const description = document.querySelector("#postDescription").value.trim();
   const files = [...input.files].filter((file) => file.type.startsWith("image/") || isVideoFile(file) || /\.(avif|bmp|gif|heic|heif|jpe?g|png|svg|tiff?|webp)$/i.test(file.name));
   const error = document.querySelector("#formError");
   if (!uploader) { error.textContent = tr("requiredName"); return; }
@@ -257,14 +270,14 @@ contributeForm.addEventListener("submit", async (event) => {
           if (uploadError) throw uploadError;
           publicUrl = supabaseClient.storage.from("zayed-photos").getPublicUrl(path).data.publicUrl;
         }
-        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, image_url: publicUrl, media_type: mediaType, approved: false });
+        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, description, image_url: publicUrl, media_type: mediaType, approved: false });
         if (insertError) {
           if (cleanupSupabasePath) await supabaseClient.storage.from("zayed-photos").remove([cleanupSupabasePath]);
           throw insertError;
         }
         submitted++;
       } else {
-        const photo = { id: crypto.randomUUID(), blob: file, mediaType, title, caption: "Freshly added to the collection.", tag: "NEW ARRIVAL", uploader, local: true };
+        const photo = { id: crypto.randomUUID(), blob: file, mediaType, title, caption: description || "Freshly added to the collection.", tag: "NEW ARRIVAL", uploader, local: true };
         await savePhoto(photo);
         addedPhotos.push(photo);
         submitted++;
@@ -297,6 +310,80 @@ dialog.addEventListener("close", () => {
   video.pause();
   video.removeAttribute("src");
   video.load();
+});
+
+const commentsDialog = document.querySelector("#commentsDialog");
+const commentsList = document.querySelector("#commentsList");
+const commentsFor = document.querySelector("#commentsFor");
+const commentForm = document.querySelector("#commentForm");
+const takedownForm = document.querySelector("#takedownForm");
+let activeCommentPhoto = null;
+
+function showComments(items) {
+  commentsList.replaceChildren();
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "comments-empty";
+    empty.textContent = tr("commentsEmpty");
+    commentsList.append(empty);
+    return;
+  }
+  for (const item of items) {
+    const entry = document.createElement("article");
+    entry.className = "comment-entry";
+    const name = document.createElement("strong");
+    name.textContent = item.name;
+    const body = document.createElement("p");
+    body.textContent = item.body;
+    entry.append(name, body);
+    commentsList.append(entry);
+  }
+}
+
+async function openComments(photo) {
+  activeCommentPhoto = photo;
+  commentsFor.textContent = photo.title;
+  document.querySelector("#commentError").textContent = "";
+  document.querySelector("#takedownError").textContent = "";
+  commentsList.textContent = "…";
+  commentsDialog.showModal();
+  if (!supabaseClient) { commentsList.textContent = tr("commentsUnavailable"); return; }
+  const { data, error } = await supabaseClient.from("photo_comments")
+    .select("id,name,body,created_at").eq("photo_id", photo.remoteId).eq("status", "visible")
+    .order("created_at", { ascending: true });
+  if (error) { commentsList.textContent = tr("commentsUnavailable"); return; }
+  showComments(data || []);
+}
+
+document.querySelector("#commentsClose").addEventListener("click", () => commentsDialog.close());
+commentsDialog.addEventListener("click", (event) => { if (event.target === commentsDialog) commentsDialog.close(); });
+commentForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const error = document.querySelector("#commentError");
+  const name = document.querySelector("#commentName").value.trim();
+  const body = document.querySelector("#commentBody").value.trim();
+  if (!activeCommentPhoto || !name || !body) { error.textContent = tr("commentRequired"); return; }
+  const button = document.querySelector("#commentSubmit");
+  error.textContent = ""; button.disabled = true; button.textContent = tr("commentPosting");
+  const { data: insertedComment, error: insertError } = await supabaseClient.from("photo_comments").insert({ photo_id: activeCommentPhoto.remoteId, name, body }).select("id").single();
+  button.disabled = false; button.textContent = tr("commentSubmit");
+  if (insertError) { error.textContent = tr("commentFailed"); return; }
+  commentForm.reset(); error.textContent = tr("commentPosted");
+  if (insertedComment?.id) fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/comment-notify`, { method: "POST", headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" }, body: JSON.stringify({ commentId: insertedComment.id }) }).catch(() => {});
+  openComments(activeCommentPhoto);
+});
+takedownForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const error = document.querySelector("#takedownError");
+  const name = document.querySelector("#takedownName").value.trim();
+  const reason = document.querySelector("#takedownReason").value.trim();
+  if (!activeCommentPhoto || !name || !reason) { error.textContent = tr("takedownRequired"); return; }
+  const button = document.querySelector("#takedownSubmit");
+  error.textContent = ""; button.disabled = true; button.textContent = tr("takedownSending");
+  const { error: insertError } = await supabaseClient.from("photo_takedown_requests").insert({ photo_id: activeCommentPhoto.remoteId, name, reason });
+  button.disabled = false; button.textContent = tr("takedownSubmit");
+  if (insertError) { error.textContent = tr("takedownFailed"); return; }
+  takedownForm.reset(); error.textContent = tr("takedownSent");
 });
 
 const quips = {
@@ -362,6 +449,15 @@ for (const button of document.querySelectorAll("[data-language-toggle]")) {
   });
 }
 applyLanguage();
+const languageDialog = document.querySelector("#languageDialog");
+for (const button of document.querySelectorAll("[data-language-choice]")) {
+  button.addEventListener("click", () => {
+    applyLanguage(button.dataset.languageChoice);
+    try { localStorage.setItem("ensmbz-language-chosen", "true"); } catch { /* Choice is still used for this page view. */ }
+    languageDialog.close();
+  });
+}
+try { if (!localStorage.getItem("ensmbz-language-chosen")) languageDialog.showModal(); } catch { languageDialog.showModal(); }
 
 // The 404 audio only plays while the owner has paused the site.
 const pauseAudio = document.querySelector("#pauseAudio");
@@ -384,7 +480,7 @@ document.addEventListener("keydown", () => {
 async function loadSharedPhotos() {
   if (!supabaseReady || !supabaseClient) return;
   const { data, error } = await supabaseClient.from("photo_submissions")
-    .select("id,name,image_url,media_type,created_at")
+    .select("id,name,description,image_url,media_type,created_at")
     .eq("approved", true)
     .order("created_at", { ascending: false });
   if (error) {
@@ -392,8 +488,8 @@ async function loadSharedPhotos() {
     return;
   }
   sharedPhotos = (data || []).map((row) => ({
-    id: `shared-${row.id}`, src: row.image_url, mediaType: row.media_type || "image", title: "A community masterpiece",
-    caption: "Freshly added to the collection.", tag: "COMMUNITY", uploader: row.name
+    id: `shared-${row.id}`, remoteId: row.id, src: row.image_url, mediaType: row.media_type || "image", title: "A community masterpiece",
+    caption: row.description || "Freshly added to the collection.", tag: "COMMUNITY", uploader: row.name
   }));
   render();
 }

@@ -33,7 +33,11 @@ type PhotoRecord = {
   image_url: string;
   media_type?: "image" | "video";
   approved: boolean;
+  description?: string;
+  discord_comments_thread_id?: string | null;
 };
+
+type CommentRecord = { id: number | string; photo_id: number | string; name: string; body: string; discord_message_id?: string | null };
 
 type DatabaseWebhook = {
   type?: string;
@@ -77,6 +81,10 @@ function archiveComponents(id: string, deleted = false) {
     type: 1,
     components: [{ type: 2, style: 4, label: deleted ? "Deleted" : "Delete photo", custom_id: `ensmbz:delete:${id}`, disabled: deleted }],
   }];
+}
+
+function commentComponents(id: string, deleted = false) {
+  return [{ type: 1, components: [{ type: 2, style: 4, label: deleted ? "Deleted" : "Delete comment", custom_id: `ensmbz:delete-comment:${id}`, disabled: deleted }] }];
 }
 
 function siteCommandAction(options: unknown): "on" | "off" | null {
@@ -398,6 +406,76 @@ async function postApprovedPhoto(record: PhotoRecord): Promise<boolean> {
   return true;
 }
 
+async function ensureCommentsChannel(projectUrl: string, key: string): Promise<string> {
+  const current = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true&select=comments_channel_id`, { headers: supabaseHeaders(key) });
+  const rows = await current.json().catch(() => []);
+  if (current.ok && Array.isArray(rows) && rows[0]?.comments_channel_id) return String(rows[0].comments_channel_id);
+  const token = requiredEnv("DISCORD_BOT_TOKEN");
+  const reviewChannelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
+  const review = await fetch(`https://discord.com/api/v10/channels/${reviewChannelId}`, { headers: { authorization: `Bot ${token}` } });
+  const reviewInfo = await review.json().catch(() => ({}));
+  if (!review.ok || !reviewInfo.guild_id) throw new Error("Could not find the Discord review channel to create #photo-comments.");
+  const created = await fetch(`https://discord.com/api/v10/guilds/${reviewInfo.guild_id}/channels`, {
+    method: "POST", headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ name: "photo-comments", type: 0, parent_id: reviewInfo.parent_id || undefined, topic: "Private comment threads from the ENS MBZ gallery." }),
+  });
+  const channel = await created.json().catch(() => ({}));
+  if (!created.ok || !channel.id) throw new Error("The bot could not create #photo-comments. Give it Manage Channels permission and try again.");
+  const saved = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true`, {
+    method: "PATCH", headers: { ...supabaseHeaders(key), prefer: "return=minimal" }, body: JSON.stringify({ comments_channel_id: String(channel.id) }),
+  });
+  if (!saved.ok) throw new Error("The comments channel was created but could not be saved.");
+  return String(channel.id);
+}
+
+async function notifyComment(request: Request): Promise<Response> {
+  const payload = await request.json().catch(() => ({}));
+  const commentId = String(payload?.commentId || "");
+  if (!/^\d{1,19}$/.test(commentId)) return json({ error: "A comment ID is required." }, 400);
+  const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
+  const key = supabaseKey();
+  const loaded = await fetch(`${projectUrl}/rest/v1/photo_comments?id=eq.${encodeURIComponent(commentId)}&select=id,photo_id,name,body,discord_message_id`, { headers: supabaseHeaders(key) });
+  const comments = await loaded.json().catch(() => []);
+  if (!loaded.ok || !Array.isArray(comments) || !comments[0]) return json({ error: "Comment not found." }, 404);
+  const comment = comments[0] as CommentRecord;
+  if (comment.discord_message_id) return json({ ok: true, already_notified: true });
+  const photoLoaded = await fetch(`${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(String(comment.photo_id))}&select=id,name,description,discord_comments_thread_id`, { headers: supabaseHeaders(key) });
+  const photos = await photoLoaded.json().catch(() => []);
+  if (!photoLoaded.ok || !Array.isArray(photos) || !photos[0]) return json({ error: "Post not found." }, 404);
+  const photo = photos[0] as PhotoRecord;
+  const token = requiredEnv("DISCORD_BOT_TOKEN");
+  let threadId = photo.discord_comments_thread_id || "";
+  if (!threadId) {
+    const channelId = await ensureCommentsChannel(projectUrl, key);
+    const starter = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+      method: "POST", headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+      body: JSON.stringify({ content: `💬 **Gallery post #${photo.id}**\n${String(photo.description || "No description.").slice(0, 280)}`, allowed_mentions: { parse: [] } }),
+    });
+    const message = await starter.json().catch(() => ({}));
+    if (!starter.ok || !message.id) return json({ error: "Could not start the Discord comment thread." }, 502);
+    const thread = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${message.id}/threads`, {
+      method: "POST", headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+      body: JSON.stringify({ name: `Post #${photo.id} comments`, auto_archive_duration: 10080 }),
+    });
+    const threadInfo = await thread.json().catch(() => ({}));
+    if (!thread.ok || !threadInfo.id) return json({ error: "Could not create the post comment thread." }, 502);
+    threadId = String(threadInfo.id);
+    await fetch(`${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(String(photo.id))}&discord_comments_thread_id=is.null`, {
+      method: "PATCH", headers: { ...supabaseHeaders(key), prefer: "return=minimal" }, body: JSON.stringify({ discord_comments_thread_id: threadId }),
+    });
+  }
+  const posted = await fetch(`https://discord.com/api/v10/channels/${threadId}/messages`, {
+    method: "POST", headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ content: `**${String(comment.name).replace(/[\r\n<>]/g, " ").slice(0, 40)}**\n${String(comment.body).slice(0, 400)}`, components: commentComponents(String(comment.id)), allowed_mentions: { parse: [] } }),
+  });
+  const message = await posted.json().catch(() => ({}));
+  if (!posted.ok || !message.id) return json({ error: "Could not post the comment to Discord." }, 502);
+  await fetch(`${projectUrl}/rest/v1/photo_comments?id=eq.${encodeURIComponent(String(comment.id))}&discord_message_id=is.null`, {
+    method: "PATCH", headers: { ...supabaseHeaders(key), prefer: "return=minimal" }, body: JSON.stringify({ discord_message_id: String(message.id) }),
+  });
+  return json({ ok: true });
+}
+
 async function handleDatabaseWebhook(request: Request, body: string): Promise<Response> {
   const secret = Deno.env.get("DB_WEBHOOK_SECRET");
   if (!secret || request.headers.get("x-review-hook") !== secret) {
@@ -431,17 +509,33 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
   const appId = requiredEnv("DISCORD_APPLICATION_ID");
   const reviewChannelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
   const archiveChannelId = Deno.env.get("DISCORD_PHOTO_ARCHIVE_CHANNEL_ID")?.trim();
+  const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
+  const key = supabaseKey();
+  const channelLookup = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true&select=comments_channel_id`, { headers: supabaseHeaders(key) });
+  const channelRows = await channelLookup.json().catch(() => []);
+  const commentsChannelId = Array.isArray(channelRows) ? channelRows[0]?.comments_channel_id : null;
   const inArchive = Boolean(archiveChannelId && interaction.channel_id === archiveChannelId);
   const inReview = interaction.channel_id === reviewChannelId;
-  if (interaction.application_id !== appId || (!inReview && !inArchive) || !interaction.guild_id) {
-    return json({ type: 4, data: { content: "Use the buttons in the private photo-review or photo-archive channel.", flags: 64 } });
+  const inComments = Boolean(commentsChannelId && (interaction.channel_id === commentsChannelId || interaction.channel?.parent_id === commentsChannelId));
+  if (interaction.application_id !== appId || (!inReview && !inArchive && !inComments) || !interaction.guild_id) {
+    return json({ type: 4, data: { content: "Use the buttons in the private photo-review, photo-archive, or photo-comments channel.", flags: 64 } });
   }
 
-  const match = /^ensmbz:(approve|decline|delete):(\d{1,19})$/.exec(String(interaction.data?.custom_id || ""));
-  if (!match) return json({ type: 4, data: { content: "That photo action is not valid.", flags: 64 } });
+  const match = /^ensmbz:(approve|decline|delete|delete-comment):(\d{1,19})$/.exec(String(interaction.data?.custom_id || ""));
+  if (!match) return json({ type: 4, data: { content: "That action is not valid.", flags: 64 } });
   const [, action, id] = match;
   const memberRoles: unknown = interaction.member?.roles;
   const hasRole = (roleId: string) => Array.isArray(memberRoles) && memberRoles.includes(roleId);
+  if (action === "delete-comment") {
+    if (!inComments || !hasRole(SITE_CONTROL_ROLE_ID)) return json({ type: 4, data: { content: "You need the King role to delete comments.", flags: 64 } });
+    const removed = await fetch(`${projectUrl}/rest/v1/photo_comments?id=eq.${encodeURIComponent(id)}&status=eq.visible`, {
+      method: "PATCH", headers: { ...supabaseHeaders(key), prefer: "return=representation" }, body: JSON.stringify({ status: "removed" }),
+    });
+    const rows = await removed.json().catch(() => []);
+    if (!removed.ok || !Array.isArray(rows) || !rows.length) return json({ type: 4, data: { content: "This comment was already removed or could not be found.", flags: 64 } });
+    const reviewerId = interaction.member?.user?.id || interaction.user?.id;
+    return json({ type: 7, data: { content: `🗑️ Comment deleted.${reviewerId ? ` Deleted by <@${reviewerId}>.` : ""}`, components: commentComponents(id, true), allowed_mentions: { parse: [] } } });
+  }
   if (inReview && action === "delete") {
     const components = Array.isArray(interaction.message?.components)
       ? interaction.message.components.map((row: Record<string, any>) => ({
@@ -469,9 +563,6 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
       return json({ type: 4, data: { content: "You need the King or Photo Approver role to review submissions.", flags: 64 } });
     }
   }
-  const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
-  const key = supabaseKey();
-
   if (action === "delete") {
     const rowUrl = `${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(id)}&select=id,name,image_url,media_type,discord_archive_message_id`;
     const selected = await fetch(rowUrl, { headers: supabaseHeaders(key) });
@@ -615,6 +706,9 @@ Deno.serve(async (request: Request) => {
   const body = await request.text();
   if (body.length > 1_000_000) return json({ error: "Request too large" }, 413);
   try {
+    if (pathname.endsWith("/comment-notify")) {
+      return await notifyComment(new Request(request.url, { method: "POST", headers: request.headers, body }));
+    }
     if (request.headers.has("x-review-hook")) return await handleDatabaseWebhook(request, body);
     if (pathname.endsWith("/media-upload-url")) {
       if (request.method !== "POST") return json({ error: "POST required" }, 405);
