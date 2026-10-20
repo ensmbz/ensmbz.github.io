@@ -20,6 +20,10 @@ const SITE_COMMAND = {
     description: "Turn the photo website back on",
   }],
 };
+const PANIC_COMMAND = {
+  name: "panic",
+  description: "Show the owner-only button to clear photo posts from Discord",
+};
 
 type PhotoRecord = {
   id: number | string;
@@ -110,6 +114,126 @@ function supabaseHeaders(key: string) {
   };
 }
 
+async function discordApi(url: string, init: RequestInit): Promise<Response> {
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const response = await fetch(url, init);
+    if (response.status !== 429) return response;
+    const retryAfter = Number(response.headers.get("retry-after")) || 1;
+    await new Promise((resolve) => setTimeout(resolve, Math.ceil(retryAfter * 1000) + 100));
+  }
+  throw new Error("Discord rate limited the photo cleanup. Try the panic button again shortly.");
+}
+
+async function guildOwnerId(guildId: string): Promise<string | null> {
+  const response = await discordApi(`https://discord.com/api/v10/guilds/${encodeURIComponent(guildId)}`, {
+    headers: { authorization: `Bot ${requiredEnv("DISCORD_BOT_TOKEN")}` },
+  });
+  if (!response.ok) {
+    console.error("Could not check Discord server owner", response.status, await response.text());
+    return null;
+  }
+  const guild = await response.json().catch(() => ({}));
+  return typeof guild.owner_id === "string" ? guild.owner_id : null;
+}
+
+async function deletePhotoPosts(channelId: string): Promise<number> {
+  const token = requiredEnv("DISCORD_BOT_TOKEN");
+  const appId = requiredEnv("DISCORD_APPLICATION_ID");
+  let before = "";
+  let deleted = 0;
+  while (true) {
+    const beforeQuery = before ? `&before=${encodeURIComponent(before)}` : "";
+    const listed = await discordApi(`https://discord.com/api/v10/channels/${encodeURIComponent(channelId)}/messages?limit=100${beforeQuery}`, {
+      headers: { authorization: `Bot ${token}` },
+    });
+    if (!listed.ok) throw new Error(`Discord could not read a photo channel (HTTP ${listed.status}).`);
+    const messages = await listed.json().catch(() => []);
+    if (!Array.isArray(messages) || messages.length === 0) break;
+    before = String(messages[messages.length - 1].id || "");
+
+    for (const message of messages) {
+      const isPhotoPost = message.author?.id === appId && Array.isArray(message.embeds) &&
+        message.embeds.some((embed: Record<string, any>) => /^Submission #\d+/.test(String(embed.footer?.text || "")));
+      if (!isPhotoPost || !message.id) continue;
+      const removed = await discordApi(`https://discord.com/api/v10/channels/${encodeURIComponent(channelId)}/messages/${encodeURIComponent(String(message.id))}`, {
+        method: "DELETE",
+        headers: { authorization: `Bot ${token}` },
+      });
+      if (removed.status === 404) continue;
+      if (!removed.ok) throw new Error(`Discord could not delete a photo post (HTTP ${removed.status}).`);
+      deleted++;
+    }
+
+    if (messages.length < 100 || !before) break;
+  }
+  return deleted;
+}
+
+async function handlePanicCommand(interaction: Record<string, any>): Promise<Response> {
+  const reviewChannelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
+  const guildId = String(interaction.guild_id || "");
+  const userId = String(interaction.member?.user?.id || interaction.user?.id || "");
+  if (!guildId || interaction.channel_id !== reviewChannelId) {
+    return json({ type: 4, data: { content: "Use /panic in the private #photo-review channel.", flags: 64 } });
+  }
+  if (!userId || await guildOwnerId(guildId) !== userId) {
+    return json({ type: 4, data: { content: "Only the server owner can use the Discord photo panic button.", flags: 64 } });
+  }
+  return json({
+    type: 4,
+    data: {
+      content: "⚠️ This clears the bot’s photo posts from #photo-review and #photo-archive. Files on your PC and the website are not affected.",
+      flags: 64,
+      components: [{
+        type: 1,
+        components: [{ type: 2, style: 4, label: "PANIC — CLEAR DISCORD PHOTO POSTS", custom_id: `ensmbz:panic:${guildId}:${userId}` }],
+      }],
+      allowed_mentions: { parse: [] },
+    },
+  });
+}
+
+async function handlePanicButton(interaction: Record<string, any>): Promise<Response> {
+  const match = /^ensmbz:panic:(\d{1,20}):(\d{1,20})$/.exec(String(interaction.data?.custom_id || ""));
+  if (!match) return json({ type: 4, data: { content: "That panic button is not valid.", flags: 64 } });
+  const [, expectedGuildId, expectedUserId] = match;
+  const guildId = String(interaction.guild_id || "");
+  const userId = String(interaction.member?.user?.id || interaction.user?.id || "");
+  if (interaction.application_id !== requiredEnv("DISCORD_APPLICATION_ID") ||
+      interaction.channel_id !== requiredEnv("DISCORD_REVIEW_CHANNEL_ID") ||
+      guildId !== expectedGuildId || userId !== expectedUserId ||
+      await guildOwnerId(guildId) !== userId) {
+    return json({ type: 4, data: { content: "Only the server owner can use this panic button in #photo-review.", flags: 64 } });
+  }
+
+  const applicationId = String(interaction.application_id || "");
+  const token = String(interaction.token || "");
+  const finishPanic = async () => {
+    const channels = [
+      { name: "#photo-review", id: requiredEnv("DISCORD_REVIEW_CHANNEL_ID") },
+      { name: "#photo-archive", id: requiredEnv("DISCORD_PHOTO_ARCHIVE_CHANNEL_ID") },
+    ];
+    const results = await Promise.all(channels.map(async (channel) => {
+      try { return { name: channel.name, count: await deletePhotoPosts(channel.id), error: "" }; }
+      catch (error) { return { name: channel.name, count: 0, error: error instanceof Error ? error.message : "Cleanup failed." }; }
+    }));
+    const total = results.reduce((sum, result) => sum + result.count, 0);
+    const detail = results.map((result) => result.error ? `${result.name}: ${result.error}` : `${result.name}: ${result.count}`).join(" · ");
+    const content = `🧹 Discord photo cleanup finished. Deleted ${total} photo post(s). ${detail}. Files on your PC and the website are untouched.`;
+    const edited = await discordApi(`https://discord.com/api/v10/webhooks/${applicationId}/${token}/messages/@original`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ content, components: [] }),
+    });
+    if (!edited.ok) console.error("Could not report Discord photo cleanup", edited.status, await edited.text());
+  };
+  const backgroundTask = finishPanic().catch((error) => console.error("Discord panic cleanup failed", error));
+  const runtime = (globalThis as typeof globalThis & { EdgeRuntime?: { waitUntil: (promise: Promise<unknown>) => void } }).EdgeRuntime;
+  if (runtime) runtime.waitUntil(backgroundTask);
+  else await backgroundTask;
+  return json({ type: 5, data: { flags: 64 } });
+}
+
 async function setSiteLive(isLive: boolean): Promise<boolean> {
   const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
   const key = supabaseKey();
@@ -193,17 +317,19 @@ async function registerSiteCommand(): Promise<Response> {
     return json({ error: "Discord would not list the bot's server commands." }, 502);
   }
   const commands = await listed.json().catch(() => []);
-  const existing = Array.isArray(commands) ? commands.find((item: any) => item.name === "site") : null;
-  const response = await fetch(existing ? `${endpoint}/${existing.id}` : endpoint, {
-    method: existing ? "PATCH" : "POST",
-    headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
-    body: JSON.stringify(SITE_COMMAND),
-  });
-  if (!response.ok) {
-    console.error("Could not register Discord /site command", response.status, await response.text());
-    return json({ error: "Discord could not register /site. Check that the bot has applications.commands permission." }, 502);
+  for (const command of [SITE_COMMAND, PANIC_COMMAND]) {
+    const existing = Array.isArray(commands) ? commands.find((item: any) => item.name === command.name) : null;
+    const response = await discordApi(existing ? `${endpoint}/${existing.id}` : endpoint, {
+      method: existing ? "PATCH" : "POST",
+      headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+      body: JSON.stringify(command),
+    });
+    if (!response.ok) {
+      console.error(`Could not register Discord /${command.name} command`, response.status, await response.text());
+      return json({ error: `Discord could not register /${command.name}. Check that the bot has applications.commands permission.` }, 502);
+    }
   }
-  return json({ ok: true, command: "/site", guild_id: channel.guild_id });
+  return json({ ok: true, commands: ["/site", "/panic"], guild_id: channel.guild_id });
 }
 
 async function postPendingPhoto(record: PhotoRecord): Promise<Response> {
@@ -478,7 +604,15 @@ Deno.serve(async (request: Request) => {
     const interaction = JSON.parse(body) as Record<string, any>;
     if (interaction.application_id !== requiredEnv("DISCORD_APPLICATION_ID")) return json({ error: "Wrong application" }, 401);
     if (interaction.type === 1) return json({ type: 1 });
-    if (interaction.type === 3) return await handleButton(interaction);
+    if (interaction.type === 3) {
+      if (String(interaction.data?.custom_id || "").startsWith("ensmbz:panic:")) {
+        return await handlePanicButton(interaction);
+      }
+      return await handleButton(interaction);
+    }
+    if (interaction.type === 2 && interaction.data?.name === "panic") {
+      return await handlePanicCommand(interaction);
+    }
     if (interaction.type === 2 && (
       interaction.data?.name === "site" ||
       interaction.data?.name === "on" ||
