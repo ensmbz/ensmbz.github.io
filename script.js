@@ -401,8 +401,9 @@ function applyLanguage(language = currentLanguage) {
   const isArabic = currentLanguage === "ar";
   document.documentElement.lang = isArabic ? "ar-AE" : "en";
   document.documentElement.dir = isArabic ? "rtl" : "ltr";
-  for (const element of document.querySelectorAll("[data-i18n]")) {
-    const value = tr(element.dataset.i18n);
+  for (const element of document.querySelectorAll("[data-i18n], [data-i18n-html]")) {
+    const key = element.dataset.i18n || element.dataset.i18nHtml;
+    const value = tr(key);
     if (element.hasAttribute("data-i18n-html")) element.innerHTML = value;
     else element.textContent = value;
   }
