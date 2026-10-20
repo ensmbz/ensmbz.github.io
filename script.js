@@ -1,23 +1,15 @@
-const basePhotos = [
-  { id: "base-0823", src: "assets/IMG_0823.PNG", title: "ENS MBZ vs. lunch", caption: "The rice has more brain cells. Probably.", tag: "RICE INCIDENT" },
-  { id: "base-0822", src: "assets/IMG_0822.PNG", title: "The thinking close-up", caption: "Searching for the last brain cell…", tag: "LOADING..." },
-  { id: "base-0821", src: "assets/IMG_0821.PNG", title: "Backseat philosopher", caption: "Has thoughts. We assume.", tag: "ROAD EDITION" }
-];
 const translations = {
   en: {
     pauseEyebrow: "ENS MBZ PHOTO MUSEUM", pauseTitle: 'TAKING A<br>BREAK<span class="period">.</span>',
     pausedMessage: "The site owner has paused the museum. Please check back later.",
     ticker: "★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★",
-    navGallery: "THE GALLERY", navAbout: "ABOUT THIS MASTERPIECE", soundOn: "FART NOISES: ON", soundOff: "FART NOISES: OFF",
+    navGallery: "THE GALLERY", navAbout: "ABOUT THIS MASTERPIECE",
     heroEyebrow: "ENS MBZ ARCHIVE · THINKING NOT REQUIRED", heroTitle: 'THE<br><span class="headline-last">ENS MBZ</span> MUSEUM<span class="period">.</span>',
     heroDescription: "A collection of moments, expressions, and one unexpected meeting with lunch. Certified goofball. Questionable decisions. Excellent photo collection.",
     tourLink: "TAKE THE TOUR", scribbleOne: "brain cell<br>loading...", scribbleTwo: "← swipe<br>for evidence",
     scrollExhibition: "SCROLL FOR THE EXHIBITION", figureLabel: "FIG. 001 — ∞", collection: "THE PERMANENT COLLECTION",
     galleryTitle: 'THE GALLERY<span class="period">.</span>', addPhotos: "ADD PHOTOS OR VIDEOS", galleryNote: "Museum rule #1: there are no bad angles, only interesting evidence.",
-    dropHint: 'Got more? Drop photos or videos anywhere in the gallery or tap “Add your photos”.', soundtrackEyebrow: "PLEASE ENJOY ENS MBZ'S VERY SERIOUS SOUNDTRACK",
-    themeStamp: "ENS MBZ'S<br>OFFICIAL<br>THEME", jingleTitle: "THE OFFICIAL<br>ENS MBZ <em>JINGLE.</em>",
-    jingleDescription: "ENS MBZ's signature sound effect, on an endless loop. Your browser may require a tap anywhere on the page before it allows audio.",
-    jingleStatus: "♪ DRY FART · ON REPEAT", jingleMutedStatus: "♪ DRY FART · MUTED", formEyebrow: "ADD TO THE ENS MBZ ARCHIVE", formTitle: 'SUBMIT MEDIA<span class="period">.</span>',
+    dropHint: 'Got more? Drop photos or videos anywhere in the gallery or tap “Add your photos”.', formEyebrow: "ADD TO THE ENS MBZ ARCHIVE", formTitle: 'SUBMIT MEDIA<span class="period">.</span>',
     nameLabel: 'YOUR NAME <span>(required)</span>', namePlaceholder: "Who is submitting this?", filesLabel: 'PHOTOS OR VIDEOS <span>(required · photos up to 5 MB, videos up to 50 MB)</span>',
     chooseMedia: "CHOOSE PHOTOS OR VIDEOS", noMediaSelected: "No media selected", mediaSelected: "item selected", mediaSelectedMany: "items selected",
     formHelp: "Your name will appear next to the photos or videos. MP4 works best; use the video controls to hear its audio. Submissions appear after approval.",
@@ -36,16 +28,13 @@ const translations = {
     pauseEyebrow: "متحف صور المدرسة الإماراتية في مدينة زايد", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
     pausedMessage: "أوقف مالك الموقع المتحف مؤقتاً. تفقّد الموقع لاحقاً.",
     ticker: "★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★",
-    navGallery: "المعرض", navAbout: "عن هذه التحفة", soundOn: "صوت الضرطة: يعمل", soundOff: "صوت الضرطة: متوقف",
+    navGallery: "المعرض", navAbout: "عن هذه التحفة",
     heroEyebrow: "أرشيف المدرسة الإماراتية · التفكير غير مطلوب", heroTitle: 'متحف<br><span class="headline-last">ENS MBZ</span><span class="period">.</span>',
     heroDescription: "مجموعة من اللحظات والتعابير ولقاء غير متوقع مع الغداء. خفة ظل معتمدة، وقرارات مثيرة للجدل، ومجموعة صور ممتازة.",
     tourLink: "ابدأ الجولة", scribbleOne: "خلية دماغية<br>جارٍ التحميل...", scribbleTwo: "← اسحب<br>لرؤية الأدلة",
     scrollExhibition: "مرّر لاستكشاف المعرض", figureLabel: "الصورة ٠٠١ — ∞", collection: "المجموعة الدائمة",
     galleryTitle: 'المعرض<span class="period">.</span>', addPhotos: "أضف صوراً أو فيديو", galleryNote: "قاعدة المتحف الأولى: لا توجد زوايا سيئة، بل أدلة مثيرة للاهتمام.",
-    dropHint: 'هل لديك المزيد؟ أفلِت الصور أو الفيديوهات في أي مكان بالمعرض أو اضغط «أضف صورك».', soundtrackEyebrow: "استمتعوا بالموسيقى الرسمية والجدية جداً لـ ENS MBZ",
-    themeStamp: "النشيد<br>الرسمي<br>لـ ENS MBZ", jingleTitle: 'النشيد الرسمي<br>لـ ENS MBZ<span class="period">.</span>',
-    jingleDescription: "المؤثر الصوتي المميز لـ ENS MBZ، في تكرار مستمر. قد يحتاج المتصفح إلى نقرة على الصفحة قبل تشغيل الصوت.",
-    jingleStatus: "♪ صوت الضرطة · يتكرر", jingleMutedStatus: "♪ صوت الضرطة · مكتوم", formEyebrow: "أضف إلى أرشيف ENS MBZ", formTitle: 'أرسل صوراً أو فيديو<span class="period">.</span>',
+    dropHint: 'هل لديك المزيد؟ أفلِت الصور أو الفيديوهات في أي مكان بالمعرض أو اضغط «أضف صورك».', formEyebrow: "أضف إلى أرشيف ENS MBZ", formTitle: 'أرسل صوراً أو فيديو<span class="period">.</span>',
     nameLabel: 'اسمك <span>(مطلوب)</span>', namePlaceholder: "من يرسل الصور أو الفيديو؟", filesLabel: 'صور أو فيديوهات <span>(مطلوب · الصور حتى ٥ م.ب. والفيديو حتى ٥٠ م.ب.)</span>',
     chooseMedia: "اختر صوراً أو فيديوهات", noMediaSelected: "لم يتم اختيار ملفات", mediaSelected: "ملف تم اختياره", mediaSelectedMany: "ملفات تم اختيارها",
     formHelp: "سيظهر اسمك بجانب الصور أو الفيديوهات. صيغة MP4 هي الأفضل؛ استخدم أدوات الفيديو لتشغيل الصوت. تظهر المشاركات بعد الموافقة.",
@@ -66,18 +55,11 @@ let currentLanguage = (() => {
   catch { return "en"; }
 })();
 function tr(key) { return translations[currentLanguage][key] ?? translations.en[key] ?? key; }
-const arabicBasePhotoText = {
-  "base-0823": { title: "ENS MBZ في مواجهة الغداء", caption: "الأرز فيه خلايا دماغية أكثر. غالباً.", tag: "حادثة الأرز" },
-  "base-0822": { title: "لقطة التفكير العميق", caption: "نبحث عن آخر خلية دماغية...", tag: "جارٍ التحميل" },
-  "base-0821": { title: "فيلسوف المقعد الخلفي", caption: "لديه أفكار. على ما يبدو.", tag: "نسخة الطريق" },
-};
 const videoFilePattern = /\.(mp4|m4v|mov|webm|ogv)$/i;
 function isVideoFile(file) {
   return ["video/mp4", "video/webm", "video/quicktime", "video/ogg", "video/x-m4v"].includes(file.type.toLowerCase()) || videoFilePattern.test(file.name);
 }
-function photoText(photo, field) {
-  return currentLanguage === "ar" ? (arabicBasePhotoText[photo.id]?.[field] || photo[field]) : photo[field];
-}
+function photoText(photo, field) { return photo[field]; }
 const grid = document.querySelector("#photoGrid");
 const input = document.querySelector("#photoInput");
 const count = document.querySelector("#photoCount");
@@ -126,7 +108,7 @@ async function deletePhoto(id) {
 }
 function render() {
   grid.replaceChildren();
-  const photos = [...basePhotos, ...sharedPhotos, ...addedPhotos];
+  const photos = [...sharedPhotos, ...addedPhotos];
   const localizedCount = currentLanguage === "ar"
     ? new Intl.NumberFormat("ar-AE", { minimumIntegerDigits: 2 }).format(photos.length)
     : String(photos.length).padStart(2, "0");
@@ -247,14 +229,31 @@ contributeForm.addEventListener("submit", async (event) => {
       const title = file.name.replace(/\.[^.]+$/, "") || "A new masterpiece";
       const mediaType = isVideoFile(file) ? "video" : "image";
       if (supabaseReady && supabaseClient) {
-        const extension = file.name.match(/\.[a-zA-Z0-9]{1,10}$/)?.[0]?.toLowerCase() || (mediaType === "video" ? ".mp4" : ".jpg");
-        const path = `${mediaType === "video" ? "videos" : "photos"}/${crypto.randomUUID()}${extension}`;
-        const { error: uploadError } = await supabaseClient.storage.from("zayed-photos").upload(path, file, { upsert: false, contentType: file.type || (mediaType === "video" ? "video/mp4" : "image/jpeg") });
-        if (uploadError) throw uploadError;
-        const { data: urlData } = supabaseClient.storage.from("zayed-photos").getPublicUrl(path);
-        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, image_url: urlData.publicUrl, media_type: mediaType, approved: false });
+        const contentType = file.type || (mediaType === "video" ? "video/mp4" : "image/jpeg");
+        let publicUrl;
+        let cleanupSupabasePath = "";
+        if (supabaseSettings.mediaStorageProvider === "r2") {
+          const uploadUrlResponse = await fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/media-upload-url`, {
+            method: "POST",
+            headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" },
+            body: JSON.stringify({ name: file.name, contentType, size: file.size }),
+          });
+          const uploadTarget = await uploadUrlResponse.json().catch(() => ({}));
+          if (!uploadUrlResponse.ok || !uploadTarget.uploadUrl || !uploadTarget.publicUrl) throw new Error(uploadTarget.error || "Could not prepare the media upload.");
+          const uploadResponse = await fetch(uploadTarget.uploadUrl, { method: "PUT", headers: { "content-type": contentType }, body: file });
+          if (!uploadResponse.ok) throw new Error(`R2 upload failed (HTTP ${uploadResponse.status}). Check the bucket CORS settings.`);
+          publicUrl = uploadTarget.publicUrl;
+        } else {
+          const extension = file.name.match(/\.[a-zA-Z0-9]{1,10}$/)?.[0]?.toLowerCase() || (mediaType === "video" ? ".mp4" : ".jpg");
+          const path = `${mediaType === "video" ? "videos" : "photos"}/${crypto.randomUUID()}${extension}`;
+          cleanupSupabasePath = path;
+          const { error: uploadError } = await supabaseClient.storage.from("zayed-photos").upload(path, file, { upsert: false, contentType });
+          if (uploadError) throw uploadError;
+          publicUrl = supabaseClient.storage.from("zayed-photos").getPublicUrl(path).data.publicUrl;
+        }
+        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, image_url: publicUrl, media_type: mediaType, approved: false });
         if (insertError) {
-          await supabaseClient.storage.from("zayed-photos").remove([path]);
+          if (cleanupSupabasePath) await supabaseClient.storage.from("zayed-photos").remove([cleanupSupabasePath]);
           throw insertError;
         }
         submitted++;
@@ -350,59 +349,26 @@ function applyLanguage(language = currentLanguage) {
 for (const button of document.querySelectorAll("[data-language-toggle]")) {
   button.addEventListener("click", () => {
     applyLanguage(currentLanguage === "ar" ? "en" : "ar");
-    updateSoundToggle();
   });
 }
 applyLanguage();
 
-// Loop the supplied sound effect unless a visitor turns it off.
-const loopAudio = document.querySelector("#loopAudio");
+// The 404 audio only plays while the owner has paused the site.
 const pauseAudio = document.querySelector("#pauseAudio");
-const soundToggle = document.querySelector("#soundToggle");
-const soundToggleLabel = document.querySelector("#soundToggleLabel");
 let siteIsPaused = false;
 let siteStatusKnown = false;
-let fartSoundsEnabled = (() => {
-  try { return localStorage.getItem("ensmbz-fart-sounds") !== "off"; }
-  catch { return true; }
-})();
-loopAudio.volume = 0.45;
 pauseAudio.volume = 0.45;
-function updateSoundToggle() {
-  const labelKey = fartSoundsEnabled ? "soundOn" : "soundOff";
-  soundToggle.setAttribute("aria-pressed", String(fartSoundsEnabled));
-  soundToggle.setAttribute("aria-label", tr(labelKey));
-  soundToggleLabel.textContent = tr(labelKey);
-  document.querySelector(".audio-status").textContent = tr(fartSoundsEnabled ? "jingleStatus" : "jingleMutedStatus");
-}
-soundToggle.addEventListener("click", () => {
-  fartSoundsEnabled = !fartSoundsEnabled;
-  try { localStorage.setItem("ensmbz-fart-sounds", fartSoundsEnabled ? "on" : "off"); } catch { /* Keep the preference for this page view. */ }
-  updateSoundToggle();
-  loopAudio.pause();
-  document.querySelector(".music-art")?.classList.remove("playing");
-  if (fartSoundsEnabled && siteStatusKnown && !siteIsPaused) startAudio();
-});
-updateSoundToggle();
-async function startAudio() {
-  const selectedAudio = siteIsPaused ? pauseAudio : (fartSoundsEnabled ? loopAudio : null);
-  if (!selectedAudio) {
-    loopAudio.pause();
-    document.querySelector(".music-art")?.classList.remove("playing");
-    return;
-  }
-  const otherAudio = siteIsPaused ? loopAudio : pauseAudio;
-  otherAudio.pause();
+async function startPauseAudio() {
+  if (!siteIsPaused) return;
   try {
-    await selectedAudio.play();
-    document.querySelector(".music-art")?.classList.toggle("playing", !siteIsPaused);
+    await pauseAudio.play();
   } catch { /* Browser autoplay policy may require a visitor interaction. */ }
 }
 document.addEventListener("pointerdown", () => {
-  if (siteStatusKnown && (siteIsPaused ? pauseAudio : loopAudio).paused && (siteIsPaused || fartSoundsEnabled)) startAudio();
+  if (siteStatusKnown && siteIsPaused && pauseAudio.paused) startPauseAudio();
 });
 document.addEventListener("keydown", () => {
-  if (siteStatusKnown && (siteIsPaused ? pauseAudio : loopAudio).paused && (siteIsPaused || fartSoundsEnabled)) startAudio();
+  if (siteStatusKnown && siteIsPaused && pauseAudio.paused) startPauseAudio();
 });
 
 async function loadSharedPhotos() {
@@ -441,7 +407,12 @@ async function refreshSiteStatus() {
     siteStatusKnown = true;
     sitePaused.hidden = !paused;
     document.body.classList.toggle("is-site-paused", paused);
-    if ((paused ? pauseAudio : loopAudio).paused) startAudio();
+    if (paused) {
+      if (pauseAudio.paused) startPauseAudio();
+    } else if (!pauseAudio.paused) {
+      pauseAudio.pause();
+      pauseAudio.currentTime = 0;
+    }
   } catch {
     // Keep the site available if Supabase is temporarily unreachable.
   }

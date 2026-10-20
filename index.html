@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=video-audio-support-1">
+  <link rel="stylesheet" href="style.css?v=clean-gallery-1">
 </head>
 <body>
   <div class="site-paused" id="sitePaused" hidden role="status" aria-live="polite">
@@ -19,7 +19,7 @@
   <header class="topbar">
     <a class="wordmark" href="#top" aria-label="The ENS MBZ Files home"><img class="wordmark-icon" src="assets/ens-mbz-school-logo.jpg" alt="" width="38" height="38"> THE ENS MBZ FILES</a>
     <nav><a href="#gallery" data-i18n="navGallery">THE GALLERY</a><a href="#about" data-i18n="navAbout">ABOUT THIS MASTERPIECE</a></nav>
-    <div class="topbar-actions"><button class="language-toggle" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button><button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true"><span class="sound-dot" aria-hidden="true"></span><span id="soundToggleLabel">FART NOISES: ON</span></button></div>
+    <div class="topbar-actions"><button class="language-toggle" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button></div>
   </header>
 
   <main id="top">
@@ -43,7 +43,7 @@
     <section class="gallery-section" id="gallery">
       <div class="section-heading">
         <div><p class="eyebrow" data-i18n="collection">THE PERMANENT COLLECTION</p><h2 data-i18n-html="galleryTitle">THE GALLERY<span class="period">.</span></h2></div>
-        <div class="gallery-tools"><span class="photo-count" id="photoCount">03 OBJECTS</span><button class="add-button" id="addPhotos" type="button"><span>＋</span><span data-i18n="addPhotos">ADD YOUR PHOTOS</span></button></div>
+        <div class="gallery-tools"><span class="photo-count" id="photoCount">00 OBJECTS</span><button class="add-button" id="addPhotos" type="button"><span>＋</span><span data-i18n="addPhotos">ADD YOUR PHOTOS</span></button></div>
       </div>
       <p class="gallery-note" data-i18n="galleryNote">Museum rule #1: there are no bad angles, only interesting evidence.</p>
       <div class="photo-grid" id="photoGrid" aria-live="polite"></div>
@@ -51,13 +51,7 @@
       <p class="storage-note" id="storageNote">Photos submitted here appear in the shared gallery after approval.</p>
     </section>
 
-    <section class="intermission" id="about">
-      <div class="intermission-stamp" data-i18n-html="themeStamp">ENS MBZ'S<br>OFFICIAL<br>THEME</div>
-      <div class="intermission-copy"><p class="eyebrow" data-i18n="soundtrackEyebrow">PLEASE ENJOY ENS MBZ'S VERY SERIOUS SOUNDTRACK</p><h2 data-i18n-html="jingleTitle">THE OFFICIAL<br>ENS MBZ <em>JINGLE.</em></h2><p data-i18n="jingleDescription">ENS MBZ's signature sound effect, on an endless loop. Your browser may require a tap anywhere on the page before it allows audio.</p><span class="audio-status" data-i18n="jingleStatus">♪ DRY FART · ON REPEAT</span></div>
-      <div class="music-art" aria-hidden="true"><div class="music-disc"><div class="disc-center"><img src="assets/ens-mbz-school-logo.jpg" alt=""></div></div><span class="music-note note-a">♪</span><span class="music-note note-b">♫</span><span class="music-note note-c">♬</span><div class="equalizer"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p>NOW SPINNING: ENS MBZ'S LAST BRAIN CELL</p></div>
-    </section>
-
-    <section class="about-strip"><img class="about-mark" src="assets/ens-mbz-school-logo.jpg" alt="Emirates National Schools logo" width="48" height="48"><p id="quip" data-i18n="initialQuip">THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.</p><button id="quipButton" type="button" aria-label="Generate another ENS MBZ roast" data-i18n="quipButton">ROAST HIM AGAIN ↻</button></section>
+    <section class="about-strip" id="about"><img class="about-mark" src="assets/ens-mbz-school-logo.jpg" alt="Emirates National Schools logo" width="48" height="48"><p id="quip" data-i18n="initialQuip">THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.</p><button id="quipButton" type="button" aria-label="Generate another ENS MBZ roast" data-i18n="quipButton">ROAST HIM AGAIN ↻</button></section>
   </main>
   <footer><a class="wordmark" href="#top"><img class="wordmark-icon" src="assets/ens-mbz-school-logo.jpg" alt="" width="38" height="38"> THE ENS MBZ FILES</a><span data-i18n="footerNote">A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.</span><a class="back-top" href="#top" data-i18n="backTop">BACK TO TOP ↑</a></footer>
   <dialog id="contributeDialog" class="contribute-dialog">
@@ -75,10 +69,9 @@
     </form>
   </dialog>
   <dialog id="photoDialog" class="photo-dialog"><button class="dialog-close" id="dialogClose" aria-label="Close photo" data-i18n-aria-label="close" type="button">×</button><img id="dialogImage" alt="Expanded gallery photograph"><video id="dialogVideo" controls playsinline preload="metadata" hidden></video><p id="dialogCaption"></p></dialog>
-  <audio id="loopAudio" src="assets/dry-fart.mp3" loop preload="auto"></audio>
   <audio id="pauseAudio" src="assets/404.mp3" loop preload="none"></audio>
-  <script src="supabase-config.js?v=1"></script>
+  <script src="supabase-config.js?v=r2-media-1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=video-audio-support-1"></script>
+  <script src="script.js?v=clean-gallery-1"></script>
 </body>
 </html>
