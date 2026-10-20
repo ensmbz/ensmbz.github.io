@@ -270,7 +270,10 @@ contributeForm.addEventListener("submit", async (event) => {
           if (uploadError) throw uploadError;
           publicUrl = supabaseClient.storage.from("zayed-photos").getPublicUrl(path).data.publicUrl;
         }
-        const { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, description, image_url: publicUrl, media_type: mediaType, approved: false });
+        let { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, description, image_url: publicUrl, media_type: mediaType, approved: false });
+        if (insertError && /description/i.test(insertError.message || "")) {
+          ({ error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, image_url: publicUrl, media_type: mediaType, approved: false }));
+        }
         if (insertError) {
           if (cleanupSupabasePath) await supabaseClient.storage.from("zayed-photos").remove([cleanupSupabasePath]);
           throw insertError;
