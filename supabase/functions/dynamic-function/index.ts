@@ -1,3 +1,5 @@
+import { AwsClient } from "npm:aws4fetch@1.0.20";
+import { createPanicHandlers } from "./panic.mjs";
 const encoder = new TextEncoder();
 const APP_NAME = "ENS MBZ Photo Review";
 const APPROVER_ROLE_ID = "1561872957670826135";
@@ -22,7 +24,7 @@ const SITE_COMMAND = {
 };
 const PANIC_COMMAND = {
   name: "panic",
-  description: "Show the owner-only button to clear photo posts from Discord",
+  description: "Owner only: permanently delete the ENS MBZ site, media and GitHub repository",
 };
 
 type PhotoRecord = {
@@ -115,6 +117,49 @@ function supabaseHeaders(key: string) {
   };
 }
 
+function r2Config() {
+  const accountId = requiredEnv("R2_ACCOUNT_ID");
+  const bucket = requiredEnv("R2_BUCKET_NAME");
+  const publicBase = requiredEnv("R2_PUBLIC_BASE_URL").replace(/\/$/, "");
+  const client = new AwsClient({
+    accessKeyId: requiredEnv("R2_ACCESS_KEY_ID"),
+    secretAccessKey: requiredEnv("R2_SECRET_ACCESS_KEY"),
+    service: "s3",
+    region: "auto",
+  });
+  return { bucket, publicBase, client, endpoint: `https://${accountId}.r2.cloudflarestorage.com` };
+}
+
+function encodedObjectPath(path: string): string {
+  return path.split("/").map(encodeURIComponent).join("/");
+}
+
+async function handleMediaUploadUrl(request: Request): Promise<Response> {
+  const origin = request.headers.get("origin");
+  const allowedOrigin = Deno.env.get("MEDIA_UPLOAD_ORIGIN")?.trim();
+  if (allowedOrigin && origin !== allowedOrigin) return json({ error: "Upload origin is not allowed." }, 403);
+  const body = await request.json().catch(() => null) as Record<string, unknown> | null;
+  const name = typeof body?.name === "string" ? body.name : "";
+  const contentType = typeof body?.contentType === "string" ? body.contentType.toLowerCase() : "";
+  const size = Number(body?.size);
+  const isVideo = contentType.startsWith("video/");
+  const allowedImage = /^image\/(jpeg|png|webp|gif|avif|bmp|tiff|heic|heif)$/.test(contentType);
+  const allowedVideo = /^video\/(mp4|webm|quicktime|ogg|x-m4v)$/.test(contentType);
+  if ((!allowedImage && !allowedVideo) || !Number.isFinite(size) || size <= 0 || size > (isVideo ? 50 : 5) * 1024 * 1024) {
+    return json({ error: "Choose a supported photo up to 5 MB or video up to 50 MB." }, 400);
+  }
+  const extension = name.match(/\.[a-zA-Z0-9]{1,10}$/)?.[0]?.toLowerCase() || (isVideo ? ".mp4" : ".jpg");
+  const key = `${isVideo ? "videos" : "photos"}/${crypto.randomUUID()}${extension}`;
+  const { bucket, publicBase, client, endpoint } = r2Config();
+  const objectUrl = `${endpoint}/${encodeURIComponent(bucket)}/${encodedObjectPath(key)}?X-Amz-Expires=900`;
+  const signedRequest = await client.sign(objectUrl, {
+    method: "PUT",
+    headers: { "content-type": contentType },
+    aws: { signQuery: true },
+  });
+  return json({ uploadUrl: signedRequest.url, publicUrl: `${publicBase}/${encodedObjectPath(key)}`, key, mediaType: isVideo ? "video" : "image" });
+}
+
 async function discordApi(url: string, init: RequestInit): Promise<Response> {
   for (let attempt = 0; attempt < 6; attempt++) {
     const response = await fetch(url, init);
@@ -137,7 +182,7 @@ async function guildOwnerId(guildId: string): Promise<string | null> {
   return typeof guild.owner_id === "string" ? guild.owner_id : null;
 }
 
-async function deletePhotoPosts(channelId: string): Promise<number> {
+async function deleteSitePosts(channelId: string): Promise<number> {
   const token = requiredEnv("DISCORD_BOT_TOKEN");
   const appId = requiredEnv("DISCORD_APPLICATION_ID");
   let before = "";
@@ -153,9 +198,7 @@ async function deletePhotoPosts(channelId: string): Promise<number> {
     before = String(messages[messages.length - 1].id || "");
 
     for (const message of messages) {
-      const isPhotoPost = message.author?.id === appId && Array.isArray(message.embeds) &&
-        message.embeds.some((embed: Record<string, any>) => /^Submission #\d+/.test(String(embed.footer?.text || "")));
-      if (!isPhotoPost || !message.id) continue;
+      if (message.author?.id !== appId || !message.id) continue;
       const removed = await discordApi(`https://discord.com/api/v10/channels/${encodeURIComponent(channelId)}/messages/${encodeURIComponent(String(message.id))}`, {
         method: "DELETE",
         headers: { authorization: `Bot ${token}` },
@@ -170,70 +213,16 @@ async function deletePhotoPosts(channelId: string): Promise<number> {
   return deleted;
 }
 
-async function handlePanicCommand(interaction: Record<string, any>): Promise<Response> {
-  const reviewChannelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
-  const guildId = String(interaction.guild_id || "");
-  const userId = String(interaction.member?.user?.id || interaction.user?.id || "");
-  if (!guildId || interaction.channel_id !== reviewChannelId) {
-    return json({ type: 4, data: { content: "Use /panic in the private #photo-review channel.", flags: 64 } });
-  }
-  if (!userId || await guildOwnerId(guildId) !== userId) {
-    return json({ type: 4, data: { content: "Only the server owner can use the Discord photo panic button.", flags: 64 } });
-  }
-  return json({
-    type: 4,
-    data: {
-      content: "⚠️ This clears the bot’s photo posts from #photo-review and #photo-archive. Files on your PC and the website are not affected.",
-      flags: 64,
-      components: [{
-        type: 1,
-        components: [{ type: 2, style: 4, label: "PANIC — CLEAR DISCORD PHOTO POSTS", custom_id: `ensmbz:panic:${guildId}:${userId}` }],
-      }],
-      allowed_mentions: { parse: [] },
-    },
-  });
-}
-
-async function handlePanicButton(interaction: Record<string, any>): Promise<Response> {
-  const match = /^ensmbz:panic:(\d{1,20}):(\d{1,20})$/.exec(String(interaction.data?.custom_id || ""));
-  if (!match) return json({ type: 4, data: { content: "That panic button is not valid.", flags: 64 } });
-  const [, expectedGuildId, expectedUserId] = match;
-  const guildId = String(interaction.guild_id || "");
-  const userId = String(interaction.member?.user?.id || interaction.user?.id || "");
-  if (interaction.application_id !== requiredEnv("DISCORD_APPLICATION_ID") ||
-      interaction.channel_id !== requiredEnv("DISCORD_REVIEW_CHANNEL_ID") ||
-      guildId !== expectedGuildId || userId !== expectedUserId ||
-      await guildOwnerId(guildId) !== userId) {
-    return json({ type: 4, data: { content: "Only the server owner can use this panic button in #photo-review.", flags: 64 } });
-  }
-
-  const applicationId = String(interaction.application_id || "");
-  const token = String(interaction.token || "");
-  const finishPanic = async () => {
-    const channels = [
-      { name: "#photo-review", id: requiredEnv("DISCORD_REVIEW_CHANNEL_ID") },
-      { name: "#photo-archive", id: requiredEnv("DISCORD_PHOTO_ARCHIVE_CHANNEL_ID") },
-    ];
-    const results = await Promise.all(channels.map(async (channel) => {
-      try { return { name: channel.name, count: await deletePhotoPosts(channel.id), error: "" }; }
-      catch (error) { return { name: channel.name, count: 0, error: error instanceof Error ? error.message : "Cleanup failed." }; }
-    }));
-    const total = results.reduce((sum, result) => sum + result.count, 0);
-    const detail = results.map((result) => result.error ? `${result.name}: ${result.error}` : `${result.name}: ${result.count}`).join(" · ");
-    const content = `🧹 Discord photo cleanup finished. Deleted ${total} photo post(s). ${detail}. Files on your PC and the website are untouched.`;
-    const edited = await discordApi(`https://discord.com/api/v10/webhooks/${applicationId}/${token}/messages/@original`, {
-      method: "PATCH",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ content, components: [] }),
-    });
-    if (!edited.ok) console.error("Could not report Discord photo cleanup", edited.status, await edited.text());
-  };
-  const backgroundTask = finishPanic().catch((error) => console.error("Discord panic cleanup failed", error));
-  const runtime = (globalThis as typeof globalThis & { EdgeRuntime?: { waitUntil: (promise: Promise<unknown>) => void } }).EdgeRuntime;
-  if (runtime) runtime.waitUntil(backgroundTask);
-  else await backgroundTask;
-  return json({ type: 5, data: { flags: 64 } });
-}
+const panicHandlers = createPanicHandlers({
+  env: (name: string) => Deno.env.get(name),
+  serviceKey: supabaseKey, json, ownerId: guildOwnerId,
+  clearDiscordPosts: deleteSitePosts, setSiteLive, discordApi,
+  waitUntil: (task: Promise<unknown>) => {
+    const runtime = (globalThis as typeof globalThis & { EdgeRuntime?: { waitUntil: (promise: Promise<unknown>) => void } }).EdgeRuntime;
+    if (runtime) runtime.waitUntil(task);
+    else void task.catch((error) => console.error("Panic background task failed", error));
+  },
+});
 
 async function setSiteLive(isLive: boolean): Promise<boolean> {
   const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
@@ -495,11 +484,19 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
       return json({ type: 4, data: { content: "This photo was already deleted or could not be found.", flags: 64 } });
     }
     let objectPath: string;
+    let storedInR2 = false;
     try {
       const imageUrl = new URL(String(rows[0].image_url));
       const storageMatch = /^\/storage\/v1\/object\/(?:public|sign)\/zayed-photos\/(.+)$/.exec(imageUrl.pathname);
-      if (!storageMatch) throw new Error("Photo is not stored in the zayed-photos bucket");
-      objectPath = decodeURIComponent(storageMatch[1]);
+      if (storageMatch) {
+        objectPath = decodeURIComponent(storageMatch[1]);
+      } else {
+        const publicBase = new URL(requiredEnv("R2_PUBLIC_BASE_URL").replace(/\/$/, ""));
+        const prefix = publicBase.pathname.replace(/\/$/, "");
+        if (imageUrl.origin !== publicBase.origin || !imageUrl.pathname.startsWith(`${prefix}/`)) throw new Error("Photo URL is not in Supabase Storage or configured R2 public storage");
+        objectPath = decodeURIComponent(imageUrl.pathname.slice(prefix.length + 1));
+        storedInR2 = true;
+      }
     } catch (error) {
       console.error("Could not map photo URL to Storage object", error);
       return json({ type: 4, data: { content: "Could not identify this photo in storage, so nothing was deleted.", flags: 64 } });
@@ -518,10 +515,16 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
       return json({ type: 4, data: { content: "This photo was already deleted or could not be found.", flags: 64 } });
     }
 
-    const removedFile = await fetch(`${projectUrl}/storage/v1/object/zayed-photos/${objectPath.split("/").map(encodeURIComponent).join("/")}`, {
-      method: "DELETE",
-      headers: { apikey: key, authorization: `Bearer ${key}` },
-    });
+    let removedFile: Response;
+    if (storedInR2) {
+      const r2 = r2Config();
+      removedFile = await r2.client.fetch(`${r2.endpoint}/${encodeURIComponent(r2.bucket)}/${encodedObjectPath(objectPath)}`, { method: "DELETE" });
+    } else {
+      removedFile = await fetch(`${projectUrl}/storage/v1/object/zayed-photos/${encodedObjectPath(objectPath)}`, {
+        method: "DELETE",
+        headers: { apikey: key, authorization: `Bearer ${key}` },
+      });
+    }
     const reviewerId = interaction.member?.user?.id || interaction.user?.id;
     let archiveCleanupNote = "";
     if (!inArchive && rows[0].discord_archive_message_id && archiveChannelId) {
@@ -613,18 +616,25 @@ Deno.serve(async (request: Request) => {
   if (body.length > 1_000_000) return json({ error: "Request too large" }, 413);
   try {
     if (request.headers.has("x-review-hook")) return await handleDatabaseWebhook(request, body);
+    if (pathname.endsWith("/media-upload-url")) {
+      if (request.method !== "POST") return json({ error: "POST required" }, 405);
+      return await handleMediaUploadUrl(new Request(request.url, { method: "POST", headers: request.headers, body }));
+    }
     if (!await verifyDiscordSignature(request, body)) return json({ error: "Invalid Discord signature" }, 401);
     const interaction = JSON.parse(body) as Record<string, any>;
     if (interaction.application_id !== requiredEnv("DISCORD_APPLICATION_ID")) return json({ error: "Wrong application" }, 401);
     if (interaction.type === 1) return json({ type: 1 });
     if (interaction.type === 3) {
       if (String(interaction.data?.custom_id || "").startsWith("ensmbz:panic:")) {
-        return await handlePanicButton(interaction);
+        return await panicHandlers.button(interaction);
       }
       return await handleButton(interaction);
     }
+    if (interaction.type === 5 && String(interaction.data?.custom_id || "").startsWith("ensmbz:wipe:")) {
+      return await panicHandlers.modal(interaction);
+    }
     if (interaction.type === 2 && interaction.data?.name === "panic") {
-      return await handlePanicCommand(interaction);
+      return await panicHandlers.command(interaction);
     }
     if (interaction.type === 2 && (
       interaction.data?.name === "site" ||
