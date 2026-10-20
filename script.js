@@ -13,7 +13,7 @@ const translations = {
     nameLabel: 'YOUR NAME <span>(required)</span>', namePlaceholder: "Who is submitting this?", filesLabel: 'PHOTOS OR VIDEOS <span>(required · photos up to 5 MB, videos up to 50 MB)</span>',
     chooseMedia: "CHOOSE PHOTOS OR VIDEOS", noMediaSelected: "No media selected", mediaSelected: "item selected", mediaSelectedMany: "items selected",
     formHelp: "Your name will appear next to the photos or videos. MP4 works best; use the video controls to hear its audio. Submissions appear after approval.",
-    submitButton: "ADD TO THE GALLERY ↗", close: "Close", storageShared: "Photos and videos are submitted to the shared gallery and appear after ENS MBZ approves them.",
+    submitButton: "ADD TO THE GALLERY ↗", submitting: "ADDING…", close: "Close", storageShared: "Photos and videos are submitted to the shared gallery and appear after ENS MBZ approves them.",
     storageLocal: "Shared uploads are not connected yet. Media you add is saved in this browser on this device.",
     objectOne: "OBJECT", objectMany: "OBJECTS", emptyGallery: "THE GALLERY IS TAKING A NAP. ADD A PHOTO TO WAKE IT UP.",
     number: "NO.", addedBy: "Added by", newArrival: "NEW ARRIVAL", expand: "Expand", remove: "Remove",
@@ -38,7 +38,7 @@ const translations = {
     nameLabel: 'اسمك <span>(مطلوب)</span>', namePlaceholder: "من يرسل الصور أو الفيديو؟", filesLabel: 'صور أو فيديوهات <span>(مطلوب · الصور حتى ٥ م.ب. والفيديو حتى ٥٠ م.ب.)</span>',
     chooseMedia: "اختر صوراً أو فيديوهات", noMediaSelected: "لم يتم اختيار ملفات", mediaSelected: "ملف تم اختياره", mediaSelectedMany: "ملفات تم اختيارها",
     formHelp: "سيظهر اسمك بجانب الصور أو الفيديوهات. صيغة MP4 هي الأفضل؛ استخدم أدوات الفيديو لتشغيل الصوت. تظهر المشاركات بعد الموافقة.",
-    submitButton: "أضف إلى المعرض ↗", close: "إغلاق", storageShared: "تُرسل الصور والفيديوهات إلى المعرض المشترك وتظهر بعد موافقة ENS MBZ عليها.",
+    submitButton: "أضف إلى المعرض ↗", submitting: "جارٍ الإضافة…", close: "إغلاق", storageShared: "تُرسل الصور والفيديوهات إلى المعرض المشترك وتظهر بعد موافقة ENS MBZ عليها.",
     storageLocal: "الرفع المشترك غير متصل حالياً. تُحفظ الوسائط التي تضيفها في هذا المتصفح على هذا الجهاز.",
     objectOne: "صورة", objectMany: "صور", emptyGallery: "المعرض يأخذ قيلولة. أضف صورة لإيقاظه.",
     number: "رقم", addedBy: "أضافها", newArrival: "إضافة جديدة", expand: "تكبير", remove: "إزالة",
@@ -205,6 +205,8 @@ storageNote.textContent = tr(storageMessageKey);
 document.querySelector("#addPhotos").addEventListener("click", () => contributeDialog.showModal());
 const choosePhotosButton = document.querySelector("#choosePhotosButton");
 const photoSelectionStatus = document.querySelector("#photoSelectionStatus");
+const submitButton = contributeForm.querySelector(".submit-button");
+let isSubmitting = false;
 function updatePhotoSelectionStatus() {
   const selectedCount = input.files?.length || 0;
   if (!selectedCount) photoSelectionStatus.textContent = tr("noMediaSelected");
@@ -216,6 +218,7 @@ document.querySelector("#contributeClose").addEventListener("click", () => contr
 contributeDialog.addEventListener("click", (event) => { if (event.target === contributeDialog) contributeDialog.close(); });
 contributeForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (isSubmitting) return;
   const uploader = document.querySelector("#submitterName").value.trim();
   const files = [...input.files].filter((file) => file.type.startsWith("image/") || isVideoFile(file) || /\.(avif|bmp|gif|heic|heif|jpe?g|png|svg|tiff?|webp)$/i.test(file.name));
   const error = document.querySelector("#formError");
@@ -223,6 +226,9 @@ contributeForm.addEventListener("submit", async (event) => {
   if (!files.length) { error.textContent = tr("chooseImage"); return; }
   if (files.some((file) => file.size > (isVideoFile(file) ? 50 : 5) * 1024 * 1024)) { error.textContent = tr("sizeLimit"); return; }
   error.textContent = "";
+  isSubmitting = true;
+  submitButton.disabled = true;
+  submitButton.textContent = tr("submitting");
   try {
     let submitted = 0;
     for (const file of files) {
@@ -276,6 +282,10 @@ contributeForm.addEventListener("submit", async (event) => {
     error.textContent = supabaseReady
       ? `${tr("uploadFailed")}: ${uploadError.message || tr("checkBucket")}`
       : tr("localSaveFailed");
+  } finally {
+    isSubmitting = false;
+    submitButton.disabled = false;
+    submitButton.textContent = tr("submitButton");
   }
 });
 for (const eventName of ["dragenter", "dragover"]) section.addEventListener(eventName, (event) => { event.preventDefault(); section.classList.add("dragging"); });

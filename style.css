@@ -13,6 +13,7 @@
 .form-error{color:#b33420;min-height:1em}
 .submit-button{background:var(--orange);border:0;color:white;padding:14px;font:10px var(--mono);letter-spacing:.05em;cursor:pointer}
 .submit-button:hover{background:var(--ink)}
+.submit-button:disabled{cursor:wait;opacity:.65}
 .contribute-dialog .dialog-close{right:10px;top:10px}
 @media(max-width:460px){.contribute-dialog{padding:30px 22px}}
 
