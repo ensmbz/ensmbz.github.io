@@ -456,13 +456,23 @@ async function ensureTakedownChannel(projectUrl: string, key: string): Promise<s
 
 async function notifyTakedown(request: Request): Promise<Response> {
   const payload = await request.json().catch(() => ({}));
-  const requestId = String(payload?.requestId || "");
-  if (!/^\d{1,19}$/.test(requestId)) return json({ error: "A takedown request ID is required." }, 400);
+  const photoId = String(payload?.photoId || "");
+  const name = String(payload?.name || "").trim();
+  const reason = String(payload?.reason || "").trim();
+  if (!/^\d{1,19}$/.test(photoId)) return json({ error: "A valid gallery post is required." }, 400);
+  if (!name || name.length > 40 || !reason || reason.length > 500) return json({ error: "Enter a name and a reason for the request." }, 400);
   const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
   const key = supabaseKey();
-  const loaded = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(requestId)}&select=id,photo_id,name,reason,status`, { headers: supabaseHeaders(key) });
-  const rows = await loaded.json().catch(() => []);
-  if (!loaded.ok || !Array.isArray(rows) || !rows[0]) return json({ error: "Takedown request not found." }, 404);
+  const photoLoaded = await fetch(`${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(photoId)}&approved=eq.true&select=id`, { headers: supabaseHeaders(key) });
+  const photos = await photoLoaded.json().catch(() => []);
+  if (!photoLoaded.ok || !Array.isArray(photos) || !photos[0]) return json({ error: "Gallery post not found." }, 404);
+  const inserted = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?select=id,photo_id,name,reason,status`, {
+    method: "POST",
+    headers: { ...supabaseHeaders(key), prefer: "return=representation" },
+    body: JSON.stringify({ photo_id: photoId, name, reason }),
+  });
+  const rows = await inserted.json().catch(() => []);
+  if (!inserted.ok || !Array.isArray(rows) || !rows[0]) return json({ error: "Could not save the takedown request." }, 502);
   const item = rows[0] as Record<string, unknown>;
   const channelId = await ensureTakedownChannel(projectUrl, key);
   const token = requiredEnv("DISCORD_BOT_TOKEN");

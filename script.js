@@ -24,7 +24,7 @@ const translations = {
     galleryLoadFailed: "The shared gallery could not load. Check the Supabase table and access policies.",
     quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
     footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية",
-    commentsButton: "COMMENTS", commentsEyebrow: "THE CONVERSATION", commentsTitle: 'COMMENTS<span class="period">.</span>', commentsEmpty: "No comments yet. Start the conversation.", commentsUnavailable: "Comments are unavailable right now.", commentNameLabel: "YOUR NAME", commentLabel: "COMMENT", commentPlaceholder: "Keep it nice.", commentSubmit: "POST COMMENT", commentPosting: "POSTING…", commentRequired: "Please enter your name and a comment.", commentPosted: "Your comment was posted.", commentFailed: "Your comment could not be posted. Please try again.", takedownSummary: "REQUEST THIS POST BE TAKEN DOWN", takedownReasonLabel: "WHY SHOULD IT BE REMOVED?", takedownPlaceholder: "Tell the moderators why.", takedownSubmit: "SEND REQUEST", takedownSending: "SENDING…", takedownRequired: "Please enter your name and a reason.", takedownSent: "Your request was sent to the moderators.", takedownFailed: "Your request could not be sent. Please try again.",
+    commentsButton: "COMMENTS", takedownButton: "REQUEST TAKEDOWN", commentsEyebrow: "THE CONVERSATION", commentsTitle: 'COMMENTS<span class="period">.</span>', commentsEmpty: "No comments yet. Start the conversation.", commentsUnavailable: "Comments are unavailable right now.", commentNameLabel: "YOUR NAME", commentLabel: "COMMENT", commentPlaceholder: "Keep it nice.", commentSubmit: "POST COMMENT", commentPosting: "POSTING…", commentRequired: "Please enter your name and a comment.", commentPosted: "Your comment was posted.", commentFailed: "Your comment could not be posted. Please try again.", takedownEyebrow: "POST SAFETY", takedownTitle: 'REQUEST TAKEDOWN<span class="period">.</span>', takedownIntro: "Tell the moderators why this post should be removed. Your request is private.", takedownReasonLabel: "WHY SHOULD IT BE REMOVED?", takedownPlaceholder: "Tell the moderators why.", takedownSubmit: "SEND REQUEST", takedownSending: "SENDING…", takedownRequired: "Please enter your name and a reason.", takedownSent: "Your request was sent to the moderators.", takedownFailed: "Your request could not be sent. Please try again.",
   },
   ar: {
     pauseEyebrow: "متحف صور المدرسة الإماراتية في مدينة زايد", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
@@ -51,7 +51,7 @@ const translations = {
     galleryLoadFailed: "تعذّر تحميل المعرض المشترك. تحقق من جدول Supabase وسياسات الوصول.",
     quipButton: "أطلق مزحة أخرى ↻", initialQuip: "يرجى العلم: ENS MBZ مشاغب معتمد.",
     footerNote: "متحف صغير على الإنترنت. ومشاغب كبير.", backTop: "العودة للأعلى ↑", languageButton: "English",
-    commentsButton: "التعليقات", commentsEyebrow: "المحادثة", commentsTitle: 'التعليقات<span class="period">.</span>', commentsEmpty: "لا توجد تعليقات بعد. ابدأ المحادثة.", commentsUnavailable: "التعليقات غير متاحة حالياً.", commentNameLabel: "اسمك", commentLabel: "تعليق", commentPlaceholder: "اكتب بلطف.", commentSubmit: "نشر التعليق", commentPosting: "جارٍ النشر…", commentRequired: "يرجى كتابة اسمك وتعليقك.", commentPosted: "تم نشر تعليقك.", commentFailed: "تعذر نشر تعليقك. حاول مرة أخرى.", takedownSummary: "اطلب إزالة هذه المشاركة", takedownReasonLabel: "لماذا يجب إزالتها؟", takedownPlaceholder: "أخبر المشرفين بالسبب.", takedownSubmit: "إرسال الطلب", takedownSending: "جارٍ الإرسال…", takedownRequired: "يرجى كتابة اسمك وسبب الطلب.", takedownSent: "تم إرسال طلبك إلى المشرفين.", takedownFailed: "تعذر إرسال طلبك. حاول مرة أخرى.",
+    commentsButton: "التعليقات", takedownButton: "طلب إزالة", commentsEyebrow: "المحادثة", commentsTitle: 'التعليقات<span class="period">.</span>', commentsEmpty: "لا توجد تعليقات بعد. ابدأ المحادثة.", commentsUnavailable: "التعليقات غير متاحة حالياً.", commentNameLabel: "اسمك", commentLabel: "تعليق", commentPlaceholder: "اكتب بلطف.", commentSubmit: "نشر التعليق", commentPosting: "جارٍ النشر…", commentRequired: "يرجى كتابة اسمك وتعليقك.", commentPosted: "تم نشر تعليقك.", commentFailed: "تعذر نشر تعليقك. حاول مرة أخرى.", takedownEyebrow: "سلامة المشاركة", takedownTitle: 'طلب إزالة<span class="period">.</span>', takedownIntro: "أخبر المشرفين بسبب إزالة هذه المشاركة. طلبك خاص.", takedownReasonLabel: "لماذا يجب إزالتها؟", takedownPlaceholder: "أخبر المشرفين بالسبب.", takedownSubmit: "إرسال الطلب", takedownSending: "جارٍ الإرسال…", takedownRequired: "يرجى كتابة اسمك وسبب الطلب.", takedownSent: "تم إرسال طلبك إلى المشرفين.", takedownFailed: "تعذر إرسال طلبك. حاول مرة أخرى.",
   },
 };
 let currentLanguage = (() => {
@@ -203,7 +203,15 @@ function render() {
       comments.className = "comments-button";
       comments.textContent = tr("commentsButton");
       comments.addEventListener("click", () => openComments(photo));
-      card.append(comments);
+      const takedown = document.createElement("button");
+      takedown.type = "button";
+      takedown.className = "takedown-button";
+      takedown.textContent = tr("takedownButton");
+      takedown.addEventListener("click", () => openTakedown(photo));
+      const actions = document.createElement("div");
+      actions.className = "post-actions";
+      actions.append(comments, takedown);
+      card.append(actions);
     }
     grid.append(card);
   });
@@ -319,8 +327,10 @@ const commentsDialog = document.querySelector("#commentsDialog");
 const commentsList = document.querySelector("#commentsList");
 const commentsFor = document.querySelector("#commentsFor");
 const commentForm = document.querySelector("#commentForm");
+const takedownDialog = document.querySelector("#takedownDialog");
 const takedownForm = document.querySelector("#takedownForm");
 let activeCommentPhoto = null;
+let activeTakedownPhoto = null;
 
 function showComments(items) {
   commentsList.replaceChildren();
@@ -347,7 +357,6 @@ async function openComments(photo) {
   activeCommentPhoto = photo;
   commentsFor.textContent = photo.title;
   document.querySelector("#commentError").textContent = "";
-  document.querySelector("#takedownError").textContent = "";
   commentsList.textContent = "…";
   commentsDialog.showModal();
   if (!supabaseClient) { commentsList.textContent = tr("commentsUnavailable"); return; }
@@ -360,6 +369,14 @@ async function openComments(photo) {
 
 document.querySelector("#commentsClose").addEventListener("click", () => commentsDialog.close());
 commentsDialog.addEventListener("click", (event) => { if (event.target === commentsDialog) commentsDialog.close(); });
+function openTakedown(photo) {
+  activeTakedownPhoto = photo;
+  document.querySelector("#takedownFor").textContent = photo.title;
+  document.querySelector("#takedownError").textContent = "";
+  takedownDialog.showModal();
+}
+document.querySelector("#takedownClose").addEventListener("click", () => takedownDialog.close());
+takedownDialog.addEventListener("click", (event) => { if (event.target === takedownDialog) takedownDialog.close(); });
 commentForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const error = document.querySelector("#commentError");
@@ -380,14 +397,24 @@ takedownForm.addEventListener("submit", async (event) => {
   const error = document.querySelector("#takedownError");
   const name = document.querySelector("#takedownName").value.trim();
   const reason = document.querySelector("#takedownReason").value.trim();
-  if (!activeCommentPhoto || !name || !reason) { error.textContent = tr("takedownRequired"); return; }
+  if (!activeTakedownPhoto || !name || !reason) { error.textContent = tr("takedownRequired"); return; }
   const button = document.querySelector("#takedownSubmit");
   error.textContent = ""; button.disabled = true; button.textContent = tr("takedownSending");
-  const { data: insertedRequest, error: insertError } = await supabaseClient.from("photo_takedown_requests").insert({ photo_id: activeCommentPhoto.remoteId, name, reason }).select("id").single();
+  let requestError = null;
+  try {
+    const response = await fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/takedown-notify`, {
+      method: "POST",
+      headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" },
+      body: JSON.stringify({ photoId: activeTakedownPhoto.remoteId, name, reason }),
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}));
+      requestError = new Error(result.error || "Request failed");
+    }
+  } catch (networkError) { requestError = networkError; }
   button.disabled = false; button.textContent = tr("takedownSubmit");
-  if (insertError) { error.textContent = tr("takedownFailed"); return; }
+  if (requestError) { error.textContent = tr("takedownFailed"); return; }
   takedownForm.reset(); error.textContent = tr("takedownSent");
-  if (insertedRequest?.id) fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/takedown-notify`, { method: "POST", headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" }, body: JSON.stringify({ requestId: insertedRequest.id }) }).catch(() => {});
 });
 
 const quips = {
