@@ -477,6 +477,25 @@ async function ensureTakedownChannel(projectUrl: string, key: string): Promise<s
   return String(channel.id);
 }
 
+async function ensureReportsChannel(): Promise<string> {
+  const token = requiredEnv("DISCORD_BOT_TOKEN");
+  const reviewChannelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
+  const review = await fetch(`https://discord.com/api/v10/channels/${reviewChannelId}`, { headers: { authorization: `Bot ${token}` } });
+  const reviewInfo = await review.json().catch(() => ({}));
+  if (!review.ok || !reviewInfo.guild_id) throw new Error("Could not find the Discord review channel to create #reports.");
+  const listed = await fetch(`https://discord.com/api/v10/guilds/${reviewInfo.guild_id}/channels`, { headers: { authorization: `Bot ${token}` } });
+  const channels = await listed.json().catch(() => []);
+  const existing = Array.isArray(channels) && channels.find((channel: Record<string, unknown>) => channel.name === "reports" && channel.type === 0);
+  if (existing?.id) return String(existing.id);
+  const created = await fetch(`https://discord.com/api/v10/guilds/${reviewInfo.guild_id}/channels`, {
+    method: "POST", headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ name: "reports", type: 0, parent_id: reviewInfo.parent_id || undefined, permission_overwrites: reviewInfo.permission_overwrites || [], topic: "Private website reports from the ENS MBZ gallery." }),
+  });
+  const channel = await created.json().catch(() => ({}));
+  if (!created.ok || !channel.id) throw new Error("The bot could not create #reports. Give it Manage Channels permission and try again.");
+  return String(channel.id);
+}
+
 async function notifyTakedown(request: Request): Promise<Response> {
   const payload = await request.json().catch(() => ({}));
   const photoId = String(payload?.photoId || "");
@@ -512,9 +531,7 @@ async function notifyReport(request: Request): Promise<Response> {
   const name = String(payload?.name || "").trim();
   const report = String(payload?.report || "").trim();
   if (name.length > 40 || !report || report.length > 1000) return json({ error: "Enter a report with no more than 1,000 characters." }, 400);
-  const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
-  const key = supabaseKey();
-  const channelId = await ensureTakedownChannel(projectUrl, key);
+  const channelId = await ensureReportsChannel();
   const token = requiredEnv("DISCORD_BOT_TOKEN");
   const reporter = name ? name.replace(/[\r\n<>]/g, " ").slice(0, 40) : "Anonymous";
   const posted = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
@@ -911,7 +928,7 @@ Deno.serve(async (request: Request) => {
     try {
       const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
       const key = supabaseKey();
-      await Promise.all([ensureCommentsChannel(projectUrl, key), ensureTakedownChannel(projectUrl, key)]).catch((error) => console.error("Could not prepare community Discord channels", error));
+      await Promise.all([ensureCommentsChannel(projectUrl, key), ensureTakedownChannel(projectUrl, key), ensureReportsChannel()]).catch((error) => console.error("Could not prepare community Discord channels", error));
       const status = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true&select=is_live`, {
         headers: supabaseHeaders(key),
       });
