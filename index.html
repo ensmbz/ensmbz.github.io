@@ -1,42 +1,50 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f3e9">
+  <meta name="theme-color" content="#3a090b">
   <meta name="description" content="The ENS MBZ Museum: a tiny, very unserious collection of ENS MBZ's greatest photo moments and goofiest decisions.">
   <title>ENS MBZ Museum — The ENS MBZ Files</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=takedown-2">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="style.css?v=editorial-1">
 </head>
 <body>
   <dialog id="languageDialog" class="language-dialog" aria-labelledby="languageDialogTitle">
     <div class="language-dialog-card"><img src="assets/ens-mbz-school-logo.jpg" alt="" width="58" height="58"><p class="eyebrow">ENS MBZ</p><h2 id="languageDialogTitle">CHOOSE YOUR LANGUAGE<span class="period">.</span></h2><p>اختر لغتك</p><div class="language-options"><button type="button" data-language-choice="en">English</button><button type="button" data-language-choice="ar">العربية الإماراتية</button></div></div>
   </dialog>
   <div class="site-paused" id="sitePaused" hidden role="status" aria-live="polite">
-    <div class="site-paused-card"><button class="language-toggle" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button><img src="assets/ens-mbz-school-logo.jpg" alt="" width="64" height="64"><p class="eyebrow" data-i18n="pauseEyebrow">ENS MBZ PHOTO MUSEUM</p><h1 data-i18n-html="pauseTitle">TAKING A<br>BREAK<span class="period">.</span></h1><p data-i18n="pausedMessage">The site owner has paused the museum. Please check back later.</p></div>
+    <div class="pause-noise" aria-hidden="true"></div>
+    <div class="site-paused-card">
+      <div class="pause-topline"><span>ENS MBZ · PRIVATE COLLECTION</span><button class="language-toggle btn btn-sm" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button></div>
+      <div class="pause-art" aria-hidden="true"><span class="pause-404">404</span><div class="pause-logo-frame"><img src="assets/ens-mbz-school-logo.jpg" alt="" width="116" height="116"></div></div>
+      <div class="pause-copy"><p class="eyebrow" data-i18n="pauseEyebrow">ENS MBZ PHOTO MUSEUM</p><h1 data-i18n-html="pauseTitle">TAKING A<br>BREAK<span class="period">.</span></h1><p data-i18n="pausedMessage">The site owner has paused the museum. Please check back later.</p></div>
+      <div class="pause-bottomline"><span class="status-dot"></span><span>EXHIBITION TEMPORARILY CLOSED</span><span>CHECK BACK SOON ↗</span></div>
+    </div>
   </div>
   <div class="ticker" aria-label="Breaking news"><div class="ticker-track" data-i18n="ticker">★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★</div></div>
   <header class="topbar">
     <a class="wordmark" href="#top" aria-label="The ENS MBZ Files home"><img class="wordmark-icon" src="assets/ens-mbz-school-logo.jpg" alt="" width="38" height="38"> THE ENS MBZ FILES</a>
-    <nav><a href="#gallery" data-i18n="navGallery">THE GALLERY</a><a href="#about" data-i18n="navAbout">ABOUT THIS MASTERPIECE</a></nav>
-    <div class="topbar-actions"><button class="language-toggle" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button></div>
+    <nav><a href="#gallery" data-i18n="navGallery">THE GALLERY</a><a href="#chat" data-i18n="navChat">CHAT ROOM</a><a href="#about" data-i18n="navAbout">ABOUT</a></nav>
+    <div class="topbar-actions"><button class="language-toggle btn btn-sm" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button></div>
   </header>
 
   <main id="top">
     <section class="hero">
-      <div class="hero-copy">
+      <div class="hero-copy hero-reveal">
         <p class="eyebrow"><span class="eyebrow-line"></span> <span data-i18n="heroEyebrow">ENS MBZ ARCHIVE · THINKING NOT REQUIRED</span></p>
         <h1 data-i18n-html="heroTitle">THE<br><span class="headline-last">ENS MBZ</span> MUSEUM<span class="period">.</span></h1>
         <p class="hero-description" data-i18n="heroDescription">A collection of moments, expressions, and one unexpected meeting with lunch. Certified goofball. Questionable decisions. Excellent photo collection.</p>
         <a class="hero-link" href="#gallery"><span data-i18n="tourLink">TAKE THE TOUR</span> <span>↓</span></a>
       </div>
-      <div class="hero-art" aria-label="Decorative portrait gallery illustration">
+      <div class="hero-art hero-reveal" aria-label="Decorative portrait gallery illustration">
         <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
         <img class="sunburst" src="assets/ens-mbz-school-logo.jpg" alt="Emirates National Schools logo">
-        <div class="portrait-frame hero-logo-frame"><img src="assets/ens-mbz-school-logo.jpg" alt="Emirates National Schools logo" fetchpriority="high"><span class="frame-sticker">ENS MBZ<br>ARCHIVE</span></div>
+        <div class="portrait-frame hero-logo-frame"><span class="frame-corner frame-corner-one"></span><span class="frame-corner frame-corner-two"></span><img src="assets/ens-mbz-school-logo.jpg" alt="Emirates National Schools logo" fetchpriority="high"><span class="frame-sticker">ENS MBZ<br>ARCHIVE</span></div>
         <span class="scribble scribble-one" data-i18n-html="scribbleOne">brain cell<br>loading...</span><span class="scribble scribble-two" data-i18n-html="scribbleTwo">← swipe<br>for evidence</span>
         <span class="spark spark-one">✳</span><span class="spark spark-two">✦</span><span class="spark spark-three">✳</span>
       </div>
@@ -46,12 +54,32 @@
     <section class="gallery-section" id="gallery">
       <div class="section-heading">
         <div><p class="eyebrow" data-i18n="collection">THE PERMANENT COLLECTION</p><h2 data-i18n-html="galleryTitle">THE GALLERY<span class="period">.</span></h2></div>
-        <div class="gallery-tools"><span class="photo-count" id="photoCount">00 OBJECTS</span><button class="add-button" id="addPhotos" type="button"><span>＋</span><span data-i18n="addPhotos">ADD YOUR PHOTOS</span></button></div>
+        <div class="gallery-tools"><span class="photo-count" id="photoCount">00 OBJECTS</span><button class="add-button btn" id="addPhotos" type="button"><span>＋</span><span data-i18n="addPhotos">ADD YOUR PHOTOS</span></button></div>
       </div>
       <p class="gallery-note" data-i18n="galleryNote">Museum rule #1: there are no bad angles, only interesting evidence.</p>
       <div class="photo-grid" id="photoGrid" aria-live="polite"></div>
       <div class="drop-hint" id="dropHint"><span>↘</span> <span data-i18n="dropHint">Got more? Drop photos anywhere in the gallery or tap “Add your photos”.</span></div>
       <p class="storage-note" id="storageNote">Photos submitted here appear in the shared gallery after approval.</p>
+    </section>
+
+    <section class="chat-section" id="chat" aria-labelledby="chatTitle">
+      <div class="chat-heading">
+        <div><p class="eyebrow" data-i18n="chatEyebrow">THE VISITOR BOOK</p><h2 id="chatTitle" data-i18n-html="chatTitle">CHAT ROOM<span class="period">.</span></h2></div>
+        <div class="chat-live"><span></span><span data-i18n="chatLive">LIVE ROOM</span></div>
+      </div>
+      <div class="chat-layout">
+        <div class="chat-messages" id="chatMessages" aria-live="polite"><p class="chat-empty" data-i18n="chatLoading">Opening the room…</p></div>
+        <form class="chat-form" id="chatForm">
+          <p class="eyebrow" data-i18n="chatJoin">JOIN THE CONVERSATION</p>
+          <label for="chatName" data-i18n="chatNameLabel">NAME (OPTIONAL)</label>
+          <input class="input input-bordered" id="chatName" maxlength="40" data-i18n-placeholder="chatNamePlaceholder" placeholder="Leave blank to post as Guest">
+          <label for="chatBody" data-i18n="chatMessageLabel">MESSAGE</label>
+          <textarea class="textarea textarea-bordered" id="chatBody" maxlength="400" rows="4" required data-i18n-placeholder="chatPlaceholder" placeholder="Say something to the room…"></textarea>
+          <p class="form-error" id="chatError" role="alert"></p>
+          <button class="submit-button btn" id="chatSubmit" type="submit" data-i18n="chatSubmit">SEND MESSAGE ↗</button>
+          <p class="chat-note" data-i18n="chatNote">Be kind. Messages are public.</p>
+        </form>
+      </div>
     </section>
 
     <section class="about-strip" id="about"><img class="about-mark" src="assets/ens-mbz-school-logo.jpg" alt="Emirates National Schools logo" width="48" height="48"><p id="quip" data-i18n="initialQuip">THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.</p><button id="quipButton" type="button" aria-label="Generate another ENS MBZ roast" data-i18n="quipButton">ROAST HIM AGAIN ↻</button></section>
@@ -65,24 +93,23 @@
       <label for="postDescription" data-i18n-html="descriptionLabel">DESCRIPTION <span>(optional)</span></label><textarea id="postDescription" name="description" maxlength="280" rows="3" placeholder="Tell people about this post" data-i18n-placeholder="descriptionPlaceholder"></textarea>
       <label id="photoFieldLabel" data-i18n-html="filesLabel">PHOTOS OR VIDEOS <span>(required · photos up to 5 MB, videos up to 50 MB)</span></label>
       <input id="photoInput" name="media" type="file" accept="image/*,video/*" multiple hidden aria-labelledby="photoFieldLabel">
-      <button class="photo-picker-button" id="choosePhotosButton" type="button"><span>＋</span><span data-i18n="chooseMedia">CHOOSE PHOTOS OR VIDEOS</span></button>
+      <button class="photo-picker-button btn" id="choosePhotosButton" type="button"><span>＋</span><span data-i18n="chooseMedia">CHOOSE PHOTOS OR VIDEOS</span></button>
       <p class="photo-selection-status" id="photoSelectionStatus" aria-live="polite" data-i18n="noMediaSelected">No media selected</p>
       <p class="form-help" data-i18n="formHelp">Your name will appear next to the photos. Submissions are saved in this browser on this device.</p>
       <p class="form-error" id="formError" role="alert"></p>
-      <button class="submit-button" type="submit" data-i18n="submitButton">ADD TO THE GALLERY ↗</button>
+      <button class="submit-button btn" type="submit" data-i18n="submitButton">ADD TO THE GALLERY ↗</button>
     </form>
   </dialog>
   <dialog id="commentsDialog" class="comments-dialog" aria-labelledby="commentsTitle">
     <button class="dialog-close" id="commentsClose" aria-label="Close comments" data-i18n-aria-label="close" type="button">×</button>
     <p class="eyebrow" data-i18n="commentsEyebrow">THE CONVERSATION</p><h2 id="commentsTitle" data-i18n-html="commentsTitle">COMMENTS<span class="period">.</span></h2>
     <p class="comments-for" id="commentsFor"></p><div class="comments-list" id="commentsList" aria-live="polite"></div>
-    <form id="commentForm" class="comment-form"><label for="commentName" data-i18n="commentNameLabel">YOUR NAME</label><input id="commentName" maxlength="40" required data-i18n-placeholder="namePlaceholder" placeholder="Who is submitting this?"><label for="commentBody" data-i18n="commentLabel">COMMENT</label><textarea id="commentBody" maxlength="400" rows="3" required data-i18n-placeholder="commentPlaceholder" placeholder="Keep it nice."></textarea><p class="form-error" id="commentError" role="alert"></p><button class="submit-button" id="commentSubmit" type="submit" data-i18n="commentSubmit">POST COMMENT</button></form>
+    <form id="commentForm" class="comment-form"><label for="commentName" data-i18n="commentNameLabel">YOUR NAME</label><input id="commentName" class="input input-bordered" maxlength="40" required data-i18n-placeholder="namePlaceholder" placeholder="Who is submitting this?"><label for="commentBody" data-i18n="commentLabel">COMMENT</label><textarea id="commentBody" class="textarea textarea-bordered" maxlength="400" rows="3" required data-i18n-placeholder="commentPlaceholder" placeholder="Keep it nice."></textarea><p class="form-error" id="commentError" role="alert"></p><button class="submit-button btn" id="commentSubmit" type="submit" data-i18n="commentSubmit">POST COMMENT</button></form>
   </dialog>
-  <dialog id="takedownDialog" class="comments-dialog" aria-labelledby="takedownTitle"><button class="dialog-close" id="takedownClose" aria-label="Close request" data-i18n-aria-label="close" type="button">×</button><p class="eyebrow" data-i18n="takedownEyebrow">POST SAFETY</p><h2 id="takedownTitle" data-i18n-html="takedownTitle">REQUEST TAKEDOWN<span class="period">.</span></h2><p class="comments-for" id="takedownFor"></p><p class="takedown-intro" data-i18n="takedownIntro">Tell the moderators why this post should be removed. Your request is private.</p><form id="takedownForm" class="comment-form"><label for="takedownName" data-i18n="commentNameLabel">YOUR NAME</label><input id="takedownName" maxlength="40" required data-i18n-placeholder="namePlaceholder" placeholder="Who is submitting this?"><label for="takedownReason" data-i18n="takedownReasonLabel">WHY SHOULD IT BE REMOVED?</label><textarea id="takedownReason" maxlength="500" rows="4" required data-i18n-placeholder="takedownPlaceholder" placeholder="Tell the moderators why."></textarea><p class="form-error" id="takedownError" role="alert"></p><button class="request-button" id="takedownSubmit" type="submit" data-i18n="takedownSubmit">SEND REQUEST</button></form></dialog>
+  <dialog id="takedownDialog" class="comments-dialog" aria-labelledby="takedownTitle"><button class="dialog-close" id="takedownClose" aria-label="Close request" data-i18n-aria-label="close" type="button">×</button><p class="eyebrow" data-i18n="takedownEyebrow">POST SAFETY</p><h2 id="takedownTitle" data-i18n-html="takedownTitle">REQUEST TAKEDOWN<span class="period">.</span></h2><p class="comments-for" id="takedownFor"></p><p class="takedown-intro" data-i18n="takedownIntro">Tell the moderators why this post should be removed. Your request is private.</p><form id="takedownForm" class="comment-form"><label for="takedownName" data-i18n="commentNameLabel">YOUR NAME</label><input id="takedownName" class="input input-bordered" maxlength="40" required data-i18n-placeholder="namePlaceholder" placeholder="Who is submitting this?"><label for="takedownReason" data-i18n="takedownReasonLabel">WHY SHOULD IT BE REMOVED?</label><textarea id="takedownReason" class="textarea textarea-bordered" maxlength="500" rows="4" required data-i18n-placeholder="takedownPlaceholder" placeholder="Tell the moderators why."></textarea><p class="form-error" id="takedownError" role="alert"></p><button class="request-button btn" id="takedownSubmit" type="submit" data-i18n="takedownSubmit">SEND REQUEST</button></form></dialog>
   <dialog id="photoDialog" class="photo-dialog"><button class="dialog-close" id="dialogClose" aria-label="Close photo" data-i18n-aria-label="close" type="button">×</button><img id="dialogImage" alt="Expanded gallery photograph"><video id="dialogVideo" controls playsinline preload="metadata" hidden></video><p id="dialogCaption"></p></dialog>
-  <audio id="pauseAudio" src="assets/404.mp3" loop preload="none"></audio>
   <script src="supabase-config.js?v=r2-media-1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=takedown-2"></script>
+  <script src="script.js?v=editorial-1"></script>
 </body>
 </html>

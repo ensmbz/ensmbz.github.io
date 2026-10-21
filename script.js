@@ -1,11 +1,11 @@
 const translations = {
   en: {
-    pauseEyebrow: "ENS MBZ PHOTO MUSEUM", pauseTitle: 'TAKING A<br>BREAK<span class="period">.</span>',
-    pausedMessage: "The site owner has paused the museum. Please check back later.",
+    pauseEyebrow: "THE EXHIBITION IS RESTING", pauseTitle: 'TAKING A<br>BREAK<span class="period">.</span>',
+    pausedMessage: "The collection is temporarily closed. The frames are staying put and the archive will return soon.",
     ticker: "★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★",
-    navGallery: "THE GALLERY", navAbout: "ABOUT THIS MASTERPIECE",
-    heroEyebrow: "ENS MBZ ARCHIVE · THINKING NOT REQUIRED", heroTitle: 'THE<br><span class="headline-last">ENS MBZ</span> MUSEUM<span class="period">.</span>',
-    heroDescription: "A collection of moments, expressions, and one unexpected meeting with lunch. Certified goofball. Questionable decisions. Excellent photo collection.",
+    navGallery: "THE GALLERY", navChat: "CHAT ROOM", navAbout: "ABOUT",
+    heroEyebrow: "ENS MBZ ARCHIVE · CURRENT EXHIBITION", heroTitle: 'THE<br><span class="headline-last">ARCHIVE</span><br>STAYS LOUD<span class="period">.</span>',
+    heroDescription: "An unofficial exhibition of school memories, unexpected portraits, and moments too good to leave in the camera roll.",
     tourLink: "TAKE THE TOUR", scribbleOne: "brain cell<br>loading...", scribbleTwo: "← swipe<br>for evidence",
     scrollExhibition: "SCROLL FOR THE EXHIBITION", figureLabel: "FIG. 001 — ∞", collection: "THE PERMANENT COLLECTION",
     galleryTitle: 'THE GALLERY<span class="period">.</span>', addPhotos: "ADD PHOTOS OR VIDEOS", galleryNote: "Museum rule #1: there are no bad angles, only interesting evidence.",
@@ -25,14 +25,15 @@ const translations = {
     quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
     footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية",
     commentsButton: "COMMENTS", takedownButton: "REQUEST TAKEDOWN", commentsEyebrow: "THE CONVERSATION", commentsTitle: 'COMMENTS<span class="period">.</span>', commentsEmpty: "No comments yet. Start the conversation.", commentsUnavailable: "Comments are unavailable right now.", commentNameLabel: "YOUR NAME", commentLabel: "COMMENT", commentPlaceholder: "Keep it nice.", commentSubmit: "POST COMMENT", commentPosting: "POSTING…", commentRequired: "Please enter your name and a comment.", commentPosted: "Your comment was posted.", commentFailed: "Your comment could not be posted. Please try again.", takedownEyebrow: "POST SAFETY", takedownTitle: 'REQUEST TAKEDOWN<span class="period">.</span>', takedownIntro: "Tell the moderators why this post should be removed. Your request is private.", takedownReasonLabel: "WHY SHOULD IT BE REMOVED?", takedownPlaceholder: "Tell the moderators why.", takedownSubmit: "SEND REQUEST", takedownSending: "SENDING…", takedownRequired: "Please enter your name and a reason.", takedownSent: "Your request was sent to the moderators.", takedownFailed: "Your request could not be sent. Please try again.",
+    chatEyebrow: "THE VISITOR BOOK", chatTitle: 'CHAT ROOM<span class="period">.</span>', chatLive: "LIVE ROOM", chatLoading: "Opening the room…", chatEmpty: "The room is quiet. Be the first to say something.", chatUnavailable: "The chat room is unavailable right now.", chatJoin: "JOIN THE CONVERSATION", chatNameLabel: "NAME (OPTIONAL)", chatNamePlaceholder: "Leave blank to post as Guest", chatMessageLabel: "MESSAGE", chatPlaceholder: "Say something to the room…", chatSubmit: "SEND MESSAGE ↗", chatSending: "SENDING…", chatRequired: "Please enter a message.", chatSent: "Message sent.", chatFailed: "Your message could not be sent. Try again.", chatNote: "Be kind. Messages are public.",
   },
   ar: {
-    pauseEyebrow: "متحف صور المدرسة الإماراتية في مدينة زايد", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
-    pausedMessage: "أوقف مالك الموقع المتحف مؤقتاً. تفقّد الموقع لاحقاً.",
+    pauseEyebrow: "المعرض يستريح الآن", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
+    pausedMessage: "المجموعة مغلقة مؤقتاً. ستبقى الإطارات في مكانها وسيعود الأرشيف قريباً.",
     ticker: "★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★",
-    navGallery: "المعرض", navAbout: "عن هذه التحفة",
-    heroEyebrow: "أرشيف المدرسة الإماراتية · التفكير غير مطلوب", heroTitle: 'متحف<br><span class="headline-last">ENS MBZ</span><span class="period">.</span>',
-    heroDescription: "مجموعة من اللحظات والتعابير ولقاء غير متوقع مع الغداء. خفة ظل معتمدة، وقرارات مثيرة للجدل، ومجموعة صور ممتازة.",
+    navGallery: "المعرض", navChat: "غرفة الدردشة", navAbout: "عن الموقع",
+    heroEyebrow: "أرشيف ENS MBZ · المعرض الحالي", heroTitle: 'الأرشيف<br><span class="headline-last">يبقى</span><br>صاخباً<span class="period">.</span>',
+    heroDescription: "معرض غير رسمي لذكريات المدرسة وصور غير متوقعة ولحظات أجمل من أن تبقى في ألبوم الكاميرا.",
     tourLink: "ابدأ الجولة", scribbleOne: "خلية دماغية<br>جارٍ التحميل...", scribbleTwo: "← اسحب<br>لرؤية الأدلة",
     scrollExhibition: "مرّر لاستكشاف المعرض", figureLabel: "الصورة ٠٠١ — ∞", collection: "المجموعة الدائمة",
     galleryTitle: 'المعرض<span class="period">.</span>', addPhotos: "أضف صوراً أو فيديو", galleryNote: "قاعدة المتحف الأولى: لا توجد زوايا سيئة، بل أدلة مثيرة للاهتمام.",
@@ -52,6 +53,7 @@ const translations = {
     quipButton: "أطلق مزحة أخرى ↻", initialQuip: "يرجى العلم: ENS MBZ مشاغب معتمد.",
     footerNote: "متحف صغير على الإنترنت. ومشاغب كبير.", backTop: "العودة للأعلى ↑", languageButton: "English",
     commentsButton: "التعليقات", takedownButton: "طلب إزالة", commentsEyebrow: "المحادثة", commentsTitle: 'التعليقات<span class="period">.</span>', commentsEmpty: "لا توجد تعليقات بعد. ابدأ المحادثة.", commentsUnavailable: "التعليقات غير متاحة حالياً.", commentNameLabel: "اسمك", commentLabel: "تعليق", commentPlaceholder: "اكتب بلطف.", commentSubmit: "نشر التعليق", commentPosting: "جارٍ النشر…", commentRequired: "يرجى كتابة اسمك وتعليقك.", commentPosted: "تم نشر تعليقك.", commentFailed: "تعذر نشر تعليقك. حاول مرة أخرى.", takedownEyebrow: "سلامة المشاركة", takedownTitle: 'طلب إزالة<span class="period">.</span>', takedownIntro: "أخبر المشرفين بسبب إزالة هذه المشاركة. طلبك خاص.", takedownReasonLabel: "لماذا يجب إزالتها؟", takedownPlaceholder: "أخبر المشرفين بالسبب.", takedownSubmit: "إرسال الطلب", takedownSending: "جارٍ الإرسال…", takedownRequired: "يرجى كتابة اسمك وسبب الطلب.", takedownSent: "تم إرسال طلبك إلى المشرفين.", takedownFailed: "تعذر إرسال طلبك. حاول مرة أخرى.",
+    chatEyebrow: "سجل الزوار", chatTitle: 'غرفة الدردشة<span class="period">.</span>', chatLive: "غرفة مباشرة", chatLoading: "جارٍ فتح الغرفة…", chatEmpty: "الغرفة هادئة. كن أول من يكتب.", chatUnavailable: "غرفة الدردشة غير متاحة حالياً.", chatJoin: "انضم إلى المحادثة", chatNameLabel: "الاسم (اختياري)", chatNamePlaceholder: "اتركه فارغاً للنشر باسم زائر", chatMessageLabel: "الرسالة", chatPlaceholder: "اكتب شيئاً للغرفة…", chatSubmit: "إرسال الرسالة ↗", chatSending: "جارٍ الإرسال…", chatRequired: "يرجى كتابة رسالة.", chatSent: "تم إرسال الرسالة.", chatFailed: "تعذر إرسال رسالتك. حاول مرة أخرى.", chatNote: "كن لطيفاً. الرسائل عامة.",
   },
 };
 let currentLanguage = (() => {
@@ -127,6 +129,7 @@ function render() {
   photos.forEach((photo, index) => {
     const card = document.createElement("article");
     card.className = "photo-card";
+    card.style.setProperty("--card-index", String(Math.min(index, 10)));
     const mediaSrc = photo.src || (photo.blob ? URL.createObjectURL(photo.blob) : "");
     const isVideo = photo.mediaType === "video" || photo.media_type === "video" || (photo.blob && isVideoFile(photo.blob)) || videoFilePattern.test(mediaSrc);
     const mediaFrame = document.createElement(isVideo ? "div" : "button");
@@ -417,6 +420,90 @@ takedownForm.addEventListener("submit", async (event) => {
   takedownForm.reset(); error.textContent = tr("takedownSent");
 });
 
+const chatMessagesElement = document.querySelector("#chatMessages");
+const chatForm = document.querySelector("#chatForm");
+const chatName = document.querySelector("#chatName");
+const chatBody = document.querySelector("#chatBody");
+const chatError = document.querySelector("#chatError");
+const chatSubmit = document.querySelector("#chatSubmit");
+let roomMessages = [];
+
+function renderChatMessages({ scroll = false } = {}) {
+  if (!chatMessagesElement) return;
+  chatMessagesElement.replaceChildren();
+  if (!roomMessages.length) {
+    const empty = document.createElement("p");
+    empty.className = "chat-empty";
+    empty.textContent = tr("chatEmpty");
+    chatMessagesElement.append(empty);
+    return;
+  }
+  const timeFormatter = new Intl.DateTimeFormat(currentLanguage === "ar" ? "ar-AE" : "en-AE", { hour: "numeric", minute: "2-digit" });
+  for (const item of roomMessages) {
+    const message = document.createElement("article");
+    message.className = "chat-message";
+    const head = document.createElement("div");
+    head.className = "chat-message-head";
+    const name = document.createElement("strong");
+    name.textContent = item.name;
+    const time = document.createElement("time");
+    time.dateTime = item.created_at;
+    time.textContent = timeFormatter.format(new Date(item.created_at));
+    const body = document.createElement("p");
+    body.textContent = item.body;
+    head.append(name, time);
+    message.append(head, body);
+    chatMessagesElement.append(message);
+  }
+  if (scroll) chatMessagesElement.scrollTop = chatMessagesElement.scrollHeight;
+}
+
+async function loadChatRoom() {
+  if (!chatMessagesElement) return;
+  if (!supabaseClient) { chatMessagesElement.textContent = tr("chatUnavailable"); return; }
+  const { data, error } = await supabaseClient.from("chat_messages")
+    .select("id,name,body,created_at")
+    .order("created_at", { ascending: false })
+    .limit(80);
+  if (error) { chatMessagesElement.textContent = tr("chatUnavailable"); return; }
+  roomMessages = (data || []).reverse();
+  renderChatMessages({ scroll: true });
+}
+
+chatForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!supabaseClient) { chatError.textContent = tr("chatUnavailable"); return; }
+  const name = chatName.value.trim() || (currentLanguage === "ar" ? "زائر" : "Guest");
+  const body = chatBody.value.trim();
+  if (!body) { chatError.textContent = tr("chatRequired"); return; }
+  chatError.textContent = "";
+  chatSubmit.disabled = true;
+  chatSubmit.textContent = tr("chatSending");
+  const { data, error } = await supabaseClient.from("chat_messages").insert({ name, body }).select("id,name,body,created_at").single();
+  chatSubmit.disabled = false;
+  chatSubmit.textContent = tr("chatSubmit");
+  if (error) { chatError.textContent = tr("chatFailed"); return; }
+  chatBody.value = "";
+  if (data && !roomMessages.some((item) => item.id === data.id)) {
+    roomMessages.push(data);
+    roomMessages = roomMessages.slice(-80);
+    renderChatMessages({ scroll: true });
+  }
+  chatError.textContent = tr("chatSent");
+});
+
+if (supabaseClient) {
+  supabaseClient.channel("ensmbz-chat-room")
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "chat_messages" }, ({ new: message }) => {
+      if (!message?.id || roomMessages.some((item) => item.id === message.id)) return;
+      roomMessages.push(message);
+      roomMessages = roomMessages.slice(-80);
+      renderChatMessages({ scroll: true });
+    })
+    .subscribe();
+}
+loadChatRoom();
+
 const quips = {
   en: [
     "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
@@ -473,6 +560,7 @@ function applyLanguage(language = currentLanguage) {
   storageNote.textContent = tr(storageMessageKey);
   try { localStorage.setItem("ensmbz-language", currentLanguage); } catch { /* Language still changes for this page view. */ }
   render();
+  renderChatMessages();
 }
 for (const button of document.querySelectorAll("[data-language-toggle]")) {
   button.addEventListener("click", () => {
@@ -489,24 +577,6 @@ for (const button of document.querySelectorAll("[data-language-choice]")) {
   });
 }
 try { if (!localStorage.getItem("ensmbz-language-chosen")) languageDialog.showModal(); } catch { languageDialog.showModal(); }
-
-// The 404 audio only plays while the owner has paused the site.
-const pauseAudio = document.querySelector("#pauseAudio");
-let siteIsPaused = false;
-let siteStatusKnown = false;
-pauseAudio.volume = 0.45;
-async function startPauseAudio() {
-  if (!siteIsPaused) return;
-  try {
-    await pauseAudio.play();
-  } catch { /* Browser autoplay policy may require a visitor interaction. */ }
-}
-document.addEventListener("pointerdown", () => {
-  if (siteStatusKnown && siteIsPaused && pauseAudio.paused) startPauseAudio();
-});
-document.addEventListener("keydown", () => {
-  if (siteStatusKnown && siteIsPaused && pauseAudio.paused) startPauseAudio();
-});
 
 async function loadSharedPhotos() {
   if (!supabaseReady || !supabaseClient) return;
@@ -540,16 +610,8 @@ async function refreshSiteStatus() {
     if (!response.ok) return;
     const status = await response.json();
     const paused = status.is_live === false;
-    siteIsPaused = paused;
-    siteStatusKnown = true;
     sitePaused.hidden = !paused;
     document.body.classList.toggle("is-site-paused", paused);
-    if (paused) {
-      if (pauseAudio.paused) startPauseAudio();
-    } else if (!pauseAudio.paused) {
-      pauseAudio.pause();
-      pauseAudio.currentTime = 0;
-    }
   } catch {
     // Keep the site available if Supabase is temporarily unreachable.
   }
