@@ -28,7 +28,7 @@ const PANIC_COMMAND = {
 };
 const CLEAR_CHAT_COMMAND = {
   name: "clear-chat",
-  description: "Owner only: clear every message from the website chat room",
+  description: "King role: clear every message from the website chat room",
 };
 
 type PhotoRecord = {
@@ -305,10 +305,9 @@ async function handleSiteCommand(interaction: Record<string, any>): Promise<Resp
 }
 
 async function handleClearChatCommand(interaction: Record<string, any>): Promise<Response> {
-  const guildId = String(interaction.guild_id || "");
-  const userId = String(interaction.member?.user?.id || interaction.user?.id || "");
-  if (!guildId || !userId || userId !== await guildOwnerId(guildId)) {
-    return json({ type: 4, data: { content: "Only the Discord server owner can use /clear-chat.", flags: 64 } });
+  const memberRoles: unknown = interaction.member?.roles;
+  if (!interaction.guild_id || !Array.isArray(memberRoles) || !memberRoles.includes(SITE_CONTROL_ROLE_ID)) {
+    return json({ type: 4, data: { content: "You need the King role to use /clear-chat.", flags: 64 } });
   }
   const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
   const response = await fetch(`${projectUrl}/rest/v1/chat_messages?id=not.is.null`, {
