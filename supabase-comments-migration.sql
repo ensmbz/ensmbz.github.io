@@ -21,6 +21,7 @@ create table if not exists public.photo_takedown_requests (
   created_at timestamptz not null default now()
 );
 alter table public.site_control add column if not exists comments_channel_id text;
+alter table public.site_control add column if not exists takedown_channel_id text;
 create index if not exists photo_takedown_requests_status_idx on public.photo_takedown_requests(status, created_at);
 
 alter table public.photo_comments enable row level security;

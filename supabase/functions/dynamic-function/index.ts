@@ -87,6 +87,10 @@ function commentComponents(id: string, deleted = false) {
   return [{ type: 1, components: [{ type: 2, style: 4, label: deleted ? "Deleted" : "Delete comment", custom_id: `ensmbz:delete-comment:${id}`, disabled: deleted }] }];
 }
 
+function takedownComponents(id: string, resolved = false) {
+  return [{ type: 1, components: [{ type: 2, style: resolved ? 2 : 3, label: resolved ? "Resolved" : "Resolve request", custom_id: `ensmbz:resolve-takedown:${id}`, disabled: resolved }] }];
+}
+
 function siteCommandAction(options: unknown): "on" | "off" | null {
   if (!Array.isArray(options)) return null;
   for (const option of options) {
@@ -417,7 +421,7 @@ async function ensureCommentsChannel(projectUrl: string, key: string): Promise<s
   if (!review.ok || !reviewInfo.guild_id) throw new Error("Could not find the Discord review channel to create #photo-comments.");
   const created = await fetch(`https://discord.com/api/v10/guilds/${reviewInfo.guild_id}/channels`, {
     method: "POST", headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
-    body: JSON.stringify({ name: "photo-comments", type: 0, parent_id: reviewInfo.parent_id || undefined, topic: "Private comment threads from the ENS MBZ gallery." }),
+    body: JSON.stringify({ name: "photo-comments", type: 0, parent_id: reviewInfo.parent_id || undefined, permission_overwrites: reviewInfo.permission_overwrites || [], topic: "Private comment threads from the ENS MBZ gallery." }),
   });
   const channel = await created.json().catch(() => ({}));
   if (!created.ok || !channel.id) throw new Error("The bot could not create #photo-comments. Give it Manage Channels permission and try again.");
@@ -426,6 +430,48 @@ async function ensureCommentsChannel(projectUrl: string, key: string): Promise<s
   });
   if (!saved.ok) throw new Error("The comments channel was created but could not be saved.");
   return String(channel.id);
+}
+
+async function ensureTakedownChannel(projectUrl: string, key: string): Promise<string> {
+  const current = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true&select=takedown_channel_id`, { headers: supabaseHeaders(key) });
+  const rows = await current.json().catch(() => []);
+  if (current.ok && Array.isArray(rows) && rows[0]?.takedown_channel_id) return String(rows[0].takedown_channel_id);
+  const token = requiredEnv("DISCORD_BOT_TOKEN");
+  const reviewChannelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
+  const review = await fetch(`https://discord.com/api/v10/channels/${reviewChannelId}`, { headers: { authorization: `Bot ${token}` } });
+  const reviewInfo = await review.json().catch(() => ({}));
+  if (!review.ok || !reviewInfo.guild_id) throw new Error("Could not find the Discord review channel to create #takedown-requests.");
+  const created = await fetch(`https://discord.com/api/v10/guilds/${reviewInfo.guild_id}/channels`, {
+    method: "POST", headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ name: "takedown-requests", type: 0, parent_id: reviewInfo.parent_id || undefined, permission_overwrites: reviewInfo.permission_overwrites || [], topic: "Private requests to remove ENS MBZ gallery posts." }),
+  });
+  const channel = await created.json().catch(() => ({}));
+  if (!created.ok || !channel.id) throw new Error("The bot could not create #takedown-requests. Give it Manage Channels permission and try again.");
+  const saved = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true`, {
+    method: "PATCH", headers: { ...supabaseHeaders(key), prefer: "return=minimal" }, body: JSON.stringify({ takedown_channel_id: String(channel.id) }),
+  });
+  if (!saved.ok) throw new Error("The takedown channel was created but could not be saved.");
+  return String(channel.id);
+}
+
+async function notifyTakedown(request: Request): Promise<Response> {
+  const payload = await request.json().catch(() => ({}));
+  const requestId = String(payload?.requestId || "");
+  if (!/^\d{1,19}$/.test(requestId)) return json({ error: "A takedown request ID is required." }, 400);
+  const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
+  const key = supabaseKey();
+  const loaded = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(requestId)}&select=id,photo_id,name,reason,status`, { headers: supabaseHeaders(key) });
+  const rows = await loaded.json().catch(() => []);
+  if (!loaded.ok || !Array.isArray(rows) || !rows[0]) return json({ error: "Takedown request not found." }, 404);
+  const item = rows[0] as Record<string, unknown>;
+  const channelId = await ensureTakedownChannel(projectUrl, key);
+  const token = requiredEnv("DISCORD_BOT_TOKEN");
+  const posted = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+    method: "POST", headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ content: `⚠️ **Takedown request for gallery post #${item.photo_id}**\n**Requested by:** ${String(item.name).replace(/[\r\n<>]/g, " ").slice(0, 40)}\n**Reason:** ${String(item.reason).slice(0, 500)}`, components: takedownComponents(String(item.id)), allowed_mentions: { parse: [] } }),
+  });
+  if (!posted.ok) return json({ error: "Could not post the takedown request to Discord." }, 502);
+  return json({ ok: true });
 }
 
 async function notifyComment(request: Request): Promise<Response> {
@@ -511,17 +557,19 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
   const archiveChannelId = Deno.env.get("DISCORD_PHOTO_ARCHIVE_CHANNEL_ID")?.trim();
   const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
   const key = supabaseKey();
-  const channelLookup = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true&select=comments_channel_id`, { headers: supabaseHeaders(key) });
+  const channelLookup = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true&select=comments_channel_id,takedown_channel_id`, { headers: supabaseHeaders(key) });
   const channelRows = await channelLookup.json().catch(() => []);
   const commentsChannelId = Array.isArray(channelRows) ? channelRows[0]?.comments_channel_id : null;
+  const takedownChannelId = Array.isArray(channelRows) ? channelRows[0]?.takedown_channel_id : null;
   const inArchive = Boolean(archiveChannelId && interaction.channel_id === archiveChannelId);
   const inReview = interaction.channel_id === reviewChannelId;
   const inComments = Boolean(commentsChannelId && (interaction.channel_id === commentsChannelId || interaction.channel?.parent_id === commentsChannelId));
-  if (interaction.application_id !== appId || (!inReview && !inArchive && !inComments) || !interaction.guild_id) {
-    return json({ type: 4, data: { content: "Use the buttons in the private photo-review, photo-archive, or photo-comments channel.", flags: 64 } });
+  const inTakedowns = Boolean(takedownChannelId && interaction.channel_id === takedownChannelId);
+  if (interaction.application_id !== appId || (!inReview && !inArchive && !inComments && !inTakedowns) || !interaction.guild_id) {
+    return json({ type: 4, data: { content: "Use the buttons in the private photo-review, photo-archive, photo-comments, or takedown-requests channel.", flags: 64 } });
   }
 
-  const match = /^ensmbz:(approve|decline|delete|delete-comment):(\d{1,19})$/.exec(String(interaction.data?.custom_id || ""));
+  const match = /^ensmbz:(approve|decline|delete|delete-comment|resolve-takedown):(\d{1,19})$/.exec(String(interaction.data?.custom_id || ""));
   if (!match) return json({ type: 4, data: { content: "That action is not valid.", flags: 64 } });
   const [, action, id] = match;
   const memberRoles: unknown = interaction.member?.roles;
@@ -535,6 +583,16 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
     if (!removed.ok || !Array.isArray(rows) || !rows.length) return json({ type: 4, data: { content: "This comment was already removed or could not be found.", flags: 64 } });
     const reviewerId = interaction.member?.user?.id || interaction.user?.id;
     return json({ type: 7, data: { content: `🗑️ Comment deleted.${reviewerId ? ` Deleted by <@${reviewerId}>.` : ""}`, components: commentComponents(id, true), allowed_mentions: { parse: [] } } });
+  }
+  if (action === "resolve-takedown") {
+    if (!inTakedowns || !hasRole(SITE_CONTROL_ROLE_ID)) return json({ type: 4, data: { content: "You need the King role to resolve takedown requests.", flags: 64 } });
+    const resolved = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(id)}&status=eq.pending`, {
+      method: "PATCH", headers: { ...supabaseHeaders(key), prefer: "return=representation" }, body: JSON.stringify({ status: "resolved" }),
+    });
+    const rows = await resolved.json().catch(() => []);
+    if (!resolved.ok || !Array.isArray(rows) || !rows.length) return json({ type: 4, data: { content: "This request was already resolved or could not be found.", flags: 64 } });
+    const reviewerId = interaction.member?.user?.id || interaction.user?.id;
+    return json({ type: 7, data: { content: `✅ Takedown request resolved.${reviewerId ? ` Resolved by <@${reviewerId}>.` : ""}`, components: takedownComponents(id, true), allowed_mentions: { parse: [] } } });
   }
   if (inReview && action === "delete") {
     const components = Array.isArray(interaction.message?.components)
@@ -686,6 +744,7 @@ Deno.serve(async (request: Request) => {
     try {
       const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
       const key = supabaseKey();
+      await Promise.all([ensureCommentsChannel(projectUrl, key), ensureTakedownChannel(projectUrl, key)]).catch((error) => console.error("Could not prepare community Discord channels", error));
       const status = await fetch(`${projectUrl}/rest/v1/site_control?id=eq.true&select=is_live`, {
         headers: supabaseHeaders(key),
       });
@@ -708,6 +767,9 @@ Deno.serve(async (request: Request) => {
   try {
     if (pathname.endsWith("/comment-notify")) {
       return await notifyComment(new Request(request.url, { method: "POST", headers: request.headers, body }));
+    }
+    if (pathname.endsWith("/takedown-notify")) {
+      return await notifyTakedown(new Request(request.url, { method: "POST", headers: request.headers, body }));
     }
     if (request.headers.has("x-review-hook")) return await handleDatabaseWebhook(request, body);
     if (pathname.endsWith("/media-upload-url")) {

@@ -383,10 +383,11 @@ takedownForm.addEventListener("submit", async (event) => {
   if (!activeCommentPhoto || !name || !reason) { error.textContent = tr("takedownRequired"); return; }
   const button = document.querySelector("#takedownSubmit");
   error.textContent = ""; button.disabled = true; button.textContent = tr("takedownSending");
-  const { error: insertError } = await supabaseClient.from("photo_takedown_requests").insert({ photo_id: activeCommentPhoto.remoteId, name, reason });
+  const { data: insertedRequest, error: insertError } = await supabaseClient.from("photo_takedown_requests").insert({ photo_id: activeCommentPhoto.remoteId, name, reason }).select("id").single();
   button.disabled = false; button.textContent = tr("takedownSubmit");
   if (insertError) { error.textContent = tr("takedownFailed"); return; }
   takedownForm.reset(); error.textContent = tr("takedownSent");
+  if (insertedRequest?.id) fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/takedown-notify`, { method: "POST", headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" }, body: JSON.stringify({ requestId: insertedRequest.id }) }).catch(() => {});
 });
 
 const quips = {
