@@ -636,6 +636,15 @@ async function removeGalleryPostForTakedown(photoId: string, projectUrl: string,
   return { ok: true, message: `The post was removed from the website.${storageNote}${archiveNote}` };
 }
 
+async function updateDeferredInteraction(appId: string, interactionToken: string, data: Record<string, unknown>) {
+  const updated = await fetch(`https://discord.com/api/v10/webhooks/${appId}/${encodeURIComponent(interactionToken)}/messages/@original`, {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!updated.ok) console.error("Could not update deferred Discord interaction", updated.status, await updated.text());
+}
+
 async function handleButton(interaction: Record<string, any>): Promise<Response> {
   const appId = requiredEnv("DISCORD_APPLICATION_ID");
   const reviewChannelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
@@ -671,21 +680,45 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
   }
   if (action === "resolve-takedown") {
     if (!inTakedowns || !hasRole(SITE_CONTROL_ROLE_ID)) return json({ type: 4, data: { content: "You need the King role to resolve takedown requests.", flags: 64 } });
-    const loaded = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(id)}&select=id,photo_id,status`, {
-      headers: supabaseHeaders(key),
-    });
-    const requests = await loaded.json().catch(() => []);
-    if (!loaded.ok || !Array.isArray(requests) || !requests.length) return json({ type: 4, data: { content: "This takedown request could not be found.", flags: 64 } });
-    const photoId = String(requests[0].photo_id || "");
-    const removal = await removeGalleryPostForTakedown(photoId, projectUrl, key, archiveChannelId);
-    if (!removal.ok) return json({ type: 4, data: { content: removal.message, flags: 64 } });
-    const resolved = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(id)}`, {
-      method: "PATCH", headers: { ...supabaseHeaders(key), prefer: "return=representation" }, body: JSON.stringify({ status: "resolved" }),
-    });
-    const rows = await resolved.json().catch(() => []);
-    if (!resolved.ok || !Array.isArray(rows) || !rows.length) return json({ type: 4, data: { content: `The post was removed, but the request could not be marked resolved. ${removal.message}`, flags: 64 } });
     const reviewerId = interaction.member?.user?.id || interaction.user?.id;
-    return json({ type: 7, data: { content: `✅ Post #${photoId} taken down. ${removal.message}${reviewerId ? ` Removed by <@${reviewerId}>.` : ""}`, components: takedownComponents(id, true), allowed_mentions: { parse: [] } } });
+    const interactionToken = String(interaction.token || "");
+    const originalContent = String(interaction.message?.content || "⚠️ Takedown request");
+    const processTakedown = async () => {
+      try {
+        const loaded = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(id)}&select=id,photo_id,status`, {
+          headers: supabaseHeaders(key),
+        });
+        const requests = await loaded.json().catch(() => []);
+        if (!loaded.ok || !Array.isArray(requests) || !requests.length) {
+          await updateDeferredInteraction(appId, interactionToken, { content: `${originalContent}\n\n❌ This takedown request could not be found.`, components: takedownComponents(id), allowed_mentions: { parse: [] } });
+          return;
+        }
+        const photoId = String(requests[0].photo_id || "");
+        const removal = await removeGalleryPostForTakedown(photoId, projectUrl, key, archiveChannelId);
+        if (!removal.ok) {
+          await updateDeferredInteraction(appId, interactionToken, { content: `${originalContent}\n\n❌ ${removal.message}`, components: takedownComponents(id), allowed_mentions: { parse: [] } });
+          return;
+        }
+        const resolved = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(id)}`, {
+          method: "PATCH", headers: { ...supabaseHeaders(key), prefer: "return=representation" }, body: JSON.stringify({ status: "resolved" }),
+        });
+        const rows = await resolved.json().catch(() => []);
+        const statusNote = resolved.ok && Array.isArray(rows) && rows.length ? "" : " The request status could not be updated.";
+        await updateDeferredInteraction(appId, interactionToken, {
+          content: `✅ Post #${photoId} taken down. ${removal.message}${statusNote}${reviewerId ? ` Removed by <@${reviewerId}>.` : ""}`,
+          components: takedownComponents(id, true),
+          allowed_mentions: { parse: [] },
+        });
+      } catch (error) {
+        console.error("Deferred takedown failed", error);
+        await updateDeferredInteraction(appId, interactionToken, { content: `${originalContent}\n\n❌ The takedown failed. Try again.`, components: takedownComponents(id), allowed_mentions: { parse: [] } });
+      }
+    };
+    const task = processTakedown();
+    const edgeRuntime = (globalThis as Record<string, any>).EdgeRuntime;
+    if (edgeRuntime?.waitUntil) edgeRuntime.waitUntil(task);
+    else task.catch((error) => console.error("Background takedown failed", error));
+    return json({ type: 6 });
   }
   if (inReview && action === "delete") {
     const components = Array.isArray(interaction.message?.components)
