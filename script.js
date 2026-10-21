@@ -76,6 +76,42 @@ const supabaseReady = Boolean(supabaseSettings.url && supabaseSettings.publishab
 const supabaseClient = supabaseReady
   ? window.supabase.createClient(supabaseSettings.url, supabaseSettings.publishableKey)
   : null;
+
+const scrollProgress = document.querySelector("#scrollProgress");
+let scrollFramePending = false;
+function updateScrollProgress() {
+  const root = document.documentElement;
+  const available = root.scrollHeight - root.clientHeight;
+  const progress = available > 0 ? Math.min(1, Math.max(0, root.scrollTop / available)) : 0;
+  scrollProgress?.style.setProperty("transform", `scaleX(${progress})`);
+  scrollFramePending = false;
+}
+window.addEventListener("scroll", () => {
+  if (scrollFramePending) return;
+  scrollFramePending = true;
+  requestAnimationFrame(updateScrollProgress);
+}, { passive: true });
+window.addEventListener("resize", updateScrollProgress, { passive: true });
+updateScrollProgress();
+
+const revealTargets = document.querySelectorAll(".section-heading, .gallery-note, .drop-hint, .storage-note, .chat-heading, .chat-layout, .about-strip, footer");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (reduceMotion || !("IntersectionObserver" in window)) {
+  revealTargets.forEach((element) => element.classList.add("scroll-reveal", "is-visible"));
+} else {
+  const revealObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      entry.target.classList.add("is-visible");
+      revealObserver.unobserve(entry.target);
+    }
+  }, { threshold: 0.12, rootMargin: "0px 0px -8%" });
+  revealTargets.forEach((element, index) => {
+    element.classList.add("scroll-reveal");
+    element.dataset.revealDelay = String(index % 3);
+    revealObserver.observe(element);
+  });
+}
 let sharedPhotos = [];
 const dbPromise = new Promise((resolve) => {
   if (!("indexedDB" in window)) return resolve(null);
@@ -461,16 +497,26 @@ function renderChatMessages({ scroll = false } = {}) {
     message.className = "chat-message";
     const isOwn = isOwnChatMessage(item);
     if (isOwn) message.classList.add("is-own");
+    message.dataset.initial = Array.from(item.name || "?")[0]?.toUpperCase() || "?";
     const head = document.createElement("div");
     head.className = "chat-message-head";
+    const identity = document.createElement("div");
+    identity.className = "chat-message-identity";
     const name = document.createElement("strong");
-    name.textContent = isOwn ? `${item.name} · ${tr("chatYou")}` : item.name;
+    name.textContent = item.name;
+    identity.append(name);
+    if (isOwn) {
+      const youBadge = document.createElement("span");
+      youBadge.className = "chat-you-badge";
+      youBadge.textContent = tr("chatYou");
+      identity.append(youBadge);
+    }
     const time = document.createElement("time");
     time.dateTime = item.created_at;
     time.textContent = timeFormatter.format(new Date(item.created_at));
     const body = document.createElement("p");
     body.textContent = item.body;
-    head.append(name, time);
+    head.append(identity, time);
     message.append(head, body);
     chatMessagesElement.append(message);
   }
