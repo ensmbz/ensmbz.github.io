@@ -26,6 +26,10 @@ const PANIC_COMMAND = {
   name: "panic",
   description: "Owner only: permanently delete the ENS MBZ site, media and GitHub repository",
 };
+const CLEAR_CHAT_COMMAND = {
+  name: "clear-chat",
+  description: "Owner only: clear every message from the website chat room",
+};
 
 type PhotoRecord = {
   id: number | string;
@@ -300,6 +304,26 @@ async function handleSiteCommand(interaction: Record<string, any>): Promise<Resp
   return json({ type: 5, data: { flags: 64 } });
 }
 
+async function handleClearChatCommand(interaction: Record<string, any>): Promise<Response> {
+  const guildId = String(interaction.guild_id || "");
+  const userId = String(interaction.member?.user?.id || interaction.user?.id || "");
+  if (!guildId || !userId || userId !== await guildOwnerId(guildId)) {
+    return json({ type: 4, data: { content: "Only the Discord server owner can use /clear-chat.", flags: 64 } });
+  }
+  const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
+  const response = await fetch(`${projectUrl}/rest/v1/chat_messages?id=not.is.null`, {
+    method: "DELETE",
+    headers: { ...supabaseHeaders(supabaseKey()), prefer: "return=representation" },
+  });
+  if (!response.ok) {
+    console.error("Could not clear website chat", response.status, await response.text());
+    return json({ type: 4, data: { content: "The chat could not be cleared. Try again.", flags: 64 } });
+  }
+  const removed = await response.json().catch(() => []);
+  const count = Array.isArray(removed) ? removed.length : 0;
+  return json({ type: 4, data: { content: `✅ Website chat cleared. ${count} message${count === 1 ? "" : "s"} removed.`, flags: 64 } });
+}
+
 async function registerSiteCommand(): Promise<Response> {
   const token = requiredEnv("DISCORD_BOT_TOKEN");
   const appId = requiredEnv("DISCORD_APPLICATION_ID");
@@ -319,7 +343,7 @@ async function registerSiteCommand(): Promise<Response> {
     return json({ error: "Discord would not list the bot's server commands." }, 502);
   }
   const commands = await listed.json().catch(() => []);
-  for (const command of [SITE_COMMAND, PANIC_COMMAND]) {
+  for (const command of [SITE_COMMAND, PANIC_COMMAND, CLEAR_CHAT_COMMAND]) {
     const existing = Array.isArray(commands) ? commands.find((item: any) => item.name === command.name) : null;
     const response = await discordApi(existing ? `${endpoint}/${existing.id}` : endpoint, {
       method: existing ? "PATCH" : "POST",
@@ -331,7 +355,7 @@ async function registerSiteCommand(): Promise<Response> {
       return json({ error: `Discord could not register /${command.name}. Check that the bot has applications.commands permission.` }, 502);
     }
   }
-  return json({ ok: true, commands: ["/site", "/panic"], guild_id: channel.guild_id });
+  return json({ ok: true, commands: ["/site", "/panic", "/clear-chat"], guild_id: channel.guild_id });
 }
 
 async function postPendingPhoto(record: PhotoRecord): Promise<Response> {
@@ -917,6 +941,9 @@ Deno.serve(async (request: Request) => {
     }
     if (interaction.type === 2 && interaction.data?.name === "panic") {
       return await panicHandlers.command(interaction);
+    }
+    if (interaction.type === 2 && interaction.data?.name === "clear-chat") {
+      return await handleClearChatCommand(interaction);
     }
     if (interaction.type === 2 && (
       interaction.data?.name === "site" ||
