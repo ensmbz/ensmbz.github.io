@@ -25,7 +25,7 @@ const translations = {
     quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
     footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية",
     commentsButton: "COMMENTS", takedownButton: "REQUEST TAKEDOWN", commentsEyebrow: "THE CONVERSATION", commentsTitle: 'COMMENTS<span class="period">.</span>', commentsEmpty: "No comments yet. Start the conversation.", commentsUnavailable: "Comments are unavailable right now.", commentNameLabel: "YOUR NAME", commentLabel: "COMMENT", commentPlaceholder: "Keep it nice.", commentSubmit: "POST COMMENT", commentPosting: "POSTING…", commentRequired: "Please enter your name and a comment.", commentPosted: "Your comment was posted.", commentFailed: "Your comment could not be posted. Please try again.", takedownEyebrow: "POST SAFETY", takedownTitle: 'REQUEST TAKEDOWN<span class="period">.</span>', takedownIntro: "Tell the moderators why this post should be removed. Your request is private.", takedownReasonLabel: "WHY SHOULD IT BE REMOVED?", takedownPlaceholder: "Tell the moderators why.", takedownSubmit: "SEND REQUEST", takedownSending: "SENDING…", takedownRequired: "Please enter your name and a reason.", takedownSent: "Your request was sent to the moderators.", takedownFailed: "Your request could not be sent. Please try again.",
-    chatEyebrow: "THE VISITOR BOOK", chatTitle: 'CHAT ROOM<span class="period">.</span>', chatLive: "LIVE ROOM", chatLoading: "Opening the room…", chatEmpty: "The room is quiet. Be the first to say something.", chatUnavailable: "The chat room is unavailable right now.", chatJoin: "JOIN THE CONVERSATION", chatNameLabel: "NAME (OPTIONAL)", chatNamePlaceholder: "Leave blank to post as Guest", chatMessageLabel: "MESSAGE", chatPlaceholder: "Say something to the room…", chatSubmit: "SEND MESSAGE ↗", chatSending: "SENDING…", chatRequired: "Please enter a message.", chatSent: "Message sent.", chatFailed: "Your message could not be sent. Try again.", chatNote: "Be kind. Messages are public.",
+    chatEyebrow: "THE VISITOR BOOK", chatTitle: 'CHAT ROOM<span class="period">.</span>', chatLive: "LIVE ROOM", chatLoading: "Opening the room…", chatEmpty: "The room is quiet. Be the first to say something.", chatUnavailable: "The chat room is unavailable right now.", chatJoin: "JOIN THE CONVERSATION", chatNameLabel: "NAME (OPTIONAL)", chatNamePlaceholder: "Leave blank to post as Guest", chatMessageLabel: "MESSAGE", chatPlaceholder: "Say something to the room…", chatSubmit: "SEND MESSAGE ↗", chatSending: "SENDING…", chatRequired: "Please enter a message.", chatSent: "Message sent.", chatFailed: "Your message could not be sent. Try again.", chatNote: "Be kind. Messages are public.", chatYou: "YOU",
   },
   ar: {
     pauseEyebrow: "المعرض يستريح الآن", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
@@ -53,7 +53,7 @@ const translations = {
     quipButton: "أطلق مزحة أخرى ↻", initialQuip: "يرجى العلم: ENS MBZ مشاغب معتمد.",
     footerNote: "متحف صغير على الإنترنت. ومشاغب كبير.", backTop: "العودة للأعلى ↑", languageButton: "English",
     commentsButton: "التعليقات", takedownButton: "طلب إزالة", commentsEyebrow: "المحادثة", commentsTitle: 'التعليقات<span class="period">.</span>', commentsEmpty: "لا توجد تعليقات بعد. ابدأ المحادثة.", commentsUnavailable: "التعليقات غير متاحة حالياً.", commentNameLabel: "اسمك", commentLabel: "تعليق", commentPlaceholder: "اكتب بلطف.", commentSubmit: "نشر التعليق", commentPosting: "جارٍ النشر…", commentRequired: "يرجى كتابة اسمك وتعليقك.", commentPosted: "تم نشر تعليقك.", commentFailed: "تعذر نشر تعليقك. حاول مرة أخرى.", takedownEyebrow: "سلامة المشاركة", takedownTitle: 'طلب إزالة<span class="period">.</span>', takedownIntro: "أخبر المشرفين بسبب إزالة هذه المشاركة. طلبك خاص.", takedownReasonLabel: "لماذا يجب إزالتها؟", takedownPlaceholder: "أخبر المشرفين بالسبب.", takedownSubmit: "إرسال الطلب", takedownSending: "جارٍ الإرسال…", takedownRequired: "يرجى كتابة اسمك وسبب الطلب.", takedownSent: "تم إرسال طلبك إلى المشرفين.", takedownFailed: "تعذر إرسال طلبك. حاول مرة أخرى.",
-    chatEyebrow: "سجل الزوار", chatTitle: 'غرفة الدردشة<span class="period">.</span>', chatLive: "غرفة مباشرة", chatLoading: "جارٍ فتح الغرفة…", chatEmpty: "الغرفة هادئة. كن أول من يكتب.", chatUnavailable: "غرفة الدردشة غير متاحة حالياً.", chatJoin: "انضم إلى المحادثة", chatNameLabel: "الاسم (اختياري)", chatNamePlaceholder: "اتركه فارغاً للنشر باسم زائر", chatMessageLabel: "الرسالة", chatPlaceholder: "اكتب شيئاً للغرفة…", chatSubmit: "إرسال الرسالة ↗", chatSending: "جارٍ الإرسال…", chatRequired: "يرجى كتابة رسالة.", chatSent: "تم إرسال الرسالة.", chatFailed: "تعذر إرسال رسالتك. حاول مرة أخرى.", chatNote: "كن لطيفاً. الرسائل عامة.",
+    chatEyebrow: "سجل الزوار", chatTitle: 'غرفة الدردشة<span class="period">.</span>', chatLive: "غرفة مباشرة", chatLoading: "جارٍ فتح الغرفة…", chatEmpty: "الغرفة هادئة. كن أول من يكتب.", chatUnavailable: "غرفة الدردشة غير متاحة حالياً.", chatJoin: "انضم إلى المحادثة", chatNameLabel: "الاسم (اختياري)", chatNamePlaceholder: "اتركه فارغاً للنشر باسم زائر", chatMessageLabel: "الرسالة", chatPlaceholder: "اكتب شيئاً للغرفة…", chatSubmit: "إرسال الرسالة ↗", chatSending: "جارٍ الإرسال…", chatRequired: "يرجى كتابة رسالة.", chatSent: "تم إرسال الرسالة.", chatFailed: "تعذر إرسال رسالتك. حاول مرة أخرى.", chatNote: "كن لطيفاً. الرسائل عامة.", chatYou: "أنت",
   },
 };
 let currentLanguage = (() => {
@@ -426,7 +426,24 @@ const chatName = document.querySelector("#chatName");
 const chatBody = document.querySelector("#chatBody");
 const chatError = document.querySelector("#chatError");
 const chatSubmit = document.querySelector("#chatSubmit");
+const chatClientStorageKey = "ensmbz-chat-client-id";
+const chatNameStorageKey = "ensmbz-chat-name";
+const chatClientId = (() => {
+  const saved = localStorage.getItem(chatClientStorageKey);
+  if (saved) return saved;
+  const created = globalThis.crypto?.randomUUID?.() || `visitor-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  localStorage.setItem(chatClientStorageKey, created);
+  return created;
+})();
+const savedChatName = localStorage.getItem(chatNameStorageKey) || "";
+if (chatName && savedChatName) chatName.value = savedChatName;
 let roomMessages = [];
+
+function isOwnChatMessage(item) {
+  if (item.client_id) return item.client_id === chatClientId;
+  const rememberedName = chatName?.value.trim() || savedChatName;
+  return Boolean(rememberedName && item.name === rememberedName);
+}
 
 function renderChatMessages({ scroll = false } = {}) {
   if (!chatMessagesElement) return;
@@ -442,10 +459,12 @@ function renderChatMessages({ scroll = false } = {}) {
   for (const item of roomMessages) {
     const message = document.createElement("article");
     message.className = "chat-message";
+    const isOwn = isOwnChatMessage(item);
+    if (isOwn) message.classList.add("is-own");
     const head = document.createElement("div");
     head.className = "chat-message-head";
     const name = document.createElement("strong");
-    name.textContent = item.name;
+    name.textContent = isOwn ? `${item.name} · ${tr("chatYou")}` : item.name;
     const time = document.createElement("time");
     time.dateTime = item.created_at;
     time.textContent = timeFormatter.format(new Date(item.created_at));
@@ -462,7 +481,7 @@ async function loadChatRoom() {
   if (!chatMessagesElement) return;
   if (!supabaseClient) { chatMessagesElement.textContent = tr("chatUnavailable"); return; }
   const { data, error } = await supabaseClient.from("chat_messages")
-    .select("id,name,body,created_at")
+    .select("id,name,body,created_at,client_id")
     .order("created_at", { ascending: false })
     .limit(80);
   if (error) { chatMessagesElement.textContent = tr("chatUnavailable"); return; }
@@ -479,7 +498,8 @@ chatForm?.addEventListener("submit", async (event) => {
   chatError.textContent = "";
   chatSubmit.disabled = true;
   chatSubmit.textContent = tr("chatSending");
-  const { data, error } = await supabaseClient.from("chat_messages").insert({ name, body }).select("id,name,body,created_at").single();
+  localStorage.setItem(chatNameStorageKey, chatName.value.trim());
+  const { data, error } = await supabaseClient.from("chat_messages").insert({ name, body, client_id: chatClientId }).select("id,name,body,created_at,client_id").single();
   chatSubmit.disabled = false;
   chatSubmit.textContent = tr("chatSubmit");
   if (error) { chatError.textContent = tr("chatFailed"); return; }
@@ -490,6 +510,11 @@ chatForm?.addEventListener("submit", async (event) => {
     renderChatMessages({ scroll: true });
   }
   chatError.textContent = tr("chatSent");
+});
+
+chatName?.addEventListener("input", () => {
+  localStorage.setItem(chatNameStorageKey, chatName.value.trim());
+  renderChatMessages();
 });
 
 if (supabaseClient) {

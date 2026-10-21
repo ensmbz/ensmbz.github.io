@@ -84,11 +84,11 @@ h2 { margin: 0; color: var(--wine); font-size: clamp(58px, 7.8vw, 124px); line-h
 .chat-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); gap: clamp(30px, 5vw, 80px); padding-top: 38px; }
 .chat-messages { min-height: 420px; max-height: 620px; overflow-y: auto; display: flex; flex-direction: column; gap: 13px; padding: 5px 18px 5px 0; scrollbar-width: thin; scrollbar-color: var(--red) transparent; }
 .chat-message { position: relative; width: min(84%, 660px); padding: 16px 18px 15px; border: 1px solid #744039; background: #471013; animation: message-in .35s var(--ease-out) both; }
-.chat-message:nth-child(even) { align-self: flex-end; background: var(--paper); color: var(--wine); border-color: var(--paper); }
+.chat-message.is-own { align-self: flex-end; background: var(--paper); color: var(--wine); border-color: var(--paper); box-shadow: 7px 7px 0 var(--red); }
 .chat-message-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 7px; }
 .chat-message strong { font: 600 11px var(--mono); letter-spacing: .06em; }
 .chat-message time { color: #bd9992; font: 7px var(--mono); white-space: nowrap; }
-.chat-message:nth-child(even) time { color: var(--muted); }
+.chat-message.is-own time { color: var(--muted); }
 .chat-message p { margin: 0; font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 .chat-empty { margin: auto; color: #bd9992; text-align: center; font: 9px var(--mono); letter-spacing: .08em; }
 .chat-form { align-self: start; display: grid; gap: 10px; padding: 26px; border: 1px solid #8a554d; background: #2d0709; box-shadow: 10px 10px 0 var(--red); }
