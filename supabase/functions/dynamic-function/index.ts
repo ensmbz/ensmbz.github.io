@@ -88,7 +88,7 @@ function commentComponents(id: string, deleted = false) {
 }
 
 function takedownComponents(id: string, resolved = false) {
-  return [{ type: 1, components: [{ type: 2, style: resolved ? 2 : 3, label: resolved ? "Resolved" : "Resolve request", custom_id: `ensmbz:resolve-takedown:${id}`, disabled: resolved }] }];
+  return [{ type: 1, components: [{ type: 2, style: resolved ? 2 : 4, label: resolved ? "Taken down" : "Take down post", custom_id: `ensmbz:resolve-takedown:${id}`, disabled: resolved }] }];
 }
 
 function siteCommandAction(options: unknown): "on" | "off" | null {
@@ -561,6 +561,81 @@ async function verifyDiscordSignature(request: Request, body: string): Promise<b
   }
 }
 
+async function removeGalleryPostForTakedown(photoId: string, projectUrl: string, key: string, archiveChannelId?: string) {
+  const selected = await fetch(`${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(photoId)}&select=id,image_url,discord_archive_message_id`, {
+    headers: supabaseHeaders(key),
+  });
+  if (!selected.ok) {
+    console.error("Could not load requested post for takedown", selected.status, await selected.text());
+    return { ok: false, message: "Could not load the requested post. Try again." };
+  }
+  const rows = await selected.json().catch(() => []);
+  if (!Array.isArray(rows) || !rows.length) {
+    return { ok: true, message: "The post was already absent from the gallery." };
+  }
+
+  let objectPath: string;
+  let storedInR2 = false;
+  try {
+    const imageUrl = new URL(String(rows[0].image_url));
+    const storageMatch = /^\/storage\/v1\/object\/(?:public|sign)\/zayed-photos\/(.+)$/.exec(imageUrl.pathname);
+    if (storageMatch) {
+      objectPath = decodeURIComponent(storageMatch[1]);
+    } else {
+      const publicBase = new URL(requiredEnv("R2_PUBLIC_BASE_URL").replace(/\/$/, ""));
+      const prefix = publicBase.pathname.replace(/\/$/, "");
+      if (imageUrl.origin !== publicBase.origin || !imageUrl.pathname.startsWith(`${prefix}/`)) {
+        throw new Error("Post URL is not in configured storage");
+      }
+      objectPath = decodeURIComponent(imageUrl.pathname.slice(prefix.length + 1));
+      storedInR2 = true;
+    }
+  } catch (error) {
+    console.error("Could not map requested post URL to storage", error);
+    return { ok: false, message: "Could not identify the uploaded file, so the post was not removed." };
+  }
+
+  const removedRow = await fetch(`${projectUrl}/rest/v1/photo_submissions?id=eq.${encodeURIComponent(photoId)}`, {
+    method: "DELETE",
+    headers: { ...supabaseHeaders(key), prefer: "return=representation" },
+  });
+  if (!removedRow.ok) {
+    console.error("Could not remove requested post", removedRow.status, await removedRow.text());
+    return { ok: false, message: "Could not remove this post from the gallery. Try again." };
+  }
+  const deletedRows = await removedRow.json().catch(() => []);
+  if (!Array.isArray(deletedRows) || !deletedRows.length) {
+    return { ok: true, message: "The post was already absent from the gallery." };
+  }
+
+  let removedFile: Response;
+  if (storedInR2) {
+    const r2 = r2Config();
+    removedFile = await r2.client.fetch(`${r2.endpoint}/${encodeURIComponent(r2.bucket)}/${encodedObjectPath(objectPath)}`, { method: "DELETE" });
+  } else {
+    removedFile = await fetch(`${projectUrl}/storage/v1/object/zayed-photos/${encodedObjectPath(objectPath)}`, {
+      method: "DELETE",
+      headers: { apikey: key, authorization: `Bearer ${key}` },
+    });
+  }
+
+  let archiveNote = "";
+  if (rows[0].discord_archive_message_id && archiveChannelId) {
+    const archiveRemoval = await fetch(`https://discord.com/api/v10/channels/${archiveChannelId}/messages/${encodeURIComponent(String(rows[0].discord_archive_message_id))}`, {
+      method: "DELETE",
+      headers: { authorization: `Bot ${requiredEnv("DISCORD_BOT_TOKEN")}` },
+    });
+    if (!archiveRemoval.ok && archiveRemoval.status !== 404) {
+      archiveNote = " The Discord archive copy could not be removed automatically.";
+      console.error("Could not remove taken-down post from archive", archiveRemoval.status, await archiveRemoval.text());
+    }
+  }
+
+  const storageNote = removedFile.ok ? " Its uploaded file was removed too." : " The gallery post is gone, but storage cleanup failed.";
+  if (!removedFile.ok) console.error("Taken-down post row deleted but storage cleanup failed", removedFile.status, await removedFile.text());
+  return { ok: true, message: `The post was removed from the website.${storageNote}${archiveNote}` };
+}
+
 async function handleButton(interaction: Record<string, any>): Promise<Response> {
   const appId = requiredEnv("DISCORD_APPLICATION_ID");
   const reviewChannelId = requiredEnv("DISCORD_REVIEW_CHANNEL_ID");
@@ -596,13 +671,21 @@ async function handleButton(interaction: Record<string, any>): Promise<Response>
   }
   if (action === "resolve-takedown") {
     if (!inTakedowns || !hasRole(SITE_CONTROL_ROLE_ID)) return json({ type: 4, data: { content: "You need the King role to resolve takedown requests.", flags: 64 } });
-    const resolved = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(id)}&status=eq.pending`, {
+    const loaded = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(id)}&select=id,photo_id,status`, {
+      headers: supabaseHeaders(key),
+    });
+    const requests = await loaded.json().catch(() => []);
+    if (!loaded.ok || !Array.isArray(requests) || !requests.length) return json({ type: 4, data: { content: "This takedown request could not be found.", flags: 64 } });
+    const photoId = String(requests[0].photo_id || "");
+    const removal = await removeGalleryPostForTakedown(photoId, projectUrl, key, archiveChannelId);
+    if (!removal.ok) return json({ type: 4, data: { content: removal.message, flags: 64 } });
+    const resolved = await fetch(`${projectUrl}/rest/v1/photo_takedown_requests?id=eq.${encodeURIComponent(id)}`, {
       method: "PATCH", headers: { ...supabaseHeaders(key), prefer: "return=representation" }, body: JSON.stringify({ status: "resolved" }),
     });
     const rows = await resolved.json().catch(() => []);
-    if (!resolved.ok || !Array.isArray(rows) || !rows.length) return json({ type: 4, data: { content: "This request was already resolved or could not be found.", flags: 64 } });
+    if (!resolved.ok || !Array.isArray(rows) || !rows.length) return json({ type: 4, data: { content: `The post was removed, but the request could not be marked resolved. ${removal.message}`, flags: 64 } });
     const reviewerId = interaction.member?.user?.id || interaction.user?.id;
-    return json({ type: 7, data: { content: `✅ Takedown request resolved.${reviewerId ? ` Resolved by <@${reviewerId}>.` : ""}`, components: takedownComponents(id, true), allowed_mentions: { parse: [] } } });
+    return json({ type: 7, data: { content: `✅ Post #${photoId} taken down. ${removal.message}${reviewerId ? ` Removed by <@${reviewerId}>.` : ""}`, components: takedownComponents(id, true), allowed_mentions: { parse: [] } } });
   }
   if (inReview && action === "delete") {
     const components = Array.isArray(interaction.message?.components)
