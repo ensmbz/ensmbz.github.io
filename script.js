@@ -3,7 +3,7 @@ const translations = {
     pauseEyebrow: "THE EXHIBITION IS RESTING", pauseTitle: 'TAKING A<br>BREAK<span class="period">.</span>',
     pausedMessage: "The collection is temporarily closed. The frames are staying put and the archive will return soon.",
     ticker: "★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★",
-    navGallery: "THE GALLERY", navChat: "CHAT ROOM", navAbout: "ABOUT",
+    navGallery: "THE GALLERY", navChat: "CHAT ROOM", navReport: "REPORT", navAbout: "ABOUT",
     heroEyebrow: "ENS MBZ ARCHIVE · CURRENT EXHIBITION", heroTitle: 'THE<br><span class="headline-last">ARCHIVE</span><br>STAYS LOUD<span class="period">.</span>',
     heroDescription: "An unofficial exhibition of school memories, unexpected portraits, and moments too good to leave in the camera roll.",
     tourLink: "TAKE THE TOUR", scribbleOne: "brain cell<br>loading...", scribbleTwo: "← swipe<br>for evidence",
@@ -24,14 +24,14 @@ const translations = {
     galleryLoadFailed: "The shared gallery could not load. Check the Supabase table and access policies.",
     quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
     footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية",
-    commentsButton: "COMMENTS", takedownButton: "REQUEST TAKEDOWN", commentsEyebrow: "THE CONVERSATION", commentsTitle: 'COMMENTS<span class="period">.</span>', commentsEmpty: "No comments yet. Start the conversation.", commentsUnavailable: "Comments are unavailable right now.", commentNameLabel: "YOUR NAME", commentLabel: "COMMENT", commentPlaceholder: "Keep it nice.", commentSubmit: "POST COMMENT", commentPosting: "POSTING…", commentRequired: "Please enter your name and a comment.", commentPosted: "Your comment was posted.", commentFailed: "Your comment could not be posted. Please try again.", takedownEyebrow: "POST SAFETY", takedownTitle: 'REQUEST TAKEDOWN<span class="period">.</span>', takedownIntro: "Tell the moderators why this post should be removed. Your request is private.", takedownReasonLabel: "WHY SHOULD IT BE REMOVED?", takedownPlaceholder: "Tell the moderators why.", takedownSubmit: "SEND REQUEST", takedownSending: "SENDING…", takedownRequired: "Please enter your name and a reason.", takedownSent: "Your request was sent to the moderators.", takedownFailed: "Your request could not be sent. Please try again.",
+    commentsButton: "COMMENTS", takedownButton: "REQUEST TAKEDOWN", commentsEyebrow: "THE CONVERSATION", commentsTitle: 'COMMENTS<span class="period">.</span>', commentsEmpty: "No comments yet. Start the conversation.", commentsUnavailable: "Comments are unavailable right now.", commentNameLabel: "YOUR NAME", commentLabel: "COMMENT", commentPlaceholder: "Keep it nice.", commentSubmit: "POST COMMENT", commentPosting: "POSTING…", commentRequired: "Please enter your name and a comment.", commentPosted: "Your comment was posted.", commentFailed: "Your comment could not be posted. Please try again.", takedownEyebrow: "POST SAFETY", takedownTitle: 'REQUEST TAKEDOWN<span class="period">.</span>', takedownIntro: "Tell the moderators why this post should be removed. Your request is private.", takedownReasonLabel: "WHY SHOULD IT BE REMOVED?", takedownPlaceholder: "Tell the moderators why.", takedownSubmit: "SEND REQUEST", takedownSending: "SENDING…", takedownRequired: "Please enter your name and a reason.", takedownSent: "Your request was sent to the moderators.", takedownFailed: "Your request could not be sent. Please try again.", reportEyebrow: "PRIVATE MODERATION", reportTitle: 'SEND A REPORT<span class="period">.</span>', reportIntro: "Tell the moderators what happened. Your report is private and does not appear in the chat room.", reportNameLabel: "YOUR NAME <span>(OPTIONAL)</span>", reportNamePlaceholder: "Leave blank to stay anonymous", reportBodyLabel: "WHAT DO YOU WANT TO REPORT?", reportBodyPlaceholder: "Give the moderators the details.", reportSubmit: "SEND REPORT", reportSending: "SENDING…", reportRequired: "Please describe what you want to report.", reportSent: "Your report was sent to the moderators.", reportFailed: "Your report could not be sent. Please try again.",
     chatEyebrow: "THE VISITOR BOOK", chatTitle: 'CHAT ROOM<span class="period">.</span>', chatLive: "LIVE ROOM", chatLoading: "Opening the room…", chatEmpty: "The room is quiet. Be the first to say something.", chatUnavailable: "The chat room is unavailable right now.", chatJoin: "JOIN THE CONVERSATION", chatNameLabel: "NAME (OPTIONAL)", chatNamePlaceholder: "Leave blank to post as Guest", chatMessageLabel: "MESSAGE", chatPlaceholder: "Say something to the room…", chatSubmit: "SEND MESSAGE ↗", chatSending: "SENDING…", chatRequired: "Please enter a message.", chatSent: "Message sent.", chatFailed: "Your message could not be sent. Try again.", chatNote: "Be kind. Messages are public.", chatYou: "YOU", musicPlay: "PLAY AMBIENCE", musicStop: "STOP MUSIC",
   },
   ar: {
     pauseEyebrow: "المعرض يستريح الآن", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
     pausedMessage: "المجموعة مغلقة مؤقتاً. ستبقى الإطارات في مكانها وسيعود الأرشيف قريباً.",
     ticker: "★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★",
-    navGallery: "المعرض", navChat: "غرفة الدردشة", navAbout: "عن الموقع",
+    navGallery: "المعرض", navChat: "غرفة الدردشة", navReport: "إبلاغ", navAbout: "عن الموقع",
     heroEyebrow: "أرشيف ENS MBZ · المعرض الحالي", heroTitle: 'الأرشيف<br><span class="headline-last">يبقى</span><br>صاخباً<span class="period">.</span>',
     heroDescription: "معرض غير رسمي لذكريات المدرسة وصور غير متوقعة ولحظات أجمل من أن تبقى في ألبوم الكاميرا.",
     tourLink: "ابدأ الجولة", scribbleOne: "خلية دماغية<br>جارٍ التحميل...", scribbleTwo: "← اسحب<br>لرؤية الأدلة",
@@ -52,7 +52,7 @@ const translations = {
     galleryLoadFailed: "تعذّر تحميل المعرض المشترك. تحقق من جدول Supabase وسياسات الوصول.",
     quipButton: "أطلق مزحة أخرى ↻", initialQuip: "يرجى العلم: ENS MBZ مشاغب معتمد.",
     footerNote: "متحف صغير على الإنترنت. ومشاغب كبير.", backTop: "العودة للأعلى ↑", languageButton: "English",
-    commentsButton: "التعليقات", takedownButton: "طلب إزالة", commentsEyebrow: "المحادثة", commentsTitle: 'التعليقات<span class="period">.</span>', commentsEmpty: "لا توجد تعليقات بعد. ابدأ المحادثة.", commentsUnavailable: "التعليقات غير متاحة حالياً.", commentNameLabel: "اسمك", commentLabel: "تعليق", commentPlaceholder: "اكتب بلطف.", commentSubmit: "نشر التعليق", commentPosting: "جارٍ النشر…", commentRequired: "يرجى كتابة اسمك وتعليقك.", commentPosted: "تم نشر تعليقك.", commentFailed: "تعذر نشر تعليقك. حاول مرة أخرى.", takedownEyebrow: "سلامة المشاركة", takedownTitle: 'طلب إزالة<span class="period">.</span>', takedownIntro: "أخبر المشرفين بسبب إزالة هذه المشاركة. طلبك خاص.", takedownReasonLabel: "لماذا يجب إزالتها؟", takedownPlaceholder: "أخبر المشرفين بالسبب.", takedownSubmit: "إرسال الطلب", takedownSending: "جارٍ الإرسال…", takedownRequired: "يرجى كتابة اسمك وسبب الطلب.", takedownSent: "تم إرسال طلبك إلى المشرفين.", takedownFailed: "تعذر إرسال طلبك. حاول مرة أخرى.",
+    commentsButton: "التعليقات", takedownButton: "طلب إزالة", commentsEyebrow: "المحادثة", commentsTitle: 'التعليقات<span class="period">.</span>', commentsEmpty: "لا توجد تعليقات بعد. ابدأ المحادثة.", commentsUnavailable: "التعليقات غير متاحة حالياً.", commentNameLabel: "اسمك", commentLabel: "تعليق", commentPlaceholder: "اكتب بلطف.", commentSubmit: "نشر التعليق", commentPosting: "جارٍ النشر…", commentRequired: "يرجى كتابة اسمك وتعليقك.", commentPosted: "تم نشر تعليقك.", commentFailed: "تعذر نشر تعليقك. حاول مرة أخرى.", takedownEyebrow: "سلامة المشاركة", takedownTitle: 'طلب إزالة<span class="period">.</span>', takedownIntro: "أخبر المشرفين بسبب إزالة هذه المشاركة. طلبك خاص.", takedownReasonLabel: "لماذا يجب إزالتها؟", takedownPlaceholder: "أخبر المشرفين بالسبب.", takedownSubmit: "إرسال الطلب", takedownSending: "جارٍ الإرسال…", takedownRequired: "يرجى كتابة اسمك وسبب الطلب.", takedownSent: "تم إرسال طلبك إلى المشرفين.", takedownFailed: "تعذر إرسال طلبك. حاول مرة أخرى.", reportEyebrow: "إشراف خاص", reportTitle: 'إرسال بلاغ<span class="period">.</span>', reportIntro: "أخبر المشرفين بما حدث. بلاغك خاص ولا يظهر في غرفة الدردشة.", reportNameLabel: "اسمك <span>(اختياري)</span>", reportNamePlaceholder: "اتركه فارغاً للإبلاغ دون اسم", reportBodyLabel: "ماذا تريد الإبلاغ عنه؟", reportBodyPlaceholder: "أعطِ المشرفين التفاصيل.", reportSubmit: "إرسال البلاغ", reportSending: "جارٍ الإرسال…", reportRequired: "يرجى وصف ما تريد الإبلاغ عنه.", reportSent: "تم إرسال بلاغك إلى المشرفين.", reportFailed: "تعذر إرسال بلاغك. حاول مرة أخرى.",
     chatEyebrow: "سجل الزوار", chatTitle: 'غرفة الدردشة<span class="period">.</span>', chatLive: "غرفة مباشرة", chatLoading: "جارٍ فتح الغرفة…", chatEmpty: "الغرفة هادئة. كن أول من يكتب.", chatUnavailable: "غرفة الدردشة غير متاحة حالياً.", chatJoin: "انضم إلى المحادثة", chatNameLabel: "الاسم (اختياري)", chatNamePlaceholder: "اتركه فارغاً للنشر باسم زائر", chatMessageLabel: "الرسالة", chatPlaceholder: "اكتب شيئاً للغرفة…", chatSubmit: "إرسال الرسالة ↗", chatSending: "جارٍ الإرسال…", chatRequired: "يرجى كتابة رسالة.", chatSent: "تم إرسال الرسالة.", chatFailed: "تعذر إرسال رسالتك. حاول مرة أخرى.", chatNote: "كن لطيفاً. الرسائل عامة.", chatYou: "أنت", musicPlay: "تشغيل الأجواء", musicStop: "إيقاف الموسيقى",
   },
 };
@@ -462,6 +462,8 @@ const commentsFor = document.querySelector("#commentsFor");
 const commentForm = document.querySelector("#commentForm");
 const takedownDialog = document.querySelector("#takedownDialog");
 const takedownForm = document.querySelector("#takedownForm");
+const reportDialog = document.querySelector("#reportDialog");
+const reportForm = document.querySelector("#reportForm");
 let activeCommentPhoto = null;
 let activeTakedownPhoto = null;
 
@@ -510,6 +512,9 @@ function openTakedown(photo) {
 }
 document.querySelector("#takedownClose").addEventListener("click", () => takedownDialog.close());
 takedownDialog.addEventListener("click", (event) => { if (event.target === takedownDialog) takedownDialog.close(); });
+document.querySelector("#reportOpen").addEventListener("click", () => { document.querySelector("#reportError").textContent = ""; reportDialog.showModal(); });
+document.querySelector("#reportClose").addEventListener("click", () => reportDialog.close());
+reportDialog.addEventListener("click", (event) => { if (event.target === reportDialog) reportDialog.close(); });
 commentForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const error = document.querySelector("#commentError");
@@ -548,6 +553,27 @@ takedownForm.addEventListener("submit", async (event) => {
   button.disabled = false; button.textContent = tr("takedownSubmit");
   if (requestError) { error.textContent = tr("takedownFailed"); return; }
   takedownForm.reset(); error.textContent = tr("takedownSent");
+});
+reportForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const error = document.querySelector("#reportError");
+  const name = document.querySelector("#reportName").value.trim();
+  const report = document.querySelector("#reportBody").value.trim();
+  if (!report) { error.textContent = tr("reportRequired"); return; }
+  const button = document.querySelector("#reportSubmit");
+  error.textContent = ""; button.disabled = true; button.textContent = tr("reportSending");
+  let reportError = null;
+  try {
+    const response = await fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/report-notify`, {
+      method: "POST",
+      headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" },
+      body: JSON.stringify({ name, report }),
+    });
+    if (!response.ok) { const result = await response.json().catch(() => ({})); reportError = new Error(result.error || "Report failed"); }
+  } catch (networkError) { reportError = networkError; }
+  button.disabled = false; button.textContent = tr("reportSubmit");
+  if (reportError) { error.textContent = tr("reportFailed"); return; }
+  reportForm.reset(); error.textContent = tr("reportSent");
 });
 
 const chatMessagesElement = document.querySelector("#chatMessages");

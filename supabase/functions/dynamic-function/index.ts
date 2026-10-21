@@ -507,6 +507,24 @@ async function notifyTakedown(request: Request): Promise<Response> {
   return json({ ok: true });
 }
 
+async function notifyReport(request: Request): Promise<Response> {
+  const payload = await request.json().catch(() => ({}));
+  const name = String(payload?.name || "").trim();
+  const report = String(payload?.report || "").trim();
+  if (name.length > 40 || !report || report.length > 1000) return json({ error: "Enter a report with no more than 1,000 characters." }, 400);
+  const projectUrl = requiredEnv("SUPABASE_URL").replace(/\/$/, "");
+  const key = supabaseKey();
+  const channelId = await ensureTakedownChannel(projectUrl, key);
+  const token = requiredEnv("DISCORD_BOT_TOKEN");
+  const reporter = name ? name.replace(/[\r\n<>]/g, " ").slice(0, 40) : "Anonymous";
+  const posted = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+    method: "POST", headers: { authorization: `Bot ${token}`, "content-type": "application/json" },
+    body: JSON.stringify({ content: `🚩 **Website report**\n**Sent by:** ${reporter}\n**Report:** ${report.replace(/[\r\n]/g, " ").slice(0, 1000)}`, allowed_mentions: { parse: [] } }),
+  });
+  if (!posted.ok) return json({ error: "Could not send the report to Discord." }, 502);
+  return json({ ok: true });
+}
+
 async function notifyComment(request: Request): Promise<Response> {
   const payload = await request.json().catch(() => ({}));
   const commentId = String(payload?.commentId || "");
@@ -919,6 +937,9 @@ Deno.serve(async (request: Request) => {
     }
     if (pathname.endsWith("/takedown-notify")) {
       return await notifyTakedown(new Request(request.url, { method: "POST", headers: request.headers, body }));
+    }
+    if (pathname.endsWith("/report-notify")) {
+      return await notifyReport(new Request(request.url, { method: "POST", headers: request.headers, body }));
     }
     if (request.headers.has("x-review-hook")) return await handleDatabaseWebhook(request, body);
     if (pathname.endsWith("/media-upload-url")) {

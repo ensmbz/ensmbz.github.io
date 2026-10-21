@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css">
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" href="style.css?v=editorial-5">
+  <link rel="stylesheet" href="style.css?v=editorial-6">
 </head>
 <body>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
@@ -30,7 +30,7 @@
   <div class="ticker" aria-label="Breaking news"><div class="ticker-track" data-i18n="ticker">★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★</div></div>
   <header class="topbar">
     <a class="wordmark" href="#top" aria-label="The ENS MBZ Files home"><img class="wordmark-icon" src="assets/ens-mbz-school-logo.jpg" alt="" width="38" height="38"> THE ENS MBZ FILES</a>
-    <nav><a href="#gallery" data-i18n="navGallery">THE GALLERY</a><a href="#chat" data-i18n="navChat">CHAT ROOM</a><a href="#about" data-i18n="navAbout">ABOUT</a></nav>
+    <nav><a href="#gallery" data-i18n="navGallery">THE GALLERY</a><a href="#chat" data-i18n="navChat">CHAT ROOM</a><button class="nav-report" id="reportOpen" type="button" data-i18n="navReport">REPORT</button><a href="#about" data-i18n="navAbout">ABOUT</a></nav>
     <div class="topbar-actions"><button class="music-toggle btn btn-sm" id="musicToggle" type="button" aria-pressed="false"><span class="music-icon" aria-hidden="true">♪</span><span data-music-label>PLAY AMBIENCE</span></button><button class="language-toggle btn btn-sm" type="button" data-language-toggle><span class="language-icon" data-language-icon aria-hidden="true">🇦🇪</span><span class="language-label" data-language-label>العربية</span></button></div>
   </header>
 
@@ -108,9 +108,10 @@
     <form id="commentForm" class="comment-form"><label for="commentName" data-i18n="commentNameLabel">YOUR NAME</label><input id="commentName" class="input input-bordered" maxlength="40" required data-i18n-placeholder="namePlaceholder" placeholder="Who is submitting this?"><label for="commentBody" data-i18n="commentLabel">COMMENT</label><textarea id="commentBody" class="textarea textarea-bordered" maxlength="400" rows="3" required data-i18n-placeholder="commentPlaceholder" placeholder="Keep it nice."></textarea><p class="form-error" id="commentError" role="alert"></p><button class="submit-button btn" id="commentSubmit" type="submit" data-i18n="commentSubmit">POST COMMENT</button></form>
   </dialog>
   <dialog id="takedownDialog" class="comments-dialog" aria-labelledby="takedownTitle"><button class="dialog-close" id="takedownClose" aria-label="Close request" data-i18n-aria-label="close" type="button">×</button><p class="eyebrow" data-i18n="takedownEyebrow">POST SAFETY</p><h2 id="takedownTitle" data-i18n-html="takedownTitle">REQUEST TAKEDOWN<span class="period">.</span></h2><p class="comments-for" id="takedownFor"></p><p class="takedown-intro" data-i18n="takedownIntro">Tell the moderators why this post should be removed. Your request is private.</p><form id="takedownForm" class="comment-form"><label for="takedownName" data-i18n="commentNameLabel">YOUR NAME</label><input id="takedownName" class="input input-bordered" maxlength="40" required data-i18n-placeholder="namePlaceholder" placeholder="Who is submitting this?"><label for="takedownReason" data-i18n="takedownReasonLabel">WHY SHOULD IT BE REMOVED?</label><textarea id="takedownReason" class="textarea textarea-bordered" maxlength="500" rows="4" required data-i18n-placeholder="takedownPlaceholder" placeholder="Tell the moderators why."></textarea><p class="form-error" id="takedownError" role="alert"></p><button class="request-button btn" id="takedownSubmit" type="submit" data-i18n="takedownSubmit">SEND REQUEST</button></form></dialog>
+  <dialog id="reportDialog" class="comments-dialog" aria-labelledby="reportTitle"><button class="dialog-close" id="reportClose" aria-label="Close report" data-i18n-aria-label="close" type="button">×</button><p class="eyebrow" data-i18n="reportEyebrow">PRIVATE MODERATION</p><h2 id="reportTitle" data-i18n-html="reportTitle">SEND A REPORT<span class="period">.</span></h2><p class="takedown-intro" data-i18n="reportIntro">Tell the moderators what happened. Your report is private and does not appear in the chat room.</p><form id="reportForm" class="comment-form"><label for="reportName" data-i18n="reportNameLabel">YOUR NAME <span>(OPTIONAL)</span></label><input id="reportName" class="input input-bordered" maxlength="40" data-i18n-placeholder="reportNamePlaceholder" placeholder="Leave blank to stay anonymous"><label for="reportBody" data-i18n="reportBodyLabel">WHAT DO YOU WANT TO REPORT?</label><textarea id="reportBody" class="textarea textarea-bordered" maxlength="1000" rows="5" required data-i18n-placeholder="reportBodyPlaceholder" placeholder="Give the moderators the details."></textarea><p class="form-error" id="reportError" role="alert"></p><button class="request-button btn" id="reportSubmit" type="submit" data-i18n="reportSubmit">SEND REPORT</button></form></dialog>
   <dialog id="photoDialog" class="photo-dialog"><button class="dialog-close" id="dialogClose" aria-label="Close photo" data-i18n-aria-label="close" type="button">×</button><img id="dialogImage" alt="Expanded gallery photograph"><video id="dialogVideo" controls playsinline preload="metadata" hidden></video><p id="dialogCaption"></p></dialog>
   <script src="supabase-config.js?v=r2-media-1"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=editorial-5"></script>
+  <script src="script.js?v=editorial-6"></script>
 </body>
 </html>

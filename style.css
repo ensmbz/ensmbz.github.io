@@ -24,9 +24,10 @@ button, a, input, textarea { font: inherit; } button, a { color: inherit; } a { 
 .wordmark-icon { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; border: 1px solid var(--line); object-fit: cover; background: #fff; transition: transform .5s var(--ease-out); }
 .wordmark:hover .wordmark-icon { transform: rotate(-10deg) scale(1.06); }
 .topbar nav { display: flex; gap: clamp(20px, 3vw, 48px); }
-.topbar nav a, .back-top { position: relative; padding-block: 8px; font: 500 9px var(--mono); letter-spacing: .1em; }
-.topbar nav a::after, .back-top::after { content: ""; position: absolute; inset-inline: 0; bottom: 2px; height: 1px; background: var(--red); transform: scaleX(0); transform-origin: right; transition: transform .3s var(--ease-out); }
-.topbar nav a:hover::after, .back-top:hover::after { transform: scaleX(1); transform-origin: left; } .topbar-actions { justify-self: end; display: flex; align-items: center; gap: 8px; }
+.topbar nav a, .topbar nav .nav-report, .back-top { position: relative; padding-block: 8px; font: 500 9px var(--mono); letter-spacing: .1em; }
+.topbar nav .nav-report { border: 0; background: transparent; cursor: pointer; }
+.topbar nav a::after, .topbar nav .nav-report::after, .back-top::after { content: ""; position: absolute; inset-inline: 0; bottom: 2px; height: 1px; background: var(--red); transform: scaleX(0); transform-origin: right; transition: transform .3s var(--ease-out); }
+.topbar nav a:hover::after, .topbar nav .nav-report:hover::after, .back-top:hover::after { transform: scaleX(1); transform-origin: left; } .topbar-actions { justify-self: end; display: flex; align-items: center; gap: 8px; }
 .music-toggle.btn { min-height: 40px; height: 40px; padding: 5px 13px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--wine); border-radius: 999px; background: var(--wine); color: var(--paper); box-shadow: none; font: 600 8px var(--mono); letter-spacing: .07em; transition: background .25s, color .25s, transform .25s, box-shadow .25s; }
 .music-toggle:hover { transform: translateY(-2px); box-shadow: 3px 3px 0 var(--red); }
 .music-toggle[aria-pressed="true"] { border-color: var(--red); background: var(--red); color: #fff8ef; }
