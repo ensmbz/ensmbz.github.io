@@ -17,6 +17,11 @@ const permissionLabels = {
   manage_reports: "Resolve reports", manage_takedowns: "Handle takedowns",
   manage_chat: "Manage chat", manage_site: "Pause or open site"
 };
+const staffLoginDomain = "staff.ensmbz.local";
+
+function staffLoginEmail(username) {
+  return `${username.trim().toLowerCase()}@${staffLoginDomain}`;
+}
 
 function showMessage(target, message, bad = false) {
   target.textContent = message;
@@ -38,7 +43,7 @@ async function checkOwnerAndLoad() {
   ]);
   if (!isOwner && !staff) {
     await reviewClient.auth.signOut();
-    showMessage(authMessage, "This account has no staff access yet. Ask the owner to add this email in Staff Desk.", true);
+    showMessage(authMessage, "This account has no staff access yet. Ask the owner to create your staff username in Staff Desk.", true);
     return;
   }
   currentAccess = isOwner
@@ -165,7 +170,8 @@ async function loadSite() {
   const panic = actionButton("EMAIL PANIC APPROVAL", "review-danger", async () => {
     panic.disabled = true;
     const { data: { session } } = await reviewClient.auth.getSession();
-    const redirectTo = `${location.origin}/review.html?approve_panic=1`;
+    if (!session?.user?.email) { panic.disabled = false; return failQueue("Owner sign-in is required before sending a panic approval email."); }
+    const redirectTo = "https://ensmbz.github.io/review.html?approve_panic=1";
     const { error } = await reviewClient.auth.signInWithOtp({ email: session.user.email, options: { shouldCreateUser: false, emailRedirectTo: redirectTo } });
     panic.disabled = false;
     if (error) return failQueue("Could not send the panic approval email.");
@@ -209,8 +215,8 @@ function makeStaffEditor(staff = null) {
   const form = document.createElement("form");
   form.className = "staff-editor";
   const title = document.createElement("h3"); title.textContent = staff ? "EDIT STAFF ACCESS" : "ADD STAFF MEMBER";
-  const note = document.createElement("p"); note.textContent = "Enter their login email, then choose what appears on their desk.";
-  const email = document.createElement("input"); email.type = "email"; email.required = true; email.placeholder = "staff@email.com"; email.value = staff?.email || ""; email.readOnly = Boolean(staff);
+  const note = document.createElement("p"); note.textContent = "Create a staff username and password, then choose what appears on their desk.";
+  const username = document.createElement("input"); username.type = "text"; username.required = true; username.autocomplete = "username"; username.pattern = "[A-Za-z0-9_-]{3,32}"; username.placeholder = "Staff username"; username.value = staff?.username || ""; username.readOnly = Boolean(staff);
   const password = document.createElement("input"); password.type = "password"; password.minLength = 8; password.autocomplete = "new-password"; password.placeholder = staff ? "New password (leave blank to keep it)" : "Create their password (8+ characters)"; password.required = !staff;
   const choices = document.createElement("div"); choices.className = "permission-grid";
   Object.entries(permissionLabels).forEach(([key, label]) => {
@@ -220,7 +226,7 @@ function makeStaffEditor(staff = null) {
     choice.append(checkbox, copy); choices.append(choice);
   });
   const save = document.createElement("button"); save.type = "submit"; save.className = "review-primary"; save.textContent = staff ? "SAVE ACCESS" : "ADD TO STAFF";
-  form.append(title, note, email, password, choices, save);
+  form.append(title, note, username, password, choices, save);
   form.addEventListener("submit", async (event) => {
     event.preventDefault(); save.disabled = true;
     const permissions = {};
@@ -228,7 +234,7 @@ function makeStaffEditor(staff = null) {
     const { data: { session } } = await reviewClient.auth.getSession();
     const response = await fetch(`${reviewConfig.url}/functions/v1/manage-staff`, {
       method: "POST", headers: { apikey: reviewConfig.publishableKey, authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
-      body: JSON.stringify({ email: email.value.trim().toLowerCase(), password: password.value, permissions }),
+      body: JSON.stringify({ username: username.value.trim().toLowerCase(), password: password.value, permissions }),
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) { save.disabled = false; return failQueue(result.error || "Could not save this staff member."); }
@@ -240,7 +246,7 @@ function makeStaffEditor(staff = null) {
 function makeStaffCard(staff) {
   const card = document.createElement("article"); card.className = "review-item staff-card";
   const label = document.createElement("p"); label.className = "review-label"; label.textContent = "STAFF ACCESS";
-  const title = document.createElement("h3"); title.textContent = staff.email;
+  const title = document.createElement("h3"); title.textContent = `@${staff.username}`;
   const permissions = document.createElement("p"); permissions.className = "review-body";
   const enabled = Object.entries(permissionLabels).filter(([key]) => staff[key]).map(([, value]) => value);
   permissions.textContent = enabled.length ? enabled.join(" · ") : "No permissions assigned";
@@ -248,11 +254,11 @@ function makeStaffCard(staff) {
     card.replaceWith(makeStaffEditor(staff));
   });
   const remove = actionButton("REMOVE STAFF", "review-reject", async () => {
-    if (!confirm(`Delete the staff login and all access for ${staff.email}?`)) return;
+    if (!confirm(`Delete the staff login and all access for @${staff.username}?`)) return;
     const { data: { session } } = await reviewClient.auth.getSession();
     const response = await fetch(`${reviewConfig.url}/functions/v1/manage-staff`, {
       method: "POST", headers: { apikey: reviewConfig.publishableKey, authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
-      body: JSON.stringify({ action: "remove", email: staff.email }),
+      body: JSON.stringify({ action: "remove", username: staff.username }),
     });
     if (!response.ok) return failQueue("Could not remove this staff member.");
     await loadStaff();
@@ -386,7 +392,8 @@ function setBusy(actions, busy) { actions.querySelectorAll("button").forEach((bu
 document.querySelectorAll(".review-tab").forEach((tab) => tab.addEventListener("click", () => loadSection(tab.dataset.section)));
 document.querySelector("#reviewLoginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
-  const email = document.querySelector("#reviewUsername").value.trim();
+  const usernameOrEmail = document.querySelector("#reviewUsername").value.trim().toLowerCase();
+  const email = usernameOrEmail.includes("@") ? usernameOrEmail : staffLoginEmail(usernameOrEmail);
   const password = document.querySelector("#reviewPassword").value;
   const button = event.currentTarget.querySelector("button");
   button.disabled = true; showMessage(authMessage, "SIGNING IN…");
@@ -398,8 +405,8 @@ document.querySelector("#reviewLoginForm").addEventListener("submit", async (eve
 });
 
 document.querySelector("#reviewResetPassword").addEventListener("click", async (event) => {
-  const email = document.querySelector("#reviewUsername").value.trim();
-  if (!email) return showMessage(authMessage, "Enter your email first.", true);
+  const email = document.querySelector("#reviewUsername").value.trim().toLowerCase();
+  if (!email.includes("@")) return showMessage(authMessage, "Only the owner can reset a password by email. Ask the owner to change a staff password.", true);
   const button = event.currentTarget;
   button.disabled = true; showMessage(authMessage, "SENDING PASSWORD RESET…");
   const { error } = await reviewClient.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/review.html` });

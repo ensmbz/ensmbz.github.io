@@ -5,6 +5,7 @@ const cors = {
   "content-type": "application/json",
 };
 const permissionNames = ["review_photos", "manage_comments", "manage_reports", "manage_takedowns", "manage_chat", "manage_site"];
+const staffLoginDomain = "staff.ensmbz.local";
 
 function reply(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: cors });
@@ -28,15 +29,16 @@ Deno.serve(async (request) => {
     if (!ownerResponse.ok || !Array.isArray(owners) || owners.length !== 1) return reply({ error: "Only the owner can manage staff accounts." }, 403);
 
     const body = await request.json().catch(() => ({}));
-    const email = String(body.email || "").trim().toLowerCase();
-    if (!/^\S+@\S+\.\S+$/.test(email)) return reply({ error: "Enter a valid staff email." }, 400);
+    const username = String(body.username || "").trim().toLowerCase();
+    if (!/^[a-z0-9][a-z0-9_-]{2,31}$/.test(username)) return reply({ error: "Staff usernames need 3-32 letters, numbers, hyphens, or underscores." }, 400);
+    const email = `${username}@${staffLoginDomain}`;
     const usersResponse = await fetch(`${baseUrl}/auth/v1/admin/users?per_page=1000`, { headers: adminHeaders });
     const usersPayload = await usersResponse.json().catch(() => ({}));
     const existing = Array.isArray(usersPayload.users) ? usersPayload.users.find((item: Record<string, unknown>) => String(item.email || "").toLowerCase() === email) : null;
 
     if (body.action === "remove") {
       if (existing?.id) await fetch(`${baseUrl}/auth/v1/admin/users/${existing.id}`, { method: "DELETE", headers: adminHeaders });
-      const removed = await fetch(`${baseUrl}/rest/v1/staff_permissions?email=eq.${encodeURIComponent(email)}`, { method: "DELETE", headers: adminHeaders });
+      const removed = await fetch(`${baseUrl}/rest/v1/staff_permissions?username=eq.${encodeURIComponent(username)}`, { method: "DELETE", headers: adminHeaders });
       if (!removed.ok) return reply({ error: "Could not remove staff access." }, 502);
       return reply({ ok: true });
     }
@@ -52,7 +54,7 @@ Deno.serve(async (request) => {
       if (!created.ok) return reply({ error: "Could not create the staff login." }, 502);
     }
 
-    const permissions: Record<string, boolean | string> = { email, updated_at: new Date().toISOString() };
+    const permissions: Record<string, boolean | string> = { email, username, updated_at: new Date().toISOString() };
     permissionNames.forEach((name) => { permissions[name] = body.permissions?.[name] === true; });
     const saved = await fetch(`${baseUrl}/rest/v1/staff_permissions?on_conflict=email`, {
       method: "POST", headers: { ...adminHeaders, prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify(permissions),

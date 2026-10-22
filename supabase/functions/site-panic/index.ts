@@ -40,6 +40,8 @@ Deno.serve(async (request) => {
 
     const body = await request.json().catch(() => ({}));
     if (body.confirmation !== CONFIRMATION) return reply({ error: `Type exactly ${CONFIRMATION}.` }, 400);
+    const githubToken = required("PANIC_GITHUB_TOKEN");
+    const managementToken = required("PANIC_SUPABASE_MANAGEMENT_TOKEN");
 
     await fetch(`${supabaseUrl}/rest/v1/site_control?id=eq.true`, {
       method: "PATCH",
@@ -50,7 +52,7 @@ Deno.serve(async (request) => {
     const githubResponse = await fetch(`https://api.github.com/repos/${REPOSITORY}`, {
       method: "DELETE",
       headers: {
-        authorization: `Bearer ${required("PANIC_GITHUB_TOKEN")}`,
+        authorization: `Bearer ${githubToken}`,
         accept: "application/vnd.github+json",
         "x-github-api-version": "2022-11-28",
         "user-agent": "ENS-MBZ-owner-panic",
@@ -62,7 +64,7 @@ Deno.serve(async (request) => {
 
     const projectResponse = await fetch(`https://api.supabase.com/v1/projects/${PROJECT_REF}`, {
       method: "DELETE",
-      headers: { authorization: `Bearer ${required("PANIC_SUPABASE_MANAGEMENT_TOKEN")}` },
+      headers: { authorization: `Bearer ${managementToken}` },
     });
     if (!projectResponse.ok && projectResponse.status !== 404) {
       return reply({ error: `GitHub was deleted, but Supabase deletion stopped with HTTP ${projectResponse.status}. Restore from the PC backup if needed.` }, 502);
