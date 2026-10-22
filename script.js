@@ -78,12 +78,27 @@ const supabaseClient = supabaseReady
   : null;
 
 const scrollProgress = document.querySelector("#scrollProgress");
+const scrollScenes = [...document.querySelectorAll(".hero, .gallery-section, .chat-section, .about-strip")];
 let scrollFramePending = false;
 function updateScrollProgress() {
   const root = document.documentElement;
   const available = root.scrollHeight - root.clientHeight;
   const progress = available > 0 ? Math.min(1, Math.max(0, root.scrollTop / available)) : 0;
   scrollProgress?.style.setProperty("transform", `scaleX(${progress})`);
+  const viewportHeight = window.innerHeight || root.clientHeight;
+  scrollScenes.forEach((scene) => {
+    const rect = scene.getBoundingClientRect();
+    const sceneProgress = Math.min(1, Math.max(0, (viewportHeight - rect.top) / (viewportHeight + rect.height)));
+    const travel = sceneProgress - 0.5;
+    scene.style.setProperty("--scene-progress", sceneProgress.toFixed(3));
+    scene.style.setProperty("--scene-shift", `${(travel * 90).toFixed(1)}px`);
+    scene.style.setProperty("--scene-counter-shift", `${(travel * -67.5).toFixed(1)}px`);
+  });
+  const heroProgress = Math.min(1, Math.max(0, root.scrollTop / Math.max(1, document.querySelector(".hero")?.offsetHeight || 1)));
+  document.documentElement.style.setProperty("--hero-lift", `${(-heroProgress * 58).toFixed(1)}px`);
+  document.documentElement.style.setProperty("--hero-copy-lift", `${(-heroProgress * 20).toFixed(1)}px`);
+  document.documentElement.style.setProperty("--hero-art-shift", `${(heroProgress * 78).toFixed(1)}px`);
+  document.documentElement.style.setProperty("--hero-fade", Math.max(0.22, 1 - heroProgress * 0.82).toFixed(3));
   scrollFramePending = false;
 }
 window.addEventListener("scroll", () => {
@@ -111,6 +126,38 @@ if (reduceMotion || !("IntersectionObserver" in window)) {
     element.dataset.revealDelay = String(index % 3);
     revealObserver.observe(element);
   });
+}
+
+const cardRevealObserver = !reduceMotion && "IntersectionObserver" in window
+  ? new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        cardRevealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.14, rootMargin: "0px 0px -6%" })
+  : null;
+
+function revealPhotoCards() {
+  document.querySelectorAll(".photo-card:not(.card-reveal)").forEach((card, index) => {
+    card.classList.add("card-reveal");
+    card.dataset.cardSide = index % 2 ? "right" : "left";
+    if (cardRevealObserver) cardRevealObserver.observe(card);
+    else card.classList.add("is-visible");
+  });
+}
+
+const pageSections = [...document.querySelectorAll("main section[id]")];
+if ("IntersectionObserver" in window) {
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      document.querySelectorAll(".topbar nav a[href^='#']").forEach((link) => {
+        link.classList.toggle("is-current", link.getAttribute("href") === `#${entry.target.id}`);
+      });
+    });
+  }, { rootMargin: "-35% 0px -55%" });
+  pageSections.forEach((pageSection) => sectionObserver.observe(pageSection));
 }
 
 const musicToggle = document.querySelector("#musicToggle");
@@ -382,6 +429,7 @@ function render() {
     }
     grid.append(card);
   });
+  revealPhotoCards();
 }
 
 const contributeDialog = document.querySelector("#contributeDialog");

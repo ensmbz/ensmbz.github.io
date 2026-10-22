@@ -280,3 +280,37 @@ dialog::backdrop { background: #170204d9; backdrop-filter: blur(12px); }
 @keyframes orbit-two { to { transform: rotate(391deg); } }
 @media (hover: none) { .photo-grid:hover .photo-card:not(:hover) { filter: none; } }
 @media (prefers-reduced-motion: reduce) { .hero, .orbit-one, .orbit-two { animation: none !important; } }
+
+/* Scroll choreography */
+.topbar nav a.is-current::after { transform: scaleX(1); transform-origin: left; }
+.hero h1 { transform: translateY(var(--hero-lift, 0)); opacity: var(--hero-fade, 1); transition: opacity .1s linear; will-change: transform, opacity; }
+.hero-art { top: calc(50% + var(--hero-art-shift, 0px)); will-change: top; }
+.hero-description, .hero-link { translate: 0 var(--hero-copy-lift, 0px); opacity: var(--hero-fade, 1); }
+.gallery-section::before { transform: translateY(var(--scene-shift, 0)); will-change: transform; }
+.chat-section::after { transform: translateY(var(--scene-counter-shift, 0px)); will-change: transform; }
+.section-heading.scroll-reveal > div:first-child,
+.chat-heading.scroll-reveal > div:first-child { transform: translateX(-48px); opacity: 0; transition: transform .9s var(--ease-out), opacity .7s ease; }
+.section-heading.scroll-reveal > .gallery-tools,
+.chat-heading.scroll-reveal > .chat-live { transform: translateX(48px); opacity: 0; transition: transform .9s var(--ease-out) .12s, opacity .7s ease .12s; }
+.section-heading.scroll-reveal.is-visible > div:first-child,
+.chat-heading.scroll-reveal.is-visible > div:first-child,
+.section-heading.scroll-reveal.is-visible > .gallery-tools,
+.chat-heading.scroll-reveal.is-visible > .chat-live { transform: translateX(0); opacity: 1; }
+.photo-card.card-reveal { opacity: 0; animation: none; transition: opacity .75s ease, transform .95s var(--ease-out), filter .35s var(--ease-out); will-change: opacity, transform; }
+.photo-card.card-reveal[data-card-side="left"] { transform: translate3d(-72px, 46px, 0) rotate(-1.4deg); }
+.photo-card.card-reveal[data-card-side="right"] { transform: translate3d(72px, 46px, 0) rotate(1.4deg); }
+.photo-card.card-reveal.is-visible { opacity: 1; transform: translate3d(0, 0, 0) rotate(0); }
+.chat-layout.scroll-reveal.is-visible .chat-messages { animation: panel-enter-left .9s var(--ease-out) both; }
+.chat-layout.scroll-reveal.is-visible .chat-form { animation: panel-enter-right .9s var(--ease-out) .12s both; }
+.about-strip.scroll-reveal.is-visible .about-mark { animation: mark-arrive .8s var(--ease-out) both; }
+@keyframes panel-enter-left { from { opacity: 0; transform: translateX(-54px); } }
+@keyframes panel-enter-right { from { opacity: 0; transform: translateX(54px); } }
+@keyframes mark-arrive { from { opacity: 0; transform: scale(.45) rotate(-35deg); } }
+@media (max-width: 760px) {
+  .photo-card.card-reveal[data-card-side] { transform: translate3d(0, 54px, 0) scale(.97); }
+  .photo-card.card-reveal.is-visible { transform: translate3d(0, 0, 0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero h1, .hero-art, .hero-description, .hero-link, .gallery-section::before, .chat-section::after { transform: none !important; translate: none !important; opacity: 1 !important; }
+  .photo-card.card-reveal, .section-heading > *, .chat-heading > * { opacity: 1 !important; transform: none !important; }
+}
