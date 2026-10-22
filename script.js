@@ -832,6 +832,8 @@ async function refreshSiteStatus() {
     if (!response.ok) return;
     const status = await response.json();
     const paused = status.is_live === false;
+    const panicMessage = document.querySelector("#sitePaused [data-i18n='panicMessage']");
+    if (panicMessage) panicMessage.textContent = tr("panicMessage");
     sitePaused.hidden = !paused;
     document.body.classList.toggle("is-site-paused", paused);
     if (paused && musicPlaying) stopAmbientMusic();
