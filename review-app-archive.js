@@ -191,7 +191,7 @@ async function loadSite() {
   if (currentAccess?.owner) {
     const ips = document.createElement("a");
     ips.className = "review-secondary";
-    ips.href = "https://100.94.57.126:8090/";
+    ips.href = "https://frequent-lexington-skirts-apnic.trycloudflare.com/ipdesk/";
     ips.target = "_blank";
     ips.rel = "noopener";
     ips.textContent = "OPEN PRIVATE IP DESK ↗";
