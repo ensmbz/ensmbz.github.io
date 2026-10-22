@@ -158,7 +158,7 @@ async function loadSite() {
   const title = document.createElement("h3"); title.textContent = `SITE ${mode}`;
   const body = document.createElement("p"); body.className = "review-body"; body.textContent = mode === "OPEN"
     ? "Visitors can use the full museum."
-    : mode === "PAUSED" ? "Visitors see the Taking a Break screen." : "Visitors only see You can't find me.";
+    : mode === "PAUSED" ? "Visitors see the Taking a Break screen." : "Visitors see a normal 404 page.";
   const setMode = async (nextMode) => {
     const buttons = card.querySelectorAll("button"); buttons.forEach((button) => { button.disabled = true; });
     const { error: updateError } = await reviewClient.from("site_control").update({ is_live: nextMode === "open", panic_mode: nextMode === "panic", updated_at: new Date().toISOString() }).eq("id", true);

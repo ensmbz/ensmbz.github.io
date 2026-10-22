@@ -132,7 +132,10 @@ dialog { color: var(--ink); animation: dialog-in .35s var(--ease-out) both; } di
 .site-paused[hidden] { display: none !important; }
 .site-paused [data-site-state][hidden] { display: none !important; }
 .site-paused { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 22px; overflow: hidden; isolation: isolate; background: radial-gradient(ellipse at 50% 44%, #2b0d10 0, #0b0405 35%, #020202 73%); color: #f7f0e8; }
-.panic-copy { width: min(92vw, 980px); display: grid; gap: clamp(18px, 3vw, 34px); place-items: center; }
+.panic-copy { position:absolute; inset:0; display:grid; place-items:center; padding:24px; background:#fff; color:#000; font-family:Arial,sans-serif; }
+.panic-404 { width:min(100%,720px); }
+.panic-404 h1 { margin:0 0 14px; color:#000; font:700 clamp(28px,5vw,56px)/1.1 Arial,sans-serif; letter-spacing:0; text-align:left; }
+.panic-404 p { margin:0; color:#333; font:16px/1.5 Arial,sans-serif; }
 .pause-copy-screen { position:absolute; inset:0; padding:32px; display:grid; place-items:center; align-content:center; gap:24px; background:#f7f2e8; color:var(--ink); text-align:center; }
 .pause-copy-screen::before { content:""; position:absolute; inset:22px; border:1px solid #3a090b1f; background:radial-gradient(circle at 50% 46%,#ed351e12 0 1px,transparent 1.5px) 0 0/24px 24px; pointer-events:none; }
 .pause-copy-screen::after { content:""; position:absolute; width:min(64vw,760px); aspect-ratio:1; border:1px solid #3a090b0d; border-radius:50%; box-shadow:0 0 0 70px #3a090b08,0 0 0 140px #3a090b05; animation:pause-orbit 14s ease-in-out infinite alternate; pointer-events:none; }
