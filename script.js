@@ -331,6 +331,11 @@ function render() {
     info.append(text, tag);
     card.append(info);
     if (photo.remoteId) {
+      const preview = document.createElement("div");
+      preview.className = "comments-preview";
+      preview.textContent = tr("commentsEmpty");
+      card.append(preview);
+      loadCommentPreview(photo, preview);
       const comments = document.createElement("button");
       comments.type = "button";
       comments.className = "comments-button";
@@ -467,6 +472,15 @@ const reportDialog = document.querySelector("#reportDialog");
 const reportForm = document.querySelector("#reportForm");
 let activeCommentPhoto = null;
 let activeTakedownPhoto = null;
+
+async function loadCommentPreview(photo, element) {
+  if (!supabaseClient || !photo.remoteId) return;
+  const { data, error } = await supabaseClient.from("photo_comments").select("name,body,created_at").eq("photo_id", photo.remoteId).eq("status", "visible").order("created_at", { ascending: false }).limit(2);
+  if (error || !data?.length) return;
+  element.replaceChildren();
+  const heading = document.createElement("span"); heading.className = "comments-preview-label"; heading.textContent = tr("commentsButton"); element.append(heading);
+  for (const item of data.reverse()) { const line = document.createElement("p"); const name = document.createElement("strong"); name.textContent = `${item.name}: `; line.append(name, document.createTextNode(item.body)); element.append(line); }
+}
 
 function showComments(items) {
   commentsList.replaceChildren();
