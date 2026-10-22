@@ -119,6 +119,10 @@ let musicMaster = null;
 let musicTimer = null;
 let musicPlaying = false;
 let musicPhrase = 0;
+let musicWanted = (() => {
+  try { return localStorage.getItem("ensmbz-music") !== "off"; }
+  catch { return true; }
+})();
 
 function updateMusicButton() {
   if (!musicToggle) return;
@@ -161,30 +165,37 @@ function scheduleAmbientPhrase() {
   if (!musicPlaying || !musicContext) return;
   const start = musicContext.currentTime + 0.08;
   const phrases = [
-    [220, 261.63, 329.63, 392],
-    [196, 246.94, 293.66, 369.99],
-    [174.61, 220, 261.63, 329.63],
+    [146.83, 174.61, 220, 261.63],
+    [130.81, 164.81, 196, 246.94],
+    [116.54, 146.83, 174.61, 220],
+    [130.81, 155.56, 196, 233.08],
   ];
   const notes = phrases[musicPhrase % phrases.length];
   musicPhrase++;
-  ambientTone(notes[0] / 2, start, 13.5, 0.035, -0.12);
-  notes.forEach((frequency, index) => ambientTone(frequency, start + index * 2.7, 5.6, 0.024, index % 2 ? 0.35 : -0.35));
+  ambientTone(notes[0] / 2, start, 14, 0.026, -0.12);
+  notes.forEach((frequency, index) => ambientTone(frequency, start + index * 1.85, 7.8, 0.019, index % 2 ? 0.38 : -0.38));
+  ambientTone(notes[3] * 2, start + 6.9, 4.2, 0.008, 0.18);
 }
 
 async function startAmbientMusic() {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContextClass) return;
+  if (!AudioContextClass || musicPlaying || !musicWanted) return false;
   if (!musicContext) {
     musicContext = new AudioContextClass();
     musicMaster = musicContext.createGain();
-    musicMaster.gain.value = 0.58;
+    musicMaster.gain.value = 0.42;
     musicMaster.connect(musicContext.destination);
   }
-  await musicContext.resume();
+  try { await musicContext.resume(); }
+  catch { return false; }
+  if (musicContext.state !== "running") return false;
+  musicMaster.gain.cancelScheduledValues(musicContext.currentTime);
+  musicMaster.gain.setTargetAtTime(0.42, musicContext.currentTime, 0.35);
   musicPlaying = true;
   scheduleAmbientPhrase();
-  musicTimer = window.setInterval(scheduleAmbientPhrase, 10800);
+  musicTimer = window.setInterval(scheduleAmbientPhrase, 9600);
   updateMusicButton();
+  return true;
 }
 
 function stopAmbientMusic() {
@@ -199,13 +210,31 @@ function stopAmbientMusic() {
 }
 
 musicToggle?.addEventListener("click", async () => {
-  if (musicPlaying) stopAmbientMusic();
+  if (musicPlaying) {
+    musicWanted = false;
+    try { localStorage.setItem("ensmbz-music", "off"); } catch {}
+    stopAmbientMusic();
+  }
   else {
-    if (musicMaster && musicContext) musicMaster.gain.setTargetAtTime(0.58, musicContext.currentTime, 0.2);
+    musicWanted = true;
+    try { localStorage.setItem("ensmbz-music", "on"); } catch {}
     await startAmbientMusic();
   }
 });
 updateMusicButton();
+
+async function unlockAutoplay() {
+  if (!musicWanted || musicPlaying) return;
+  if (await startAmbientMusic()) {
+    document.removeEventListener("pointerdown", unlockAutoplay);
+    document.removeEventListener("keydown", unlockAutoplay);
+    document.removeEventListener("touchstart", unlockAutoplay);
+  }
+}
+document.addEventListener("pointerdown", unlockAutoplay, { passive: true });
+document.addEventListener("touchstart", unlockAutoplay, { passive: true });
+document.addEventListener("keydown", unlockAutoplay);
+startAmbientMusic();
 let sharedPhotos = [];
 const dbPromise = new Promise((resolve) => {
   if (!("indexedDB" in window)) return resolve(null);

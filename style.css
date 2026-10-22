@@ -258,3 +258,25 @@ dialog::backdrop { background: #170204d9; backdrop-filter: blur(12px); }
   .about-strip { padding-inline: 20px; }
   footer { align-items: flex-start; flex-direction: column; }
 }
+
+/* Final polish */
+* { scrollbar-width: thin; scrollbar-color: var(--red) #2b070a; }
+*:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
+.ticker:hover .ticker-track { animation-play-state: paused; }
+.hero { background-size: 120% 120%; animation: hero-ambient 16s ease-in-out infinite alternate; }
+.hero::before { box-shadow: inset 0 0 100px #0002; }
+.orbit-one { animation: orbit-one 18s linear infinite; }
+.orbit-two { animation: orbit-two 24s linear infinite reverse; }
+.hero-link { transition: color .25s, border-color .25s; }
+.hero-link:hover { color: #ff806d; border-color: #ff806d; }
+.section-heading h2, .chat-heading h2 { text-wrap: balance; }
+.photo-card { transition: filter .35s var(--ease-out); }
+.photo-grid:hover .photo-card:not(:hover) { filter: saturate(.72) opacity(.72); }
+.photo-card:hover { z-index: 2; }
+.music-toggle::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #d8c8c1; }
+.music-toggle[aria-pressed="true"]::after { background: #7df0a1; box-shadow: 0 0 0 4px #7df0a122; }
+@keyframes hero-ambient { to { background-position: 60% 46%; } }
+@keyframes orbit-one { to { transform: rotate(339deg); } }
+@keyframes orbit-two { to { transform: rotate(391deg); } }
+@media (hover: none) { .photo-grid:hover .photo-card:not(:hover) { filter: none; } }
+@media (prefers-reduced-motion: reduce) { .hero, .orbit-one, .orbit-two { animation: none !important; } }
