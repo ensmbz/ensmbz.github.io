@@ -188,6 +188,15 @@ async function loadSite() {
     showMessage(queueMessage, `PANIC APPROVAL SENT TO ${session.user.email}. NOTHING HAS BEEN DELETED.`);
   });
   card.append(label, title, body, makeActions([open, pause, panic]));
+  if (currentAccess?.owner) {
+    const ips = document.createElement("a");
+    ips.className = "review-secondary";
+    ips.href = "https://100.94.57.126:8090/";
+    ips.target = "_blank";
+    ips.rel = "noopener";
+    ips.textContent = "OPEN PRIVATE IP DESK ↗";
+    card.append(ips);
+  }
   queueItems.append(card);
 }
 
