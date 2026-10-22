@@ -343,10 +343,8 @@ function makeActions(buttons) {
 
 async function moderate(item, approve, actions) {
   setBusy(actions, true);
-  const { error } = await reviewClient.from("photo_submissions")
-    .update({ approved: approve, status: approve ? "approved" : "rejected" })
-    .eq("image_url", item.image_url).eq("name", item.name).eq("status", "pending");
-  if (error) { setBusy(actions, false); return failQueue("Could not save decision. Try again."); }
+  const { error } = await reviewClient.rpc("moderate_photo", { photo_id: item.id, approve, photo_url: item.image_url, photo_name: item.name });
+  if (error) { setBusy(actions, false); return failQueue(error.message || "Could not save decision. Try again."); }
   await loadSection();
 }
 
