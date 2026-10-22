@@ -10,7 +10,7 @@ let currentAccess = null;
 let panicApprovalHandled = false;
 const sectionPermissions = {
   photos: "review_photos", archive: "manage_takedowns", comments: "manage_comments", reports: "manage_reports",
-  takedowns: "manage_takedowns", chat: "manage_chat", site: "manage_site", staff: "owner"
+  takedowns: "manage_takedowns", chat: "manage_chat", site: "manage_site", ipdesk: "owner", staff: "owner"
 };
 const permissionLabels = {
   review_photos: "Approve photos", manage_comments: "Moderate comments",
@@ -87,6 +87,7 @@ async function loadSection(section = activeSection) {
   if (section === "takedowns") return loadTakedowns();
   if (section === "chat") return loadChat();
   if (section === "site") return loadSite();
+  if (section === "ipdesk") return loadIpDesk();
   return loadStaff();
 }
 
@@ -188,15 +189,28 @@ async function loadSite() {
     showMessage(queueMessage, `PANIC APPROVAL SENT TO ${session.user.email}. NOTHING HAS BEEN DELETED.`);
   });
   card.append(label, title, body, makeActions([open, pause, panic]));
-  if (currentAccess?.owner) {
-    const ips = document.createElement("a");
-    ips.className = "review-secondary";
-    ips.href = "https://frequent-lexington-skirts-apnic.trycloudflare.com/ipdesk/";
-    ips.target = "_blank";
-    ips.rel = "noopener";
-    ips.textContent = "OPEN PRIVATE IP DESK ↗";
-    card.append(ips);
-  }
+  queueItems.append(card);
+}
+
+function loadIpDesk() {
+  showMessage(queueMessage, "PRIVATE IP DESK · OWNER ONLY");
+  const card = document.createElement("article");
+  card.className = "review-item ipdesk-shell";
+  const label = document.createElement("p");
+  label.className = "review-label";
+  label.textContent = "LIVE VISITOR NETWORK LOG";
+  const title = document.createElement("h3");
+  title.textContent = "VISITOR IP DESK";
+  const body = document.createElement("p");
+  body.className = "review-body";
+  body.textContent = "Review recent requests and ban an address without leaving the Owner Desk.";
+  const frame = document.createElement("iframe");
+  frame.className = "ipdesk-frame";
+  frame.title = "Visitor IP Desk";
+  frame.src = `${reviewConfig.url.replace(/\/+$/, "")}/ipdesk/`;
+  frame.loading = "lazy";
+  frame.referrerPolicy = "no-referrer";
+  card.append(label, title, body, frame);
   queueItems.append(card);
 }
 
