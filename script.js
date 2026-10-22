@@ -1,6 +1,6 @@
 const translations = {
   en: {
-    pauseEyebrow: "THE EXHIBITION IS RESTING", pauseTitle: 'TAKING A<br>BREAK<span class="period">.</span>',
+    pauseEyebrow: "THE EXHIBITION IS RESTING", pauseTitle: 'TAKING A<br>BREAK<span class="period">.</span>', panicMessage: "YOU CAN'T FIND ME.",
     pausedMessage: "The collection is temporarily closed. The frames are staying put and the archive will return soon.",
     ticker: "★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★",
     navGallery: "THE GALLERY", navChat: "CHAT ROOM", navReport: "REPORT", navAbout: "ABOUT",
@@ -28,7 +28,7 @@ const translations = {
     chatEyebrow: "THE VISITOR BOOK", chatTitle: 'CHAT ROOM<span class="period">.</span>', chatLive: "LIVE ROOM", chatLoading: "Opening the room…", chatEmpty: "The room is quiet. Be the first to say something.", chatUnavailable: "The chat room is unavailable right now.", chatJoin: "JOIN THE CONVERSATION", chatNameLabel: "NAME (OPTIONAL)", chatNamePlaceholder: "Leave blank to post as Guest", chatMessageLabel: "MESSAGE", chatPlaceholder: "Say something to the room…", chatSubmit: "SEND MESSAGE ↗", chatSending: "SENDING…", chatRequired: "Please enter a message.", chatSent: "Message sent.", chatFailed: "Your message could not be sent. Try again.", chatNote: "Be kind. Messages are public.", chatYou: "YOU", musicPlay: "PLAY AMBIENCE", musicStop: "STOP MUSIC",
   },
   ar: {
-    pauseEyebrow: "المعرض يستريح الآن", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>',
+    pauseEyebrow: "المعرض يستريح الآن", pauseTitle: 'نأخذ<br>استراحة<span class="period">.</span>', panicMessage: "لا يتم العثور على الموقع",
     pausedMessage: "المجموعة مغلقة مؤقتاً. ستبقى الإطارات في مكانها وسيعود الأرشيف قريباً.",
     ticker: "★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★",
     navGallery: "المعرض", navChat: "غرفة الدردشة", navReport: "إبلاغ", navAbout: "عن الموقع",
@@ -459,6 +459,7 @@ dialog.addEventListener("close", () => {
 const commentsDialog = document.querySelector("#commentsDialog");
 const commentsList = document.querySelector("#commentsList");
 const commentsFor = document.querySelector("#commentsFor");
+const commentsCount = document.querySelector("#commentsCount");
 const commentForm = document.querySelector("#commentForm");
 const takedownDialog = document.querySelector("#takedownDialog");
 const takedownForm = document.querySelector("#takedownForm");
@@ -469,6 +470,7 @@ let activeTakedownPhoto = null;
 
 function showComments(items) {
   commentsList.replaceChildren();
+  commentsCount.textContent = `${items.length} ${items.length === 1 ? "COMMENT" : "COMMENTS"}`;
   if (!items.length) {
     const empty = document.createElement("p");
     empty.className = "comments-empty";
@@ -479,11 +481,20 @@ function showComments(items) {
   for (const item of items) {
     const entry = document.createElement("article");
     entry.className = "comment-entry";
+    const meta = document.createElement("div");
+    meta.className = "comment-meta";
+    const avatar = document.createElement("span");
+    avatar.className = "comment-avatar";
+    avatar.textContent = Array.from(item.name || "?")[0].toUpperCase();
     const name = document.createElement("strong");
     name.textContent = item.name;
+    const time = document.createElement("time");
+    time.dateTime = item.created_at;
+    time.textContent = new Intl.DateTimeFormat(currentLanguage === "ar" ? "ar-AE" : "en-AE", { hour: "numeric", minute: "2-digit", day: "numeric", month: "short" }).format(new Date(item.created_at));
+    meta.append(avatar, name, time);
     const body = document.createElement("p");
     body.textContent = item.body;
-    entry.append(name, body);
+    entry.append(meta, body);
     commentsList.append(entry);
   }
 }
