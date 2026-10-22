@@ -35,3 +35,23 @@
 .review-approve { background:#1a5944; color:white; }
 .review-reject { background:#842a2a; color:white; }
 @media(max-width:560px) { .review-top,.review-main { width:calc(100% - 28px); } .review-queue-head { align-items:flex-start; flex-direction:column; } .review-queue-head>div { display:flex; gap:8px; } .review-secondary { margin:0; } }
+
+/* Owner desk refresh */
+.review-page { background: radial-gradient(circle at 10% 12%, #551218, transparent 28%), var(--wine); }
+.review-top { position: sticky; top: 12px; z-index: 20; width: min(1180px, calc(100% - 28px)); min-height: 72px; padding: 0 22px; border: 1px solid #ffffff1c; background: #f8f2eaf2; box-shadow: 0 18px 50px #1000023d; backdrop-filter: blur(16px); }
+.review-main { width: min(1180px, calc(100% - 28px)); min-height: calc(100vh - 100px); margin-top: 12px; padding: clamp(56px,8vw,108px) clamp(20px,5vw,72px); background: linear-gradient(145deg, #f8f2ea, #efe4d8); box-shadow: 0 35px 90px #0d00024d; }
+.review-main h1 { max-width: none; margin-inline: 0; color: var(--wine); text-align: left; }
+.review-lede { font-size: 14px; line-height: 1.75; }
+.review-card { border: 0; background:#fffaf5; box-shadow:10px 10px 0 var(--red), 0 24px 65px #3a090b20; }
+.review-card input { border:1px solid #c6b7a9; border-radius:2px; background:#fffdf9; }
+.review-primary,.review-secondary { border:0; border-radius:2px; }
+.review-primary { background:var(--wine); box-shadow:4px 4px 0 var(--red); }
+.review-secondary { border:1px solid var(--wine); }
+.review-tabs { gap:10px; padding:10px 0 18px; }
+.review-tab { border:1px solid #b9a99a; border-radius:999px; background:#fffaf5; }
+.review-tab.is-active { border-color:var(--red); background:var(--red); }
+.review-grid { gap:26px; }
+.review-item { border:0; border-top:4px solid var(--wine); background:#fffaf5; box-shadow:0 18px 45px #3a090b14; }
+.review-media { max-height:460px; }
+.review-actions button { border-radius:2px; }
+@media(max-width:560px) { .review-top,.review-main { width:calc(100% - 12px); } .review-top { top:6px; padding:0 14px; } .review-main { margin-top:6px; padding:44px 18px 64px; } .review-main h1 { font-size:clamp(48px,15vw,72px); } }
