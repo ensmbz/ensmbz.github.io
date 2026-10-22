@@ -7,6 +7,7 @@ const queueMessage = document.querySelector("#reviewQueueMessage");
 const queueItems = document.querySelector("#reviewItems");
 let activeSection = "photos";
 let currentAccess = null;
+let panicApprovalHandled = false;
 const sectionPermissions = {
   photos: "review_photos", comments: "manage_comments", reports: "manage_reports",
   takedowns: "manage_takedowns", chat: "manage_chat", site: "manage_site", staff: "owner"
@@ -62,6 +63,7 @@ async function checkOwnerAndLoad() {
   loginSection.hidden = true;
   queueSection.hidden = false;
   await loadSection(activeSection);
+  await handlePanicEmailApproval(session);
 }
 
 async function loadSection(section = activeSection) {
@@ -160,24 +162,39 @@ async function loadSite() {
   };
   const open = actionButton("OPEN SITE", "review-approve", () => setMode("open"));
   const pause = actionButton("PAUSE SITE", "review-pause", () => setMode("paused"));
-  const panic = actionButton("PANIC — DELETE EVERYTHING", "review-danger", async () => {
-    const typed = prompt("This permanently deletes the GitHub website and the entire Supabase project. A backup is saved on this PC. Type DELETE EVERYTHING to continue.");
-    if (typed !== "DELETE EVERYTHING") return;
-    if (!confirm("Final confirmation: permanently delete the website, database, uploads, owner accounts, and staff access?")) return;
+  const panic = actionButton("EMAIL PANIC APPROVAL", "review-danger", async () => {
     panic.disabled = true;
-    showMessage(queueMessage, "PANIC DELETION STARTING…");
     const { data: { session } } = await reviewClient.auth.getSession();
+    const redirectTo = `${location.origin}/review.html?approve_panic=1`;
+    const { error } = await reviewClient.auth.signInWithOtp({ email: session.user.email, options: { shouldCreateUser: false, emailRedirectTo: redirectTo } });
+    panic.disabled = false;
+    if (error) return failQueue("Could not send the panic approval email.");
+    showMessage(queueMessage, `PANIC APPROVAL SENT TO ${session.user.email}. NOTHING HAS BEEN DELETED.`);
+  });
+  card.append(label, title, body, makeActions([open, pause, panic]));
+  queueItems.append(card);
+}
+
+async function handlePanicEmailApproval(session) {
+  if (panicApprovalHandled || !currentAccess?.owner || new URLSearchParams(location.search).get("approve_panic") !== "1") return;
+  panicApprovalHandled = true;
+  history.replaceState({}, "", "/review.html");
+  const typed = prompt("Email approval received. Type DELETE EVERYTHING to permanently delete GitHub and Supabase. The PC backup will remain.");
+  if (typed !== "DELETE EVERYTHING") return showMessage(queueMessage, "PANIC CANCELLED. NOTHING WAS DELETED.");
+  if (!confirm("Final confirmation: permanently delete the website, database, uploads, owner accounts, and staff access?")) return showMessage(queueMessage, "PANIC CANCELLED. NOTHING WAS DELETED.");
+  showMessage(queueMessage, "PANIC DELETION STARTING…");
+  try {
     const response = await fetch(`${reviewConfig.url}/functions/v1/site-panic`, {
       method: "POST",
       headers: { apikey: reviewConfig.publishableKey, authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
       body: JSON.stringify({ confirmation: typed }),
     });
     const result = await response.json().catch(() => ({}));
-    if (!response.ok) { panic.disabled = false; return failQueue(result.error || "Panic deletion failed."); }
+    if (!response.ok) return failQueue(result.error || "Panic deletion failed.");
     showMessage(queueMessage, result.message || "DELETION STARTED.");
-  });
-  card.append(label, title, body, makeActions([open, pause, panic]));
-  queueItems.append(card);
+  } catch {
+    failQueue("Panic deletion could not start.");
+  }
 }
 
 async function loadStaff() {
