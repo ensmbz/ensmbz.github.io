@@ -20,14 +20,14 @@
     <p class="review-lede">Manage the museum and give each staff member only the controls they need.</p>
     <section id="reviewLogin" class="review-card">
       <h2>STAFF SIGN IN</h2>
-      <p>Use the email approved by the owner. Your desk only shows the controls assigned to you.</p>
+      <p>Use the email and password created for you by the owner. Your desk only shows your assigned controls.</p>
       <form id="reviewLoginForm">
         <label for="reviewUsername">USERNAME / EMAIL</label>
         <input id="reviewUsername" type="email" autocomplete="username" required placeholder="Owner email">
         <label for="reviewPassword">PASSWORD</label>
         <input id="reviewPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="Your password">
         <button class="review-primary" type="submit">SIGN IN</button>
-        <button class="review-secondary review-create" id="reviewCreateAccount" type="button">CREATE STAFF LOGIN</button>
+        <button class="review-secondary review-create" id="reviewResetPassword" type="button">EMAIL PASSWORD RESET</button>
       </form>
       <p id="reviewAuthMessage" class="review-message" role="status"></p>
     </section>
@@ -48,6 +48,6 @@
   </main>
   <script src="supabase-config.js?v=restore-c001185"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="review.js?v=staff-desk-2"></script>
+  <script src="review.js?v=staff-desk-4"></script>
 </body>
 </html>

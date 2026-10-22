@@ -1,2 +1,8 @@
 [functions.dynamic-function]
 verify_jwt = false
+
+[functions.site-panic]
+verify_jwt = false
+
+[functions.manage-staff]
+verify_jwt = false
