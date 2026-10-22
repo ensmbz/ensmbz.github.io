@@ -105,6 +105,10 @@ h2 { margin: 0; color: var(--wine); font-size: clamp(58px, 7.8vw, 124px); line-h
 .chat-message-identity { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .chat-message strong { font: 600 11px var(--mono); letter-spacing: .06em; }
 .chat-you-badge { padding: 3px 6px; border-radius: 999px; background: var(--red); color: #fff8ef; font: 600 6px var(--mono); letter-spacing: .11em; }
+.chat-role-badge { padding:3px 7px; border:1px solid currentColor; border-radius:999px; color:#f5d2a9; font:700 7px var(--mono); letter-spacing:.12em; }
+.chat-message.is-own .chat-role-badge { color:var(--wine); }
+.chat-role-badge.is-owner { border-color:var(--red); color:#ff8e78; }
+.chat-message.is-own .chat-role-badge.is-owner { background:var(--wine); border-color:var(--wine); color:var(--paper); }
 .chat-message time { color: #bd9992; font: 7px var(--mono); white-space: nowrap; }
 .chat-message.is-own time { color: var(--muted); }
 .chat-message p { margin: 0; font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }

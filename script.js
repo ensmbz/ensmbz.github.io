@@ -708,6 +708,12 @@ function renderChatMessages({ scroll = false } = {}) {
     const name = document.createElement("strong");
     name.textContent = item.name;
     identity.append(name);
+    if (item.sender_role === "owner" || item.sender_role === "staff") {
+      const roleBadge = document.createElement("span");
+      roleBadge.className = `chat-role-badge is-${item.sender_role}`;
+      roleBadge.textContent = item.sender_role === "owner" ? "OWNER" : "STAFF";
+      identity.append(roleBadge);
+    }
     if (isOwn) {
       const youBadge = document.createElement("span");
       youBadge.className = "chat-you-badge";
@@ -730,7 +736,7 @@ async function loadChatRoom() {
   if (!chatMessagesElement) return;
   if (!supabaseClient) { chatMessagesElement.textContent = tr("chatUnavailable"); return; }
   const { data, error } = await supabaseClient.from("chat_messages")
-    .select("id,name,body,created_at,client_id")
+    .select("id,name,body,created_at,client_id,sender_role")
     .order("created_at", { ascending: false })
     .limit(80);
   if (error) { chatMessagesElement.textContent = tr("chatUnavailable"); return; }
@@ -748,7 +754,7 @@ chatForm?.addEventListener("submit", async (event) => {
   chatSubmit.disabled = true;
   chatSubmit.textContent = tr("chatSending");
   localStorage.setItem(chatNameStorageKey, chatName.value.trim());
-  const { data, error } = await supabaseClient.from("chat_messages").insert({ name, body, client_id: chatClientId }).select("id,name,body,created_at,client_id").single();
+  const { data, error } = await supabaseClient.from("chat_messages").insert({ name, body, client_id: chatClientId }).select("id,name,body,created_at,client_id,sender_role").single();
   chatSubmit.disabled = false;
   chatSubmit.textContent = tr("chatSubmit");
   if (error) { chatError.textContent = tr("chatFailed"); return; }
