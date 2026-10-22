@@ -28,12 +28,6 @@ button, a, input, textarea { font: inherit; } button, a { color: inherit; } a { 
 .topbar nav .nav-report { border: 0; background: transparent; cursor: pointer; }
 .topbar nav a::after, .topbar nav .nav-report::after, .back-top::after { content: ""; position: absolute; inset-inline: 0; bottom: 2px; height: 1px; background: var(--red); transform: scaleX(0); transform-origin: right; transition: transform .3s var(--ease-out); }
 .topbar nav a:hover::after, .topbar nav .nav-report:hover::after, .back-top:hover::after { transform: scaleX(1); transform-origin: left; } .topbar-actions { justify-self: end; display: flex; align-items: center; gap: 8px; }
-.music-toggle.btn { min-height: 40px; height: 40px; padding: 5px 13px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--wine); border-radius: 999px; background: var(--wine); color: var(--paper); box-shadow: none; font: 600 8px var(--mono); letter-spacing: .07em; transition: background .25s, color .25s, transform .25s, box-shadow .25s; }
-.music-toggle:hover { transform: translateY(-2px); box-shadow: 3px 3px 0 var(--red); }
-.music-toggle[aria-pressed="true"] { border-color: var(--red); background: var(--red); color: #fff8ef; }
-.music-icon { width: 22px; height: 22px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-size: 13px; }
-.music-toggle[aria-pressed="true"] .music-icon { animation: music-pulse 1.6s ease-in-out infinite; }
-@keyframes music-pulse { 50% { transform: scale(1.12); box-shadow: 0 0 0 5px #fff3; } }
 .language-toggle.btn { min-height: 40px; height: 40px; padding: 5px 12px 5px 6px; display: inline-flex; align-items: center; gap: 9px; border: 1px solid var(--wine); border-radius: 999px; background: transparent; color: var(--wine); box-shadow: none; font: 700 11px var(--sans); text-transform: none; transition: background .25s, color .25s, transform .25s; }
 .language-toggle:hover { background: var(--wine); color: var(--paper); transform: translateY(-2px); }
 .language-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--red); color: #fff; font: 700 9px var(--sans); }

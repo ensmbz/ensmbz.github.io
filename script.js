@@ -158,128 +158,6 @@ if ("IntersectionObserver" in window) {
   pageSections.forEach((pageSection) => sectionObserver.observe(pageSection));
 }
 
-const musicToggle = document.querySelector("#musicToggle");
-let musicContext = null;
-let musicMaster = null;
-let musicTimer = null;
-let musicPlaying = false;
-let musicPhrase = 0;
-let musicWanted = (() => {
-  try { return localStorage.getItem("ensmbz-music") !== "off"; }
-  catch { return true; }
-})();
-
-function updateMusicButton() {
-  if (!musicToggle) return;
-  musicToggle.setAttribute("aria-pressed", String(musicPlaying));
-  musicToggle.querySelector("[data-music-label]").textContent = tr(musicPlaying ? "musicStop" : "musicPlay");
-  musicToggle.title = tr(musicPlaying ? "musicStop" : "musicPlay");
-}
-
-function ambientTone(frequency, start, duration, volume, pan = 0) {
-  if (!musicContext || !musicMaster) return;
-  const oscillator = musicContext.createOscillator();
-  const shimmer = musicContext.createOscillator();
-  const envelope = musicContext.createGain();
-  const filter = musicContext.createBiquadFilter();
-  const panner = typeof musicContext.createStereoPanner === "function" ? musicContext.createStereoPanner() : null;
-  oscillator.type = "sine";
-  shimmer.type = "triangle";
-  oscillator.frequency.value = frequency;
-  shimmer.frequency.value = frequency * 2;
-  shimmer.detune.value = 7;
-  filter.type = "lowpass";
-  filter.frequency.value = 1250;
-  filter.Q.value = 0.45;
-  envelope.gain.setValueAtTime(0.0001, start);
-  envelope.gain.exponentialRampToValueAtTime(volume, start + Math.min(1.4, duration * 0.28));
-  envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-  if (panner) panner.pan.value = pan;
-  oscillator.connect(filter);
-  shimmer.connect(filter);
-  filter.connect(envelope);
-  envelope.connect(panner || musicMaster);
-  if (panner) panner.connect(musicMaster);
-  oscillator.start(start);
-  shimmer.start(start);
-  oscillator.stop(start + duration + 0.1);
-  shimmer.stop(start + duration + 0.1);
-}
-
-function scheduleAmbientPhrase() {
-  if (!musicPlaying || !musicContext) return;
-  const start = musicContext.currentTime + 0.08;
-  const phrases = [
-    [146.83, 174.61, 220, 261.63],
-    [130.81, 164.81, 196, 246.94],
-    [116.54, 146.83, 174.61, 220],
-    [130.81, 155.56, 196, 233.08],
-  ];
-  const notes = phrases[musicPhrase % phrases.length];
-  musicPhrase++;
-  ambientTone(notes[0] / 2, start, 14, 0.026, -0.12);
-  notes.forEach((frequency, index) => ambientTone(frequency, start + index * 1.85, 7.8, 0.019, index % 2 ? 0.38 : -0.38));
-  ambientTone(notes[3] * 2, start + 6.9, 4.2, 0.008, 0.18);
-}
-
-async function startAmbientMusic() {
-  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContextClass || musicPlaying || !musicWanted) return false;
-  if (!musicContext) {
-    musicContext = new AudioContextClass();
-    musicMaster = musicContext.createGain();
-    musicMaster.gain.value = 0.42;
-    musicMaster.connect(musicContext.destination);
-  }
-  try { await musicContext.resume(); }
-  catch { return false; }
-  if (musicContext.state !== "running") return false;
-  musicMaster.gain.cancelScheduledValues(musicContext.currentTime);
-  musicMaster.gain.setTargetAtTime(0.42, musicContext.currentTime, 0.35);
-  musicPlaying = true;
-  scheduleAmbientPhrase();
-  musicTimer = window.setInterval(scheduleAmbientPhrase, 9600);
-  updateMusicButton();
-  return true;
-}
-
-function stopAmbientMusic() {
-  musicPlaying = false;
-  if (musicTimer) window.clearInterval(musicTimer);
-  musicTimer = null;
-  if (musicMaster && musicContext) {
-    musicMaster.gain.cancelScheduledValues(musicContext.currentTime);
-    musicMaster.gain.setTargetAtTime(0.0001, musicContext.currentTime, 0.25);
-  }
-  updateMusicButton();
-}
-
-musicToggle?.addEventListener("click", async () => {
-  if (musicPlaying) {
-    musicWanted = false;
-    try { localStorage.setItem("ensmbz-music", "off"); } catch {}
-    stopAmbientMusic();
-  }
-  else {
-    musicWanted = true;
-    try { localStorage.setItem("ensmbz-music", "on"); } catch {}
-    await startAmbientMusic();
-  }
-});
-updateMusicButton();
-
-async function unlockAutoplay() {
-  if (!musicWanted || musicPlaying) return;
-  if (await startAmbientMusic()) {
-    document.removeEventListener("pointerdown", unlockAutoplay);
-    document.removeEventListener("keydown", unlockAutoplay);
-    document.removeEventListener("touchstart", unlockAutoplay);
-  }
-}
-document.addEventListener("pointerdown", unlockAutoplay, { passive: true });
-document.addEventListener("touchstart", unlockAutoplay, { passive: true });
-document.addEventListener("keydown", unlockAutoplay);
-startAmbientMusic();
 let sharedPhotos = [];
 const dbPromise = new Promise((resolve) => {
   if (!("indexedDB" in window)) return resolve(null);
@@ -835,7 +713,6 @@ function applyLanguage(language = currentLanguage) {
   }
   document.title = isArabic ? "متحف ENS MBZ — ملفات ENS MBZ" : "ENS MBZ Museum — The ENS MBZ Files";
   storageNote.textContent = tr(storageMessageKey);
-  updateMusicButton();
   try { localStorage.setItem("ensmbz-language", currentLanguage); } catch { /* Language still changes for this page view. */ }
   render();
   renderChatMessages();
@@ -893,7 +770,6 @@ async function refreshSiteStatus() {
     sitePaused.hidden = mode === "live";
     document.body.classList.toggle("is-site-paused", mode !== "live");
     document.body.classList.toggle("is-site-panic", mode === "panic");
-    if (mode !== "live" && musicPlaying) stopAmbientMusic();
   } catch {
     // Keep the site available if Supabase is temporarily unreachable.
   }
