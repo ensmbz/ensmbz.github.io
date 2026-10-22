@@ -563,20 +563,10 @@ takedownForm.addEventListener("submit", async (event) => {
   if (!activeTakedownPhoto || !name || !reason) { error.textContent = tr("takedownRequired"); return; }
   const button = document.querySelector("#takedownSubmit");
   error.textContent = ""; button.disabled = true; button.textContent = tr("takedownSending");
-  let requestError = null;
-  try {
-    const response = await fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/takedown-notify`, {
-      method: "POST",
-      headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" },
-      body: JSON.stringify({ photoId: activeTakedownPhoto.remoteId, name, reason }),
-    });
-    if (!response.ok) {
-      const result = await response.json().catch(() => ({}));
-      requestError = new Error(result.error || "Request failed");
-    }
-  } catch (networkError) { requestError = networkError; }
+  const { error: requestError } = await supabaseClient.from("photo_takedown_requests").insert({ photo_id: activeTakedownPhoto.remoteId, name, reason });
   button.disabled = false; button.textContent = tr("takedownSubmit");
   if (requestError) { error.textContent = tr("takedownFailed"); return; }
+  fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/takedown-notify`, { method: "POST", headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" }, body: JSON.stringify({ photoId: activeTakedownPhoto.remoteId, name, reason }) }).catch(() => {});
   takedownForm.reset(); error.textContent = tr("takedownSent");
 });
 reportForm.addEventListener("submit", async (event) => {
@@ -587,17 +577,10 @@ reportForm.addEventListener("submit", async (event) => {
   if (!report) { error.textContent = tr("reportRequired"); return; }
   const button = document.querySelector("#reportSubmit");
   error.textContent = ""; button.disabled = true; button.textContent = tr("reportSending");
-  let reportError = null;
-  try {
-    const response = await fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/report-notify`, {
-      method: "POST",
-      headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" },
-      body: JSON.stringify({ name, report }),
-    });
-    if (!response.ok) { const result = await response.json().catch(() => ({})); reportError = new Error(result.error || "Report failed"); }
-  } catch (networkError) { reportError = networkError; }
+  const { error: reportError } = await supabaseClient.from("site_reports").insert({ name: name || "Anonymous", body: report });
   button.disabled = false; button.textContent = tr("reportSubmit");
   if (reportError) { error.textContent = tr("reportFailed"); return; }
+  fetch(`${supabaseSettings.url.replace(/\/$/, "")}/functions/v1/dynamic-function/report-notify`, { method: "POST", headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "content-type": "application/json" }, body: JSON.stringify({ name, report }) }).catch(() => {});
   reportForm.reset(); error.textContent = tr("reportSent");
 });
 
@@ -825,12 +808,13 @@ Promise.all([readPhotos(), loadSharedPhotos()]).then(([photos]) => {
 // The Discord /site command changes this shared value in Supabase. Poll so an
 // already-open tab also switches to the pause screen without a manual refresh.
 const sitePaused = document.querySelector("#sitePaused");
-const siteControlUrl = `${supabaseSettings.url || "https://vuxenevtawplaklregbz.supabase.co"}/functions/v1/dynamic-function/site-control`;
+const siteControlUrl = `${supabaseSettings.url}/rest/v1/site_control?select=is_live&id=eq.true`;
 async function refreshSiteStatus() {
   try {
-    const response = await fetch(siteControlUrl, { cache: "no-store" });
+    const response = await fetch(siteControlUrl, { cache: "no-store", headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}` } });
     if (!response.ok) return;
-    const status = await response.json();
+    const [status] = await response.json();
+    if (!status) return;
     const paused = status.is_live === false;
     const panicMessage = document.querySelector("#sitePaused [data-i18n='panicMessage']");
     if (panicMessage) panicMessage.textContent = tr("panicMessage");
