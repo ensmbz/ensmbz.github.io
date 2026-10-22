@@ -41,8 +41,8 @@ for insert
 to anon
 with check (bucket_id = 'zayed-photos');
 
--- Allow video clips (up to 50 MiB) alongside photos in the shared media bucket.
+-- Allow the storage provider to enforce its own capacity without an app-level size cap.
 update storage.buckets
-set file_size_limit = 52428800,
+set file_size_limit = null,
     allowed_mime_types = array['image/*', 'video/*']
 where id = 'zayed-photos';

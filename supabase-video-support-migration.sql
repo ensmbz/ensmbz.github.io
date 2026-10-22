@@ -22,6 +22,6 @@ with check (
 );
 
 update storage.buckets
-set file_size_limit = 52428800,
+set file_size_limit = null,
     allowed_mime_types = array['image/*', 'video/*']
 where id = 'zayed-photos';
