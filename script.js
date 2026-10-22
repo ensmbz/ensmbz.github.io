@@ -75,6 +75,38 @@ const supabaseClient = supabaseReady
   ? window.supabase.createClient(supabaseSettings.url, supabaseSettings.publishableKey)
   : null;
 
+// Cloudflare's free proxy caps a single request near 100 MB. Upload larger
+// clips in 50 MB TUS chunks so the Debian storage can still accept them.
+async function uploadMedia(path, file, contentType) {
+  if (file.size <= 80 * 1024 * 1024) {
+    const { error } = await supabaseClient.storage.from("zayed-photos").upload(path, file, { upsert: false, contentType });
+    if (error) throw error;
+    return;
+  }
+  const base = (value) => btoa(unescape(encodeURIComponent(value)));
+  const api = supabaseSettings.url.replace(/\/$/, "");
+  const headers = {
+    apikey: supabaseSettings.publishableKey,
+    authorization: `Bearer ${supabaseSettings.publishableKey}`,
+    "tus-resumable": "1.0.0",
+    "upload-length": String(file.size),
+    "upload-metadata": `bucketName ${base("zayed-photos")},objectName ${base(path)},contentType ${base(contentType)}`,
+    "x-upsert": "false",
+  };
+  const start = await fetch(`${api}/storage/v1/upload/resumable`, { method: "POST", headers });
+  if (!start.ok) throw new Error(`Resumable upload setup failed (HTTP ${start.status})`);
+  let location = start.headers.get("location");
+  if (!location) throw new Error("Resumable upload returned no location");
+  if (location.startsWith("/")) location = `${api}${location}`;
+  const chunkSize = 50 * 1024 * 1024;
+  for (let offset = 0; offset < file.size;) {
+    const chunk = file.slice(offset, Math.min(offset + chunkSize, file.size));
+    const part = await fetch(location, { method: "PATCH", headers: { ...headers, "content-type": "application/offset+octet-stream", "upload-offset": String(offset) }, body: chunk });
+    if (!part.ok) throw new Error(`Resumable upload failed (HTTP ${part.status})`);
+    offset = Number(part.headers.get("upload-offset")) || offset + chunk.size;
+  }
+}
+
 const scrollProgress = document.querySelector("#scrollProgress");
 const scrollScenes = [...document.querySelectorAll(".hero, .gallery-section, .chat-section")];
 let scrollFramePending = false;
@@ -364,8 +396,7 @@ contributeForm.addEventListener("submit", async (event) => {
           const extension = file.name.match(/\.[a-zA-Z0-9]{1,10}$/)?.[0]?.toLowerCase() || (mediaType === "video" ? ".mp4" : ".jpg");
           const path = `${mediaType === "video" ? "videos" : "photos"}/${crypto.randomUUID()}${extension}`;
           cleanupSupabasePath = path;
-          const { error: uploadError } = await supabaseClient.storage.from("zayed-photos").upload(path, file, { upsert: false, contentType });
-          if (uploadError) throw uploadError;
+          await uploadMedia(path, file, contentType);
           publicUrl = supabaseClient.storage.from("zayed-photos").getPublicUrl(path).data.publicUrl;
         }
         let { error: insertError } = await supabaseClient.from("photo_submissions").insert({ name: uploader, description, image_url: publicUrl, media_type: mediaType, approved: false });
