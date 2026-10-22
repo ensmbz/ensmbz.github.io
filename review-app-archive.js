@@ -9,7 +9,7 @@ let activeSection = "photos";
 let currentAccess = null;
 let panicApprovalHandled = false;
 const sectionPermissions = {
-  photos: "review_photos", comments: "manage_comments", reports: "manage_reports",
+  photos: "review_photos", archive: "manage_takedowns", comments: "manage_comments", reports: "manage_reports",
   takedowns: "manage_takedowns", chat: "manage_chat", site: "manage_site", staff: "owner"
 };
 const permissionLabels = {
@@ -81,6 +81,7 @@ async function loadSection(section = activeSection) {
   queueItems.replaceChildren();
   showMessage(queueMessage, "LOADING…");
   if (section === "photos") return loadPhotos();
+  if (section === "archive") return loadArchive();
   if (section === "comments") return loadComments();
   if (section === "reports") return loadReports();
   if (section === "takedowns") return loadTakedowns();
@@ -102,6 +103,14 @@ async function loadPhotos() {
   const uniquePhotos = [...new Map(data.map((item) => [`${item.image_url}|${item.name}|${item.description || ""}`, item])).values()];
   showMessage(queueMessage, countLabel(uniquePhotos.length, "PHOTO", "PHOTOS"));
   uniquePhotos.forEach((item) => queueItems.append(makePhotoCard(item)));
+}
+
+async function loadArchive() {
+  const { data, error } = await loadRows("photo_submissions", "id,name,description,image_url,media_type,created_at")
+    .eq("approved", true).eq("status", "approved");
+  if (error) return failQueue("Could not load the photo archive.");
+  showMessage(queueMessage, countLabel(data.length, "ARCHIVED POST", "ARCHIVED POSTS"));
+  data.forEach((item) => queueItems.append(makeArchiveCard(item)));
 }
 
 async function loadComments() {
@@ -308,6 +317,36 @@ function makePhotoCard(item) {
   ]);
   card.append(media, title, description, date, actions);
   return card;
+}
+
+function makeArchiveCard(item) {
+  const card = document.createElement("article");
+  card.className = "review-item";
+  const media = document.createElement(item.media_type === "video" ? "video" : "img");
+  media.className = "review-media";
+  media.src = item.image_url;
+  if (item.media_type === "video") { media.controls = true; media.playsInline = true; }
+  else media.alt = `Archived post from ${item.name}`;
+  const title = document.createElement("h3"); title.textContent = `FROM ${item.name}`;
+  const description = document.createElement("p"); description.textContent = item.description || "No description.";
+  const remove = actionButton("DELETE PHOTO", "review-reject", () => deleteArchivedMedia(item, card));
+  card.append(media, title, description, makeDate(item.created_at), makeActions([remove]));
+  return card;
+}
+
+async function deleteArchivedMedia(item, card) {
+  if (!confirm(`Permanently delete this post from ${item.name}?`)) return;
+  const button = card.querySelector("button");
+  button.disabled = true;
+  const { data: { session } } = await reviewClient.auth.getSession();
+  const response = await fetch(`${reviewConfig.url}/functions/v1/delete-media`, {
+    method: "POST",
+    headers: { apikey: reviewConfig.publishableKey, authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
+    body: JSON.stringify({ id: item.id }),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) { button.disabled = false; return failQueue(result.error || "Could not delete this photo."); }
+  await loadArchive();
 }
 
 function makeTextCard(label, titleText, bodyText, dateValue, buttons) {
