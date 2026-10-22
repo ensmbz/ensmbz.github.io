@@ -161,8 +161,8 @@ async function handleMediaUploadUrl(request: Request): Promise<Response> {
   const isVideo = contentType.startsWith("video/");
   const allowedImage = /^image\/(jpeg|png|webp|gif|avif|bmp|tiff|heic|heif)$/.test(contentType);
   const allowedVideo = /^video\/(mp4|webm|quicktime|ogg|x-m4v)$/.test(contentType);
-  if ((!allowedImage && !allowedVideo) || !Number.isFinite(size) || size <= 0 || size > (isVideo ? 50 : 5) * 1024 * 1024) {
-    return json({ error: "Choose a supported photo up to 5 MB or video up to 50 MB." }, 400);
+  if ((!allowedImage && !allowedVideo) || !Number.isFinite(size) || size <= 0 || size > (isVideo ? 50 : 20) * 1024 * 1024) {
+    return json({ error: "Choose a supported photo up to 20 MB or video up to 50 MB." }, 400);
   }
   const extension = name.match(/\.[a-zA-Z0-9]{1,10}$/)?.[0]?.toLowerCase() || (isVideo ? ".mp4" : ".jpg");
   const key = `${isVideo ? "videos" : "photos"}/${crypto.randomUUID()}${extension}`;
