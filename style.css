@@ -137,6 +137,7 @@ dialog { color: var(--ink); animation: dialog-in .35s var(--ease-out) both; } di
 .pause-copy-screen::before { content:""; position:absolute; inset:22px; border:1px solid #3a090b1f; background:radial-gradient(circle at 50% 46%,#ed351e12 0 1px,transparent 1.5px) 0 0/24px 24px; pointer-events:none; }
 .pause-copy-screen::after { content:""; position:absolute; width:min(64vw,760px); aspect-ratio:1; border:1px solid #3a090b0d; border-radius:50%; box-shadow:0 0 0 70px #3a090b08,0 0 0 140px #3a090b05; animation:pause-orbit 14s ease-in-out infinite alternate; pointer-events:none; }
 .pause-copy-screen>* { position:relative; z-index:1; }
+.pause-owner-logo { display:block; border-radius:50%; }
 .pause-copy-screen img { width:72px; height:72px; border-radius:50%; object-fit:cover; box-shadow:0 16px 40px #3a090b24; animation:pause-logo 5s ease-in-out infinite; }
 .pause-copy-screen .eyebrow { justify-content:center; margin:4px 0 2px; color:var(--wine); }
 .pause-copy-screen h1 { max-width:8ch; color:#121915; font-size:clamp(66px,12vw,150px); line-height:.74; text-shadow:none; }
