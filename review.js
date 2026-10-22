@@ -99,8 +99,9 @@ async function loadPhotos() {
   const { data, error } = await loadRows("photo_submissions", "id,name,description,image_url,media_type,created_at")
     .eq("approved", false).eq("status", "pending");
   if (error) return failQueue("Could not load photos. Check owner access and setup SQL.");
-  showMessage(queueMessage, countLabel(data.length, "PHOTO", "PHOTOS"));
-  data.forEach((item) => queueItems.append(makePhotoCard(item)));
+  const uniquePhotos = [...new Map(data.map((item) => [`${item.image_url}|${item.name}|${item.description || ""}`, item])).values()];
+  showMessage(queueMessage, countLabel(uniquePhotos.length, "PHOTO", "PHOTOS"));
+  uniquePhotos.forEach((item) => queueItems.append(makePhotoCard(item)));
 }
 
 async function loadComments() {
@@ -302,8 +303,8 @@ function makePhotoCard(item) {
   const description = document.createElement("p"); description.textContent = item.description || "No description.";
   const date = makeDate(item.created_at);
   const actions = makeActions([
-    actionButton("APPROVE", "review-approve", () => moderate(item.id, true, actions)),
-    actionButton("DECLINE", "review-reject", () => moderate(item.id, false, actions))
+    actionButton("APPROVE", "review-approve", () => moderate(item, true, actions)),
+    actionButton("DECLINE", "review-reject", () => moderate(item, false, actions))
   ]);
   card.append(media, title, description, date, actions);
   return card;
@@ -340,10 +341,11 @@ function makeActions(buttons) {
   return actions;
 }
 
-async function moderate(id, approve, actions) {
+async function moderate(item, approve, actions) {
   setBusy(actions, true);
   const { error } = await reviewClient.from("photo_submissions")
-    .update({ approved: approve, status: approve ? "approved" : "rejected" }).eq("id", id);
+    .update({ approved: approve, status: approve ? "approved" : "rejected" })
+    .eq("image_url", item.image_url).eq("name", item.name).eq("status", "pending");
   if (error) { setBusy(actions, false); return failQueue("Could not save decision. Try again."); }
   await loadSection();
 }

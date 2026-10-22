@@ -677,6 +677,25 @@ const chatClientId = (() => {
 const savedChatName = localStorage.getItem(chatNameStorageKey) || "";
 if (chatName && savedChatName) chatName.value = savedChatName;
 let roomMessages = [];
+let chatIdentityRole = "guest";
+
+async function refreshChatIdentity() {
+  if (!supabaseClient) return;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  const email = session?.user?.email?.toLowerCase();
+  if (!email) return;
+  const { data: owner } = await supabaseClient.rpc("is_site_owner");
+  if (owner) chatIdentityRole = "owner";
+  else {
+    const { data: staff } = await supabaseClient.from("staff_permissions").select("username").eq("email", email).maybeSingle();
+    if (staff) chatIdentityRole = "staff";
+  }
+  if (chatIdentityRole !== "guest" && chatName) {
+    chatName.value = chatIdentityRole === "owner" ? "Owner" : "Staff";
+    chatName.readOnly = true;
+    chatName.setAttribute("aria-label", `${chatName.value} chat identity`);
+  }
+}
 
 function isOwnChatMessage(item) {
   if (item.client_id) return item.client_id === chatClientId;
@@ -747,7 +766,7 @@ async function loadChatRoom() {
 chatForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!supabaseClient) { chatError.textContent = tr("chatUnavailable"); return; }
-  const name = chatName.value.trim() || (currentLanguage === "ar" ? "زائر" : "Guest");
+  const name = chatIdentityRole === "owner" ? "Owner" : chatIdentityRole === "staff" ? "Staff" : (chatName.value.trim() || (currentLanguage === "ar" ? "زائر" : "Guest"));
   const body = chatBody.value.trim();
   if (!body) { chatError.textContent = tr("chatRequired"); return; }
   chatError.textContent = "";
@@ -773,6 +792,8 @@ chatName?.addEventListener("input", () => {
 });
 
 if (supabaseClient) {
+  refreshChatIdentity();
+  supabaseClient.auth.onAuthStateChange(() => { refreshChatIdentity(); });
   supabaseClient.channel("ensmbz-chat-room")
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "chat_messages" }, ({ new: message }) => {
       if (!message?.id || roomMessages.some((item) => item.id === message.id)) return;
