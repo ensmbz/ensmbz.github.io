@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=editorial-16">
-  <link rel="stylesheet" href="review.css?v=review-2">
+  <link rel="stylesheet" href="review.css?v=review-3">
 </head>
 <body class="review-page">
   <header class="review-top"><a href="/" class="wordmark"><img class="wordmark-icon" src="assets/ens-mbz-school-logo.jpg" alt=""> ENS MBZ FILES</a><a class="review-back" href="/">BACK TO MUSEUM ↗</a></header>
@@ -20,8 +20,15 @@
     <p class="review-lede">Manage photos, comments, reports, and takedown requests. Only the owner account can review.</p>
     <section id="reviewLogin" class="review-card">
       <h2>OWNER SIGN IN</h2>
-      <p>Enter your email. Supabase sends you a private sign-in link.</p>
-      <form id="reviewLoginForm"><label for="reviewEmail">YOUR EMAIL</label><input id="reviewEmail" type="email" autocomplete="email" required placeholder="you@example.com"><button class="review-primary" type="submit">SEND SIGN-IN LINK</button></form>
+      <p>Use your owner email as your username. Only the allowlisted owner can open the inbox.</p>
+      <form id="reviewLoginForm">
+        <label for="reviewUsername">USERNAME / EMAIL</label>
+        <input id="reviewUsername" type="email" autocomplete="username" required placeholder="Owner email">
+        <label for="reviewPassword">PASSWORD</label>
+        <input id="reviewPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="Your password">
+        <button class="review-primary" type="submit">SIGN IN</button>
+        <button class="review-secondary review-create" id="reviewCreateAccount" type="button">CREATE OWNER LOGIN</button>
+      </form>
       <p id="reviewAuthMessage" class="review-message" role="status"></p>
     </section>
     <section id="reviewQueue" hidden>
@@ -38,6 +45,6 @@
   </main>
   <script src="supabase-config.js?v=restore-c001185"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="review.js?v=review-2"></script>
+  <script src="review.js?v=review-3"></script>
 </body>
 </html>

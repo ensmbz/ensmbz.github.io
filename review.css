@@ -12,6 +12,7 @@
 .review-card form { display:grid; gap:12px; margin-top:24px; }
 .review-card label { font:500 10px var(--mono); letter-spacing:.12em; }
 .review-card input { height:52px; padding:0 14px; border:1px solid var(--line); background:white; color:var(--ink); }
+.review-create { margin:0; }
 .review-primary,.review-secondary { min-height:44px; padding:0 18px; border:1px solid var(--wine); cursor:pointer; }
 .review-primary { background:var(--red); color:white; }
 .review-secondary { margin-left:8px; background:transparent; color:var(--wine); }

@@ -171,12 +171,32 @@ function setBusy(actions, busy) { actions.querySelectorAll("button").forEach((bu
 document.querySelectorAll(".review-tab").forEach((tab) => tab.addEventListener("click", () => loadSection(tab.dataset.section)));
 document.querySelector("#reviewLoginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
-  const email = document.querySelector("#reviewEmail").value.trim();
+  const email = document.querySelector("#reviewUsername").value.trim();
+  const password = document.querySelector("#reviewPassword").value;
   const button = event.currentTarget.querySelector("button");
-  button.disabled = true; showMessage(authMessage, "SENDING SIGN-IN LINK…");
-  const { error } = await reviewClient.auth.signInWithOtp({ email, options: { emailRedirectTo: `${location.origin}/review.html` } });
+  button.disabled = true; showMessage(authMessage, "SIGNING IN…");
+  const { error } = await reviewClient.auth.signInWithPassword({ email, password });
   button.disabled = false;
-  showMessage(authMessage, error ? "Could not send link. Check email and try again." : "CHECK YOUR EMAIL FOR THE PRIVATE SIGN-IN LINK.", !!error);
+  if (error) return showMessage(authMessage, "Sign-in failed. Check username and password.", true);
+  showMessage(authMessage, "SIGNED IN.");
+  await checkOwnerAndLoad();
+});
+
+document.querySelector("#reviewCreateAccount").addEventListener("click", async (event) => {
+  const email = document.querySelector("#reviewUsername").value.trim();
+  const password = document.querySelector("#reviewPassword").value;
+  if (!email || password.length < 8) return showMessage(authMessage, "Enter your owner email and a password with 8+ characters.", true);
+  const button = event.currentTarget;
+  button.disabled = true; showMessage(authMessage, "CREATING OWNER LOGIN…");
+  const { data, error } = await reviewClient.auth.signUp({ email, password, options: { emailRedirectTo: `${location.origin}/review.html` } });
+  button.disabled = false;
+  if (error) return showMessage(authMessage, "Could not create login. Try signing in or check your email.", true);
+  if (data.session) {
+    showMessage(authMessage, "OWNER LOGIN CREATED.");
+    await checkOwnerAndLoad();
+  } else {
+    showMessage(authMessage, "CHECK EMAIL TO CONFIRM. THEN SIGN IN WITH YOUR PASSWORD.");
+  }
 });
 
 document.querySelector("#reviewRefresh").addEventListener("click", () => loadSection());
