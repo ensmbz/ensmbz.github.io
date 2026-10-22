@@ -10,24 +10,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=editorial-19">
-  <link rel="stylesheet" href="review.css?v=review-4">
+  <link rel="stylesheet" href="review.css?v=review-5">
 </head>
 <body class="review-page">
   <header class="review-top"><a href="/" class="wordmark"><img class="wordmark-icon" src="assets/ens-mbz-school-logo.jpg" alt=""> ENS MBZ FILES</a><a class="review-back" href="/">BACK TO MUSEUM ↗</a></header>
   <main class="review-main">
     <p class="eyebrow">PRIVATE MODERATION · OWNER ACCESS</p>
     <h1>OWNER DESK<span>.</span></h1>
-    <p class="review-lede">Manage photos, comments, reports, and takedown requests. Only the owner account can review.</p>
+    <p class="review-lede">Manage the museum and give each staff member only the controls they need.</p>
     <section id="reviewLogin" class="review-card">
-      <h2>OWNER SIGN IN</h2>
-      <p>Use your owner email as your username. Only the allowlisted owner can open the inbox.</p>
+      <h2>STAFF SIGN IN</h2>
+      <p>Use the email approved by the owner. Your desk only shows the controls assigned to you.</p>
       <form id="reviewLoginForm">
         <label for="reviewUsername">USERNAME / EMAIL</label>
         <input id="reviewUsername" type="email" autocomplete="username" required placeholder="Owner email">
         <label for="reviewPassword">PASSWORD</label>
         <input id="reviewPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="Your password">
         <button class="review-primary" type="submit">SIGN IN</button>
-        <button class="review-secondary review-create" id="reviewCreateAccount" type="button">CREATE OWNER LOGIN</button>
+        <button class="review-secondary review-create" id="reviewCreateAccount" type="button">CREATE STAFF LOGIN</button>
       </form>
       <p id="reviewAuthMessage" class="review-message" role="status"></p>
     </section>
@@ -38,6 +38,9 @@
         <button class="review-tab" data-section="comments" type="button">COMMENTS</button>
         <button class="review-tab" data-section="reports" type="button">REPORTS</button>
         <button class="review-tab" data-section="takedowns" type="button">TAKEDOWNS</button>
+        <button class="review-tab" data-section="chat" type="button">CHAT</button>
+        <button class="review-tab" data-section="site" type="button">SITE</button>
+        <button class="review-tab" data-section="staff" type="button">STAFF DESK</button>
       </nav>
       <p id="reviewQueueMessage" class="review-message" role="status"></p>
       <div id="reviewItems" class="review-grid"></div>
@@ -45,6 +48,6 @@
   </main>
   <script src="supabase-config.js?v=restore-c001185"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="review.js?v=review-3"></script>
+  <script src="review.js?v=staff-desk-1"></script>
 </body>
 </html>
