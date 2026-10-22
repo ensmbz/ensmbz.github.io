@@ -28,8 +28,8 @@ drop policy if exists "Anyone can see approved photos" on public.photo_submissio
 create policy "Anyone can see approved photos" on public.photo_submissions for select to anon, authenticated using (approved = true);
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('zayed-photos', 'zayed-photos', true, 52428800, array['image/*','video/*'])
-on conflict (id) do update set public = true, file_size_limit = 52428800, allowed_mime_types = array['image/*','video/*'];
+values ('zayed-photos', 'zayed-photos', true, null, array['image/*','video/*'])
+on conflict (id) do update set public = true, file_size_limit = null, allowed_mime_types = array['image/*','video/*'];
 drop policy if exists "Anyone can upload to zayed-photos" on storage.objects;
 create policy "Anyone can upload to zayed-photos" on storage.objects for insert to anon, authenticated
   with check (bucket_id = 'zayed-photos');
