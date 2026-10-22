@@ -141,23 +141,27 @@ async function loadChat() {
 }
 
 async function loadSite() {
-  const { data, error } = await reviewClient.from("site_control").select("id,is_live,updated_at").eq("id", true).single();
+  const { data, error } = await reviewClient.from("site_control").select("id,is_live,panic_mode,updated_at").eq("id", true).single();
   if (error) return failQueue("Could not load the site controls.");
-  showMessage(queueMessage, data.is_live ? "THE MUSEUM IS OPEN" : "THE MUSEUM IS PAUSED");
+  const mode = data.panic_mode ? "PANIC" : data.is_live ? "OPEN" : "PAUSED";
+  showMessage(queueMessage, `THE MUSEUM IS IN ${mode} MODE`);
   const card = document.createElement("article");
   card.className = "review-item site-control-card";
   const label = document.createElement("p"); label.className = "review-label"; label.textContent = "LIVE STATUS";
-  const title = document.createElement("h3"); title.textContent = data.is_live ? "SITE OPEN" : "SITE PAUSED";
-  const body = document.createElement("p"); body.className = "review-body"; body.textContent = data.is_live
-    ? "Visitors can use the gallery, comments, and chat room."
-    : "Visitors only see the mysterious paused screen.";
-  const toggle = actionButton(data.is_live ? "PAUSE SITE" : "OPEN SITE", data.is_live ? "review-reject" : "review-approve", async () => {
-    toggle.disabled = true;
-    const { error: updateError } = await reviewClient.from("site_control").update({ is_live: !data.is_live, updated_at: new Date().toISOString() }).eq("id", true);
+  const title = document.createElement("h3"); title.textContent = `SITE ${mode}`;
+  const body = document.createElement("p"); body.className = "review-body"; body.textContent = mode === "OPEN"
+    ? "Visitors can use the full museum."
+    : mode === "PAUSED" ? "Visitors see the Taking a Break screen." : "Visitors only see You can't find me.";
+  const setMode = async (nextMode) => {
+    const buttons = card.querySelectorAll("button"); buttons.forEach((button) => { button.disabled = true; });
+    const { error: updateError } = await reviewClient.from("site_control").update({ is_live: nextMode === "open", panic_mode: nextMode === "panic", updated_at: new Date().toISOString() }).eq("id", true);
     if (updateError) return failQueue("Could not change the site status.");
     await loadSite();
-  });
-  card.append(label, title, body, makeActions([toggle]));
+  };
+  const open = actionButton("OPEN SITE", "review-approve", () => setMode("open"));
+  const pause = actionButton("PAUSE SITE", "review-pause", () => setMode("paused"));
+  const panic = actionButton("PANIC MODE", "review-reject", () => setMode("panic"));
+  card.append(label, title, body, makeActions([open, pause, panic]));
   queueItems.append(card);
 }
 

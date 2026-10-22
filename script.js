@@ -22,7 +22,6 @@ const translations = {
     photosSubmitted: "items submitted", photoSubmitted: "item submitted", afterApproval: "New photos and videos join the shared gallery after approval.",
     uploadFailed: "Upload failed", checkBucket: "check the Supabase bucket size limit and policies, then try again.", localSaveFailed: "This browser couldn't save the media. Try a smaller file or another browser.",
     galleryLoadFailed: "The shared gallery could not load. Check the Supabase table and access policies.",
-    quipButton: "ROAST HIM AGAIN ↻", initialQuip: "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
     footerNote: "A SMALL INTERNET MUSEUM. ONE LARGE GOOFBALL.", backTop: "BACK TO TOP ↑", languageButton: "العربية",
     commentsButton: "COMMENTS", takedownButton: "REQUEST TAKEDOWN", commentsEyebrow: "THE CONVERSATION", commentsTitle: 'COMMENTS<span class="period">.</span>', commentsEmpty: "No comments yet. Start the conversation.", commentsUnavailable: "Comments are unavailable right now.", commentNameLabel: "YOUR NAME", commentLabel: "COMMENT", commentPlaceholder: "Keep it nice.", commentSubmit: "POST COMMENT", commentPosting: "POSTING…", commentRequired: "Please enter your name and a comment.", commentPosted: "Your comment was posted.", commentFailed: "Your comment could not be posted. Please try again.", takedownEyebrow: "POST SAFETY", takedownTitle: 'REQUEST TAKEDOWN<span class="period">.</span>', takedownIntro: "Tell the moderators why this post should be removed. Your request is private.", takedownReasonLabel: "WHY SHOULD IT BE REMOVED?", takedownPlaceholder: "Tell the moderators why.", takedownSubmit: "SEND REQUEST", takedownSending: "SENDING…", takedownRequired: "Please enter your name and a reason.", takedownSent: "Your request was sent to the moderators.", takedownFailed: "Your request could not be sent. Please try again.", reportEyebrow: "PRIVATE MODERATION", reportTitle: 'SEND A REPORT<span class="period">.</span>', reportIntro: "Tell the moderators what happened. Your report is private and does not appear in the chat room.", reportNameLabel: "YOUR NAME <span>(OPTIONAL)</span>", reportNamePlaceholder: "Leave blank to stay anonymous", reportBodyLabel: "WHAT DO YOU WANT TO REPORT?", reportBodyPlaceholder: "Give the moderators the details.", reportSubmit: "SEND REPORT", reportSending: "SENDING…", reportRequired: "Please describe what you want to report.", reportSent: "Your report was sent to the moderators.", reportFailed: "Your report could not be sent. Please try again.",
     chatEyebrow: "THE VISITOR BOOK", chatTitle: 'CHAT ROOM<span class="period">.</span>', chatLive: "LIVE ROOM", chatLoading: "Opening the room…", chatEmpty: "The room is quiet. Be the first to say something.", chatUnavailable: "The chat room is unavailable right now.", chatJoin: "JOIN THE CONVERSATION", chatNameLabel: "NAME (OPTIONAL)", chatNamePlaceholder: "Leave blank to post as Guest", chatMessageLabel: "MESSAGE", chatPlaceholder: "Say something to the room…", chatSubmit: "SEND MESSAGE ↗", chatSending: "SENDING…", chatRequired: "Please enter a message.", chatSent: "Message sent.", chatFailed: "Your message could not be sent. Try again.", chatNote: "Be kind. Messages are public.", chatYou: "YOU", musicPlay: "PLAY AMBIENCE", musicStop: "STOP MUSIC",
@@ -50,7 +49,6 @@ const translations = {
     photosSubmitted: "ملفات تم إرسالها", photoSubmitted: "ملف تم إرساله", afterApproval: "تُضاف الصور والفيديوهات الجديدة إلى المعرض المشترك بعد الموافقة عليها.",
     uploadFailed: "تعذّر رفع الملف", checkBucket: "تحقق من حد حجم الملفات في Supabase وسياسات التخزين ثم حاول مجدداً.", localSaveFailed: "تعذّر حفظ الوسائط في هذا المتصفح. جرّب ملفاً أصغر أو متصفحاً آخر.",
     galleryLoadFailed: "تعذّر تحميل المعرض المشترك. تحقق من جدول Supabase وسياسات الوصول.",
-    quipButton: "أطلق مزحة أخرى ↻", initialQuip: "يرجى العلم: ENS MBZ مشاغب معتمد.",
     footerNote: "متحف صغير على الإنترنت. ومشاغب كبير.", backTop: "العودة للأعلى ↑", languageButton: "English",
     commentsButton: "التعليقات", takedownButton: "طلب إزالة", commentsEyebrow: "المحادثة", commentsTitle: 'التعليقات<span class="period">.</span>', commentsEmpty: "لا توجد تعليقات بعد. ابدأ المحادثة.", commentsUnavailable: "التعليقات غير متاحة حالياً.", commentNameLabel: "اسمك", commentLabel: "تعليق", commentPlaceholder: "اكتب بلطف.", commentSubmit: "نشر التعليق", commentPosting: "جارٍ النشر…", commentRequired: "يرجى كتابة اسمك وتعليقك.", commentPosted: "تم نشر تعليقك.", commentFailed: "تعذر نشر تعليقك. حاول مرة أخرى.", takedownEyebrow: "سلامة المشاركة", takedownTitle: 'طلب إزالة<span class="period">.</span>', takedownIntro: "أخبر المشرفين بسبب إزالة هذه المشاركة. طلبك خاص.", takedownReasonLabel: "لماذا يجب إزالتها؟", takedownPlaceholder: "أخبر المشرفين بالسبب.", takedownSubmit: "إرسال الطلب", takedownSending: "جارٍ الإرسال…", takedownRequired: "يرجى كتابة اسمك وسبب الطلب.", takedownSent: "تم إرسال طلبك إلى المشرفين.", takedownFailed: "تعذر إرسال طلبك. حاول مرة أخرى.", reportEyebrow: "إشراف خاص", reportTitle: 'إرسال بلاغ<span class="period">.</span>', reportIntro: "أخبر المشرفين بما حدث. بلاغك خاص ولا يظهر في غرفة الدردشة.", reportNameLabel: "اسمك <span>(اختياري)</span>", reportNamePlaceholder: "اتركه فارغاً للإبلاغ دون اسم", reportBodyLabel: "ماذا تريد الإبلاغ عنه؟", reportBodyPlaceholder: "أعطِ المشرفين التفاصيل.", reportSubmit: "إرسال البلاغ", reportSending: "جارٍ الإرسال…", reportRequired: "يرجى وصف ما تريد الإبلاغ عنه.", reportSent: "تم إرسال بلاغك إلى المشرفين.", reportFailed: "تعذر إرسال بلاغك. حاول مرة أخرى.",
     chatEyebrow: "سجل الزوار", chatTitle: 'غرفة الدردشة<span class="period">.</span>', chatLive: "غرفة مباشرة", chatLoading: "جارٍ فتح الغرفة…", chatEmpty: "الغرفة هادئة. كن أول من يكتب.", chatUnavailable: "غرفة الدردشة غير متاحة حالياً.", chatJoin: "انضم إلى المحادثة", chatNameLabel: "الاسم (اختياري)", chatNamePlaceholder: "اتركه فارغاً للنشر باسم زائر", chatMessageLabel: "الرسالة", chatPlaceholder: "اكتب شيئاً للغرفة…", chatSubmit: "إرسال الرسالة ↗", chatSending: "جارٍ الإرسال…", chatRequired: "يرجى كتابة رسالة.", chatSent: "تم إرسال الرسالة.", chatFailed: "تعذر إرسال رسالتك. حاول مرة أخرى.", chatNote: "كن لطيفاً. الرسائل عامة.", chatYou: "أنت", musicPlay: "تشغيل الأجواء", musicStop: "إيقاف الموسيقى",
@@ -78,7 +76,7 @@ const supabaseClient = supabaseReady
   : null;
 
 const scrollProgress = document.querySelector("#scrollProgress");
-const scrollScenes = [...document.querySelectorAll(".hero, .gallery-section, .chat-section, .about-strip")];
+const scrollScenes = [...document.querySelectorAll(".hero, .gallery-section, .chat-section")];
 let scrollFramePending = false;
 function updateScrollProgress() {
   const root = document.documentElement;
@@ -109,7 +107,7 @@ window.addEventListener("scroll", () => {
 window.addEventListener("resize", updateScrollProgress, { passive: true });
 updateScrollProgress();
 
-const revealTargets = document.querySelectorAll(".section-heading, .gallery-note, .drop-hint, .storage-note, .chat-heading, .chat-layout, .about-strip, footer");
+const revealTargets = document.querySelectorAll(".section-heading, .gallery-note, .drop-hint, .storage-note, .chat-heading, .chat-layout, footer");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 if (reduceMotion || !("IntersectionObserver" in window)) {
   revealTargets.forEach((element) => element.classList.add("scroll-reveal", "is-visible"));
@@ -785,33 +783,6 @@ if (supabaseClient) {
 }
 loadChatRoom();
 
-const quips = {
-  en: [
-    "THE CURATOR WOULD LIKE YOU TO KNOW: ENS MBZ IS A CERTIFIED GOOFBALL.",
-    "BREAKING: ENS MBZ HAS LOST AN ARGUMENT TO A DOOR THAT SAYS PUSH.",
-    "EXPERTS AGREE: ENS MBZ'S LAST BRAIN CELL IS WORKING OVERTIME.",
-    "THIS JUST IN: ENS MBZ HAS BEEN CONFUSED BY A SPOON AGAIN.",
-    "PLEASE KEEP HANDS INSIDE THE INTERNET. ENS MBZ IS DRIVING.",
-    "ENS MBZ IS PROOF THAT CONFIDENCE AND CLUELESSNESS CAN COEXIST."
-  ],
-  ar: [
-    "يرجى العلم: ENS MBZ مشاغب معتمد.",
-    "عاجل: خسر ENS MBZ نقاشاً مع باب كُتب عليه «ادفع».",
-    "يتفق الخبراء: آخر خلية دماغية لدى ENS MBZ تعمل لساعات إضافية.",
-    "خبر عاجل: اختلط الأمر على ENS MBZ بسبب ملعقة مرة أخرى.",
-    "يرجى إبقاء الأيدي داخل الإنترنت. ENS MBZ هو السائق.",
-    "ENS MBZ دليل على أن الثقة والحيرة قد تجتمعان."
-  ],
-};
-let previousQuip = 0;
-document.querySelector("#quipButton").addEventListener("click", () => {
-  const options = quips[currentLanguage];
-  let next = Math.floor(Math.random() * options.length);
-  if (next === previousQuip) next = (next + 1) % options.length;
-  previousQuip = next;
-  document.querySelector("#quip").textContent = options[next];
-});
-
 function applyLanguage(language = currentLanguage) {
   currentLanguage = language === "ar" ? "ar" : "en";
   const isArabic = currentLanguage === "ar";
@@ -836,8 +807,6 @@ function applyLanguage(language = currentLanguage) {
     button.title = isArabic ? "Switch to English" : "التبديل إلى العربية الإماراتية";
   }
   document.title = isArabic ? "متحف ENS MBZ — ملفات ENS MBZ" : "ENS MBZ Museum — The ENS MBZ Files";
-  document.querySelector("#quipButton").setAttribute("aria-label", isArabic ? "أطلق مزحة أخرى عن ENS MBZ" : "Generate another ENS MBZ roast");
-  document.querySelector("#quip").textContent = tr("initialQuip");
   storageNote.textContent = tr(storageMessageKey);
   updateMusicButton();
   try { localStorage.setItem("ensmbz-language", currentLanguage); } catch { /* Language still changes for this page view. */ }
@@ -885,19 +854,19 @@ Promise.all([readPhotos(), loadSharedPhotos()]).then(([photos]) => {
 // The Discord /site command changes this shared value in Supabase. Poll so an
 // already-open tab also switches to the pause screen without a manual refresh.
 const sitePaused = document.querySelector("#sitePaused");
-const siteControlUrl = `${supabaseSettings.url}/rest/v1/site_control?select=is_live&id=eq.true`;
+const siteControlUrl = `${supabaseSettings.url}/rest/v1/site_control?select=is_live,panic_mode&id=eq.true`;
 async function refreshSiteStatus() {
   try {
     const response = await fetch(siteControlUrl, { cache: "no-store", headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}` } });
     if (!response.ok) return;
     const [status] = await response.json();
     if (!status) return;
-    const paused = status.is_live === false;
-    const panicMessage = document.querySelector("#sitePaused [data-i18n='panicMessage']");
-    if (panicMessage) panicMessage.textContent = tr("panicMessage");
-    sitePaused.hidden = !paused;
-    document.body.classList.toggle("is-site-paused", paused);
-    if (paused && musicPlaying) stopAmbientMusic();
+    const mode = status.panic_mode ? "panic" : status.is_live === false ? "paused" : "live";
+    document.querySelectorAll("#sitePaused [data-site-state]").forEach((panel) => { panel.hidden = panel.dataset.siteState !== mode; });
+    sitePaused.hidden = mode === "live";
+    document.body.classList.toggle("is-site-paused", mode !== "live");
+    document.body.classList.toggle("is-site-panic", mode === "panic");
+    if (mode !== "live" && musicPlaying) stopAmbientMusic();
   } catch {
     // Keep the site available if Supabase is temporarily unreachable.
   }

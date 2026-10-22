@@ -34,6 +34,7 @@
 .review-actions button { flex:1; min-height:42px; border:0; cursor:pointer; font:500 10px var(--mono); letter-spacing:.08em; }
 .review-approve { background:#1a5944; color:white; }
 .review-reject { background:#842a2a; color:white; }
+.review-pause { background:#b06b16; color:white; }
 @media(max-width:560px) { .review-top,.review-main { width:calc(100% - 28px); } .review-queue-head { align-items:flex-start; flex-direction:column; } .review-queue-head>div { display:flex; gap:8px; } .review-secondary { margin:0; } }
 
 /* Owner desk refresh */
