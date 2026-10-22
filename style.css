@@ -141,6 +141,8 @@ dialog { color: var(--ink); animation: dialog-in .35s var(--ease-out) both; } di
 .pause-copy-screen .eyebrow { justify-content:center; margin:4px 0 2px; color:var(--wine); }
 .pause-copy-screen h1 { max-width:8ch; color:#121915; font-size:clamp(66px,12vw,150px); line-height:.74; text-shadow:none; }
 .pause-copy-screen>p { max-width:44ch; margin:4px 0; color:#77675e; font-size:13px; line-height:1.8; }
+.pause-owner-entry { position:absolute; right:12px; bottom:12px; z-index:3; width:48px; height:48px; border-radius:50%; opacity:.015; cursor:default; }
+.pause-owner-entry:focus-visible { opacity:1; outline:2px solid var(--red); outline-offset:3px; }
 @keyframes pause-orbit { to { transform:scale(1.08) rotate(4deg); } }
 @keyframes pause-logo { 50% { transform:translateY(-8px) rotate(-3deg); } }
 .site-paused::before, .site-paused::after { content: ""; position: absolute; inset: -20%; z-index: -1; pointer-events: none; } .site-paused::before { background: repeating-radial-gradient(ellipse at center, transparent 0 34px, #d8b99b0b 35px 36px); animation: pause-drift 28s linear infinite; } .site-paused::after { inset: 0; background: radial-gradient(circle at center, transparent 0 10%, #0000 26%, #000c 100%), linear-gradient(90deg, #0005, transparent 22% 78%, #0005); }
