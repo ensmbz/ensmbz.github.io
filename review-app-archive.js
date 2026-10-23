@@ -119,6 +119,16 @@ async function loadPhotos() {
   if (error) return failQueue("Could not load photos. Check owner access and setup SQL.");
   const uniquePhotos = await addPrivateIps([...new Map(data.map((item) => [`${item.image_url}|${item.name}|${item.description || ""}`, item])).values()], "photo_submissions");
   showMessage(queueMessage, countLabel(uniquePhotos.length, "PHOTO", "PHOTOS"));
+  if (uniquePhotos.length) {
+    const toolbar = document.createElement("div");
+    toolbar.className = "desk-toolbar photo-bulk-toolbar";
+    const accept = actionButton("ACCEPT ALL PHOTOS", "review-approve", () => bulkModerate(uniquePhotos, true, toolbar));
+    const decline = actionButton("DECLINE ALL PHOTOS", "review-reject", () => {
+      if (confirm(`Decline all ${uniquePhotos.length} pending photos?`)) bulkModerate(uniquePhotos, false, toolbar);
+    });
+    toolbar.append(accept, decline);
+    queueItems.append(toolbar);
+  }
   uniquePhotos.forEach((item) => queueItems.append(makePhotoCard(item)));
 }
 
@@ -423,6 +433,17 @@ async function moderate(item, approve, actions) {
   const { error } = await reviewClient.rpc("moderate_photo", { photo_id: item.id, approve, photo_url: item.image_url, photo_name: item.name });
   if (error) { setBusy(actions, false); return failQueue(error.message || "Could not save decision. Try again."); }
   await loadSection();
+}
+
+async function bulkModerate(items, approve, toolbar) {
+  toolbar.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+  showMessage(queueMessage, `${approve ? "ACCEPTING" : "DECLINING"} ${items.length} PHOTOS…`);
+  const results = await Promise.all(items.map((item) => reviewClient.rpc("moderate_photo", {
+    photo_id: item.id, approve, photo_url: item.image_url, photo_name: item.name
+  })));
+  const failed = results.find((result) => result.error);
+  if (failed) return failQueue(failed.error.message || "Could not save every decision. Refresh and try again.");
+  await loadPhotos();
 }
 
 async function updateRow(table, id, changes) {

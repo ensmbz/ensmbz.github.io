@@ -59,6 +59,9 @@
 
 .review-tab[hidden] { display:none; }
 .desk-toolbar { grid-column:1/-1; display:flex; justify-content:flex-end; padding:0 0 8px; }
+.photo-bulk-toolbar { justify-content:flex-start; gap:10px; flex-wrap:wrap; }
+.photo-bulk-toolbar button { min-height:44px; padding:0 18px; border:0; cursor:pointer; font:600 10px var(--mono); letter-spacing:.08em; }
+.photo-bulk-toolbar button:disabled { opacity:.55; cursor:wait; }
 .review-danger { min-height:44px; padding:0 18px; border:0; background:#5f0b10; color:white; cursor:pointer; font:600 10px var(--mono); letter-spacing:.08em; }
 .site-control-card { grid-column:1/-1; max-width:620px; border-top-color:var(--red); }
 .site-control-card .review-actions { flex-wrap:wrap; }
