@@ -97,11 +97,28 @@ function loadRows(table, select, filters = []) {
   return query;
 }
 
+async function addPrivateIps(items, contentType) {
+  if (!currentAccess?.owner || !items.length) return items;
+  const ids = items.map((item) => String(item.id));
+  const { data, error } = await reviewClient.from("content_ip_log")
+    .select("content_id,ip_address").eq("content_type", contentType).in("content_id", ids);
+  if (error) return items;
+  const byId = new Map(data.map((row) => [row.content_id, row.ip_address]));
+  return items.map((item) => ({ ...item, privateIp: byId.get(String(item.id)) || "Not recorded" }));
+}
+
+function makePrivateIp(value) {
+  const node = document.createElement("p");
+  node.className = "review-date";
+  node.textContent = `OWNER IP: ${value || "Not recorded"}`;
+  return node;
+}
+
 async function loadPhotos() {
   const { data, error } = await loadRows("photo_submissions", "id,name,description,image_url,media_type,created_at")
     .eq("approved", false).eq("status", "pending");
   if (error) return failQueue("Could not load photos. Check owner access and setup SQL.");
-  const uniquePhotos = [...new Map(data.map((item) => [`${item.image_url}|${item.name}|${item.description || ""}`, item])).values()];
+  const uniquePhotos = await addPrivateIps([...new Map(data.map((item) => [`${item.image_url}|${item.name}|${item.description || ""}`, item])).values()], "photo_submissions");
   showMessage(queueMessage, countLabel(uniquePhotos.length, "PHOTO", "PHOTOS"));
   uniquePhotos.forEach((item) => queueItems.append(makePhotoCard(item)));
 }
@@ -110,17 +127,19 @@ async function loadArchive() {
   const { data, error } = await loadRows("photo_submissions", "id,name,description,image_url,media_type,created_at")
     .eq("approved", true).eq("status", "approved");
   if (error) return failQueue("Could not load the photo archive.");
-  showMessage(queueMessage, countLabel(data.length, "ARCHIVED POST", "ARCHIVED POSTS"));
-  data.forEach((item) => queueItems.append(makeArchiveCard(item)));
+  const items = await addPrivateIps(data, "photo_submissions");
+  showMessage(queueMessage, countLabel(items.length, "ARCHIVED POST", "ARCHIVED POSTS"));
+  items.forEach((item) => queueItems.append(makeArchiveCard(item)));
 }
 
 async function loadComments() {
   const { data, error } = await loadRows("photo_comments", "id,photo_id,name,body,status,created_at", [["status", "visible"]]);
   if (error) return failQueue("Could not load comments. Run the owner inbox SQL first.");
-  showMessage(queueMessage, countLabel(data.length, "COMMENT", "COMMENTS"));
-  data.forEach((item) => queueItems.append(makeTextCard("COMMENT", `POST #${item.photo_id} · ${item.name}`, item.body, item.created_at, [
+  const items = await addPrivateIps(data, "photo_comments");
+  showMessage(queueMessage, countLabel(items.length, "COMMENT", "COMMENTS"));
+  items.forEach((item) => queueItems.append(makeTextCard("COMMENT", `POST #${item.photo_id} · ${item.name}`, item.body, item.created_at, [
     actionButton("HIDE COMMENT", "review-reject", () => updateRow("photo_comments", item.id, { status: "removed" }))
-  ])));
+  ], item.privateIp)));
 }
 
 async function loadReports() {
@@ -145,17 +164,18 @@ async function loadTakedowns() {
 async function loadChat() {
   const { data, error } = await loadRows("chat_messages", "id,name,body,created_at");
   if (error) return failQueue("Could not load the chat room.");
-  showMessage(queueMessage, countLabel(data.length, "MESSAGE", "MESSAGES"));
-  if (data.length) {
+  const items = await addPrivateIps(data, "chat_messages");
+  showMessage(queueMessage, countLabel(items.length, "MESSAGE", "MESSAGES"));
+  if (items.length) {
     const toolbar = document.createElement("div");
     toolbar.className = "desk-toolbar";
     const clear = actionButton("CLEAR ALL CHAT", "review-danger", clearChat);
     toolbar.append(clear);
     queueItems.append(toolbar);
   }
-  data.forEach((item) => queueItems.append(makeTextCard("CHAT MESSAGE", item.name, item.body, item.created_at, [
+  items.forEach((item) => queueItems.append(makeTextCard("CHAT MESSAGE", item.name, item.body, item.created_at, [
     actionButton("DELETE MESSAGE", "review-reject", () => deleteRow("chat_messages", item.id))
-  ])));
+  ], item.privateIp)));
 }
 
 async function loadSite() {
@@ -338,7 +358,9 @@ function makePhotoCard(item) {
     actionButton("APPROVE", "review-approve", () => moderate(item, true, actions)),
     actionButton("DECLINE", "review-reject", () => moderate(item, false, actions))
   ]);
-  card.append(media, title, description, date, actions);
+  card.append(media, title, description, date);
+  if (currentAccess?.owner) card.append(makePrivateIp(item.privateIp));
+  card.append(actions);
   return card;
 }
 
@@ -353,7 +375,9 @@ function makeArchiveCard(item) {
   const title = document.createElement("h3"); title.textContent = `FROM ${item.name}`;
   const description = document.createElement("p"); description.textContent = item.description || "No description.";
   const remove = actionButton("DELETE PHOTO", "review-reject", () => deleteArchivedMedia(item, card));
-  card.append(media, title, description, makeDate(item.created_at), makeActions([remove]));
+  card.append(media, title, description, makeDate(item.created_at));
+  if (currentAccess?.owner) card.append(makePrivateIp(item.privateIp));
+  card.append(makeActions([remove]));
   return card;
 }
 
@@ -372,13 +396,15 @@ async function deleteArchivedMedia(item, card) {
   await loadArchive();
 }
 
-function makeTextCard(label, titleText, bodyText, dateValue, buttons) {
+function makeTextCard(label, titleText, bodyText, dateValue, buttons, privateIp = null) {
   const card = document.createElement("article");
   card.className = "review-item review-note";
   const labelNode = document.createElement("p"); labelNode.className = "review-label"; labelNode.textContent = label;
   const title = document.createElement("h3"); title.textContent = titleText;
   const body = document.createElement("p"); body.className = "review-body"; body.textContent = bodyText;
-  card.append(labelNode, title, body, makeDate(dateValue), makeActions(buttons));
+  card.append(labelNode, title, body, makeDate(dateValue));
+  if (currentAccess?.owner && privateIp) card.append(makePrivateIp(privateIp));
+  card.append(makeActions(buttons));
   return card;
 }
 
