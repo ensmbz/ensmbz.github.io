@@ -371,6 +371,7 @@ html[dir="rtl"] .section-heading.scroll-reveal.is-visible h2, html[dir="rtl"] .c
 
 /* Desktop cursor */
 html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
+html.has-custom-cursor dialog, html.has-custom-cursor dialog * { cursor: auto !important; }
 .custom-cursor { position: fixed; top: 0; left: 0; z-index: 1000000; width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 1px solid #ff5a43; border-radius: 50%; opacity: 0; pointer-events: none; box-shadow: 0 0 0 1px #3a090b55, 0 0 24px #ed351e35; transition: width .22s var(--ease-out), height .22s var(--ease-out), margin .22s var(--ease-out), background .22s, opacity .16s; will-change: transform; }
 .custom-cursor::before { content: ""; position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border-radius: 50%; background: #ff513b; box-shadow: 0 0 10px #ff513b; transform: translate(-50%, -50%); transition: transform .22s var(--ease-out), background .22s; }
 .custom-cursor.is-visible { opacity: 1; }
