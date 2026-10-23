@@ -68,7 +68,6 @@ async function checkOwnerAndLoad() {
   loginSection.hidden = true;
   queueSection.hidden = false;
   await loadSection(activeSection);
-  await handlePanicEmailApproval(session);
 }
 
 async function loadSection(section = activeSection) {
@@ -198,15 +197,27 @@ async function loadSite() {
   };
   const open = actionButton("OPEN SITE", "review-approve", () => setMode("open"));
   const pause = actionButton("PAUSE SITE", "review-pause", () => setMode("paused"));
-  const panic = actionButton("EMAIL PANIC APPROVAL", "review-danger", async () => {
+  const panic = actionButton("PANIC · PASSWORD", "review-danger", async () => {
     panic.disabled = true;
     const { data: { session } } = await reviewClient.auth.getSession();
-    if (!session?.user?.email) { panic.disabled = false; return failQueue("Owner sign-in is required before sending a panic approval email."); }
-    const redirectTo = "https://ensmbz.github.io/review.html?approve_panic=1";
-    const { error } = await reviewClient.auth.signInWithOtp({ email: session.user.email, options: { shouldCreateUser: false, emailRedirectTo: redirectTo } });
+    if (!session?.user?.email) { panic.disabled = false; return failQueue("Owner sign-in is required."); }
+    const password = prompt("Enter the owner password to continue.");
+    if (!password) { panic.disabled = false; return showMessage(queueMessage, "PANIC CANCELLED."); }
+    const { data: verified, error } = await reviewClient.auth.signInWithPassword({ email: session.user.email, password });
     panic.disabled = false;
-    if (error) return failQueue("Could not send the panic approval email.");
-    showMessage(queueMessage, `PANIC APPROVAL SENT TO ${session.user.email}. NOTHING HAS BEEN DELETED.`);
+    if (error || !verified?.session) return failQueue("Wrong owner password. Nothing was deleted.");
+    if (!confirm("Final confirmation: permanently delete the website, database, uploads, owner accounts, and staff access?")) return showMessage(queueMessage, "PANIC CANCELLED. NOTHING WAS DELETED.");
+    showMessage(queueMessage, "PANIC DELETION STARTING…");
+    try {
+      const response = await fetch(`${reviewConfig.url}/functions/v1/site-panic`, {
+        method: "POST",
+        headers: { apikey: reviewConfig.publishableKey, authorization: `Bearer ${verified.session.access_token}`, "content-type": "application/json" },
+        body: JSON.stringify({ confirmation: "DELETE EVERYTHING" }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) return failQueue(result.error || "Panic deletion failed.");
+      showMessage(queueMessage, result.message || "DELETION STARTED.");
+    } catch { failQueue("Panic deletion could not start."); }
   });
   card.append(label, title, body, makeActions([open, pause, panic]));
   queueItems.append(card);
@@ -232,28 +243,6 @@ function loadIpDesk() {
   frame.referrerPolicy = "no-referrer";
   card.append(label, title, body, frame);
   queueItems.append(card);
-}
-
-async function handlePanicEmailApproval(session) {
-  if (panicApprovalHandled || !currentAccess?.owner || new URLSearchParams(location.search).get("approve_panic") !== "1") return;
-  panicApprovalHandled = true;
-  history.replaceState({}, "", "/review.html");
-  const typed = prompt("Email approval received. Type DELETE EVERYTHING to permanently delete GitHub and Supabase. The PC backup will remain.");
-  if (typed !== "DELETE EVERYTHING") return showMessage(queueMessage, "PANIC CANCELLED. NOTHING WAS DELETED.");
-  if (!confirm("Final confirmation: permanently delete the website, database, uploads, owner accounts, and staff access?")) return showMessage(queueMessage, "PANIC CANCELLED. NOTHING WAS DELETED.");
-  showMessage(queueMessage, "PANIC DELETION STARTING…");
-  try {
-    const response = await fetch(`${reviewConfig.url}/functions/v1/site-panic`, {
-      method: "POST",
-      headers: { apikey: reviewConfig.publishableKey, authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
-      body: JSON.stringify({ confirmation: typed }),
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) return failQueue(result.error || "Panic deletion failed.");
-    showMessage(queueMessage, result.message || "DELETION STARTED.");
-  } catch {
-    failQueue("Panic deletion could not start.");
-  }
 }
 
 async function loadStaff() {
