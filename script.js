@@ -189,6 +189,57 @@ if (!reduceMotion && window.matchMedia("(hover: hover) and (pointer: fine)").mat
       button.style.removeProperty("--magnet-y");
     });
   });
+
+  const cursor = document.createElement("div");
+  cursor.className = "custom-cursor";
+  cursor.setAttribute("aria-hidden", "true");
+  const particles = Array.from({ length: 12 }, (_, index) => {
+    const particle = document.createElement("span");
+    particle.className = "cursor-particle";
+    particle.style.setProperty("--particle-color", index % 3 ? "#ff513b" : "#fff4e9");
+    return particle;
+  });
+  document.body.append(cursor, ...particles);
+  document.documentElement.classList.add("has-custom-cursor");
+
+  let cursorFrame = 0;
+  let cursorX = 0;
+  let cursorY = 0;
+  let lastParticleX = 0;
+  let lastParticleY = 0;
+  let lastParticleAt = 0;
+  let particleIndex = 0;
+  document.addEventListener("pointermove", (event) => {
+    cursorX = event.clientX;
+    cursorY = event.clientY;
+    cursor.classList.add("is-visible");
+    if (cursorFrame) return;
+    cursorFrame = requestAnimationFrame(() => {
+      cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+      const now = performance.now();
+      const distance = (cursorX - lastParticleX) ** 2 + (cursorY - lastParticleY) ** 2;
+      if (now - lastParticleAt > 28 && distance > 110) {
+        const particle = particles[particleIndex++ % particles.length];
+        const driftX = (Math.random() - .5) * 30;
+        const driftY = 14 + Math.random() * 22;
+        particle.style.left = `${cursorX}px`;
+        particle.style.top = `${cursorY}px`;
+        particle.getAnimations().forEach((animation) => animation.cancel());
+        particle.animate([
+          { opacity: .8, transform: "translate3d(-50%, -50%, 0) scale(1) rotate(0deg)" },
+          { opacity: 0, transform: `translate3d(calc(-50% + ${driftX}px), calc(-50% + ${driftY}px), 0) scale(.15) rotate(80deg)` }
+        ], { duration: 580, easing: "cubic-bezier(.2,.8,.2,1)" });
+        lastParticleX = cursorX;
+        lastParticleY = cursorY;
+        lastParticleAt = now;
+      }
+      cursorFrame = 0;
+    });
+  }, { passive: true });
+  document.addEventListener("pointerover", (event) => {
+    cursor.classList.toggle("is-action", Boolean(event.target.closest("a, button, input, textarea, .photo-image")));
+  }, { passive: true });
+  document.documentElement.addEventListener("pointerleave", () => cursor.classList.remove("is-visible"));
 }
 if (reduceMotion || !("IntersectionObserver" in window)) {
   revealTargets.forEach((element) => element.classList.add("scroll-reveal", "is-visible"));
