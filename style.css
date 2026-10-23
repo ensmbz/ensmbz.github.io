@@ -377,10 +377,10 @@ html[dir="rtl"] .section-heading.scroll-reveal.is-visible h2, html[dir="rtl"] .c
 /* Desktop cursor */
 html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
 html.has-custom-cursor dialog, html.has-custom-cursor dialog * { cursor: auto !important; }
-.custom-cursor { position: fixed; top: 0; left: 0; z-index: 1000000; width: 28px; height: 28px; margin: -14px 0 0 -14px; opacity: 0; pointer-events: none; background: #ff513b; clip-path: polygon(50% 0%, 61% 35%, 100% 38%, 69% 58%, 79% 100%, 50% 73%, 21% 100%, 31% 58%, 0% 38%, 39% 35%); filter: drop-shadow(0 0 7px #ed351e99); transition: width .22s var(--ease-out), height .22s var(--ease-out), margin .22s var(--ease-out), background .22s, opacity .16s, filter .22s; will-change: transform; }
-.custom-cursor::before { content: ""; position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border-radius: 50%; background: #fff4e9; box-shadow: 0 0 10px #fff4e9; transform: translate(-50%, -50%); transition: transform .22s var(--ease-out), background .22s; }
+.custom-cursor { position: fixed; top: 0; left: 0; z-index: 1000000; width: 22px; height: 31px; margin: -2px 0 0 -2px; opacity: 0; pointer-events: none; background: #ff513b; clip-path: polygon(0 0, 100% 64%, 61% 68%, 43% 100%); filter: drop-shadow(0 0 7px #ed351eaa); transition: width .22s var(--ease-out), height .22s var(--ease-out), margin .22s var(--ease-out), background .22s, opacity .16s, filter .22s; will-change: transform; }
+.custom-cursor::before { content: ""; position: absolute; top: 10px; left: 7px; width: 4px; height: 4px; border-radius: 50%; background: #fff4e9; box-shadow: 0 0 9px #fff4e9; transition: transform .22s var(--ease-out), background .22s; }
 .custom-cursor.is-visible { opacity: 1; }
-.custom-cursor.is-action { width: 38px; height: 38px; margin: -19px 0 0 -19px; background: #3a090b; filter: drop-shadow(0 0 10px #ff513b); }
-.custom-cursor.is-action::before { background: #ffb09f; transform: translate(-50%, -50%) scale(.7); }
+.custom-cursor.is-action { width: 27px; height: 38px; margin: -2px 0 0 -2px; background: #3a090b; filter: drop-shadow(0 0 10px #ff513b); }
+.custom-cursor.is-action::before { background: #ffb09f; transform: scale(.8); }
 .cursor-particle { position: fixed; z-index: 999999; width: 6px; height: 6px; border-radius: 1px; opacity: 0; pointer-events: none; background: var(--particle-color); box-shadow: 0 0 9px color-mix(in srgb, var(--particle-color) 70%, transparent); will-change: transform, opacity; }
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) { .custom-cursor, .cursor-particle { display: none !important; } }
