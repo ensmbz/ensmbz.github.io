@@ -43,7 +43,7 @@ async function checkOwnerAndLoad() {
   ]);
   if (!isOwner && !staff) {
     await reviewClient.auth.signOut();
-    showMessage(authMessage, "This account has no staff access yet. Ask the owner to create your staff username in Staff Desk.", true);
+    showMessage(authMessage, "This login exists, but no staff access is assigned yet. Re-save the account in Staff Desk, then try again.", true);
     return;
   }
   currentAccess = isOwner
@@ -497,9 +497,9 @@ document.querySelector("#reviewLoginForm").addEventListener("submit", async (eve
   const password = document.querySelector("#reviewPassword").value;
   const button = event.currentTarget.querySelector("button");
   button.disabled = true; showMessage(authMessage, "SIGNING IN…");
-  const { error } = await reviewClient.auth.signInWithPassword({ email, password });
+  const { data: signedIn, error } = await reviewClient.auth.signInWithPassword({ email, password });
   button.disabled = false;
-  if (error) return showMessage(authMessage, "Sign-in failed. Check username and password.", true);
+  if (error || !signedIn?.session) return showMessage(authMessage, "Sign-in failed. Check the staff username and password, then ask the owner to re-save the account if it still fails.", true);
   showMessage(authMessage, "SIGNED IN.");
   await checkOwnerAndLoad();
 });
