@@ -117,7 +117,8 @@ async function loadPhotos() {
   const { data, error } = await loadRows("photo_submissions", "id,name,description,image_url,media_type,created_at")
     .eq("approved", false).eq("status", "pending");
   if (error) return failQueue("Could not load photos. Check owner access and setup SQL.");
-  const uniquePhotos = await addPrivateIps([...new Map(data.map((item) => [`${item.image_url}|${item.name}|${item.description || ""}`, item])).values()], "photo_submissions");
+  // A retry can create multiple rows for the same uploaded object. Review it once.
+  const uniquePhotos = await addPrivateIps([...new Map(data.map((item) => [item.image_url || item.id, item])).values()], "photo_submissions");
   showMessage(queueMessage, countLabel(uniquePhotos.length, "PHOTO", "PHOTOS"));
   if (uniquePhotos.length) {
     const toolbar = document.createElement("div");
