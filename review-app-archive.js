@@ -259,6 +259,8 @@ function loadIpDesk() {
 async function loadStaff() {
   const { data, error } = await reviewClient.from("staff_permissions").select("*").order("created_at", { ascending: true });
   if (error) return failQueue("Could not load staff permissions.");
+  // Auth refreshes can finish together; never append a second Staff Desk form.
+  if (queueItems.querySelector(".staff-editor")) return;
   showMessage(queueMessage, countLabel(data.length, "STAFF MEMBER", "STAFF MEMBERS"));
   queueItems.append(makeOwnerPasswordCard(), makeStaffEditor());
   data.forEach((staff) => queueItems.append(makeStaffCard(staff)));
