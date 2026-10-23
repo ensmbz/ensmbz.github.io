@@ -378,7 +378,7 @@ html[dir="rtl"] .section-heading.scroll-reveal.is-visible h2, html[dir="rtl"] .c
 html.has-custom-cursor, html.has-custom-cursor * { cursor: none !important; }
 html.has-custom-cursor dialog, html.has-custom-cursor dialog * { cursor: auto !important; }
 .custom-cursor { position: fixed; top: 0; left: 0; z-index: 1000000; width: 22px; height: 31px; margin: -2px 0 0 -2px; opacity: 0; pointer-events: none; background: #ff513b; clip-path: polygon(0 0, 100% 64%, 61% 68%, 43% 100%) !important; filter: drop-shadow(0 0 7px #ed351eaa); transition: width .22s var(--ease-out), height .22s var(--ease-out), margin .22s var(--ease-out), background .22s, opacity .16s, filter .22s; will-change: transform; }
-.custom-cursor::before { content: ""; position: absolute; top: 10px; left: 7px; width: 4px; height: 4px; border-radius: 50%; background: #fff4e9; box-shadow: 0 0 9px #fff4e9; transition: transform .22s var(--ease-out), background .22s; }
+.custom-cursor::before { content: ""; position: absolute; top: 16px; left: 11px; width: 4px; height: 4px; border-radius: 50%; background: #fff4e9; box-shadow: 0 0 9px #fff4e9; transform: translate(-50%, -50%); transition: transform .22s var(--ease-out), background .22s; }
 .custom-cursor.is-visible { opacity: 1; }
 .custom-cursor.is-action { width: 27px; height: 38px; margin: -2px 0 0 -2px; background: #3a090b; filter: drop-shadow(0 0 10px #ff513b); }
 .custom-cursor.is-action::before { background: #ffb09f; transform: scale(.8); }
