@@ -98,7 +98,7 @@ function loadRows(table, select, filters = []) {
 }
 
 async function addPrivateIps(items, contentType) {
-  if (!currentAccess?.owner || !items.length) return items;
+  if (!items.length) return items;
   const ids = items.map((item) => String(item.id));
   const { data, error } = await reviewClient.from("content_ip_log")
     .select("content_id,ip_address").eq("content_type", contentType).in("content_id", ids);
@@ -359,7 +359,7 @@ function makePhotoCard(item) {
     actionButton("DECLINE", "review-reject", () => moderate(item, false, actions))
   ]);
   card.append(media, title, description, date);
-  if (currentAccess?.owner) card.append(makePrivateIp(item.privateIp));
+  if (item.privateIp) card.append(makePrivateIp(item.privateIp));
   card.append(actions);
   return card;
 }
@@ -376,7 +376,7 @@ function makeArchiveCard(item) {
   const description = document.createElement("p"); description.textContent = item.description || "No description.";
   const remove = actionButton("DELETE PHOTO", "review-reject", () => deleteArchivedMedia(item, card));
   card.append(media, title, description, makeDate(item.created_at));
-  if (currentAccess?.owner) card.append(makePrivateIp(item.privateIp));
+  if (item.privateIp) card.append(makePrivateIp(item.privateIp));
   card.append(makeActions([remove]));
   return card;
 }
@@ -403,7 +403,7 @@ function makeTextCard(label, titleText, bodyText, dateValue, buttons, privateIp 
   const title = document.createElement("h3"); title.textContent = titleText;
   const body = document.createElement("p"); body.className = "review-body"; body.textContent = bodyText;
   card.append(labelNode, title, body, makeDate(dateValue));
-  if (currentAccess?.owner && privateIp) card.append(makePrivateIp(privateIp));
+  if (privateIp) card.append(makePrivateIp(privateIp));
   card.append(makeActions(buttons));
   return card;
 }
