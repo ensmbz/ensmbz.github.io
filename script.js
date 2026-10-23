@@ -350,6 +350,7 @@ function render() {
     mediaFrame.className = "photo-image";
     if (isVideo) {
       const video = document.createElement("video");
+      mediaFrame.classList.add("video-frame");
       video.className = "photo-video";
       video.src = mediaSrc;
       video.controls = true;
@@ -699,7 +700,7 @@ async function refreshChatIdentity() {
     if (staff) chatIdentityRole = "staff";
   }
   if (chatIdentityRole !== "guest" && chatName) {
-    chatName.value = chatIdentityRole === "owner" ? "Owner" : "Staff";
+    chatName.value = chatIdentityRole === "owner" ? "7MOOD" : "Staff";
     chatName.readOnly = true;
     chatName.setAttribute("aria-label", `${chatName.value} chat identity`);
   }
@@ -774,7 +775,7 @@ async function loadChatRoom() {
 chatForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!supabaseClient) { chatError.textContent = tr("chatUnavailable"); return; }
-  const name = chatIdentityRole === "owner" ? "Owner" : chatIdentityRole === "staff" ? "Staff" : (chatName.value.trim() || (currentLanguage === "ar" ? "زائر" : "Guest"));
+  const name = chatIdentityRole === "owner" ? "7MOOD" : chatIdentityRole === "staff" ? "Staff" : (chatName.value.trim() || (currentLanguage === "ar" ? "زائر" : "Guest"));
   const body = chatBody.value.trim();
   if (!body) { chatError.textContent = tr("chatRequired"); return; }
   chatError.textContent = "";
