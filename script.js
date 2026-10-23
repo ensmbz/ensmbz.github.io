@@ -104,7 +104,11 @@ async function uploadMedia(path, file, contentType) {
   const chunkSize = 50 * 1024 * 1024;
   for (let offset = 0; offset < file.size;) {
     const chunk = file.slice(offset, Math.min(offset + chunkSize, file.size));
-    const part = await fetch(location, { method: "PATCH", headers: { ...headers, "content-type": "application/offset+octet-stream", "upload-offset": String(offset) }, body: chunk });
+    const part = await fetch(location, {
+      method: "PATCH",
+      headers: { apikey: supabaseSettings.publishableKey, authorization: `Bearer ${supabaseSettings.publishableKey}`, "tus-resumable": "1.0.0", "content-type": "application/offset+octet-stream", "upload-offset": String(offset) },
+      body: chunk,
+    });
     if (!part.ok) throw new Error(`Resumable upload failed (HTTP ${part.status})`);
     offset = Number(part.headers.get("upload-offset")) || offset + chunk.size;
   }
