@@ -8,6 +8,8 @@ const queueItems = document.querySelector("#reviewItems");
 let activeSection = "photos";
 let currentAccess = null;
 let panicApprovalHandled = false;
+let accessCheckRunning = false;
+let accessCheckQueued = false;
 const sectionPermissions = {
   photos: "review_photos", archive: "manage_takedowns", comments: "manage_comments", reports: "manage_reports",
   takedowns: "manage_takedowns", chat: "manage_chat", site: "manage_site", ipdesk: "owner", staff: "owner"
@@ -29,6 +31,17 @@ function showMessage(target, message, bad = false) {
 }
 
 async function checkOwnerAndLoad() {
+  if (accessCheckRunning) { accessCheckQueued = true; return; }
+  accessCheckRunning = true;
+  try {
+    await checkOwnerAndLoadNow();
+  } finally {
+    accessCheckRunning = false;
+    if (accessCheckQueued) { accessCheckQueued = false; setTimeout(checkOwnerAndLoad, 0); }
+  }
+}
+
+async function checkOwnerAndLoadNow() {
   const { data: { session } } = await reviewClient.auth.getSession();
   if (!session) {
     currentAccess = null;
