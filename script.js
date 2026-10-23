@@ -97,7 +97,10 @@ async function uploadMedia(path, file, contentType) {
   if (!start.ok) throw new Error(`Resumable upload setup failed (HTTP ${start.status})`);
   let location = start.headers.get("location");
   if (!location) throw new Error("Resumable upload returned no location");
-  if (location.startsWith("/")) location = `${api}${location}`;
+  // The local storage service can return an old tunnel hostname. Keep every
+  // chunk on the same public origin the visitor is already using.
+  const locationUrl = new URL(location, api);
+  location = `${api}${locationUrl.pathname}${locationUrl.search}`;
   const chunkSize = 50 * 1024 * 1024;
   for (let offset = 0; offset < file.size;) {
     const chunk = file.slice(offset, Math.min(offset + chunkSize, file.size));
