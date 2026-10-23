@@ -4,7 +4,7 @@ const translations = {
     pausedMessage: "The collection is temporarily closed. The frames are staying put and the archive will return soon.",
     ticker: "★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★ THE ENS MBZ FILES ★ VERY IMPORTANT GOOFINESS ★ THINKING OPTIONAL ★ NO CONTEXT REQUIRED ★",
     navGallery: "THE GALLERY", navChat: "CHAT ROOM", navReport: "REPORT", navAbout: "ABOUT", navOwner: "OWNER",
-    heroEyebrow: "ENS MBZ ARCHIVE · CURRENT EXHIBITION", heroTitle: 'THE<br><span class="headline-last">ARCHIVE</span><br>STAYS LOUD<span class="period">.</span>',
+    heroEyebrow: "ENS MBZ ARCHIVE · CURRENT EXHIBITION", heroTitle: '<span class="hero-line">THE</span><span class="hero-line headline-last">ARCHIVE</span><span class="hero-line">STAYS LOUD<span class="period">.</span></span>',
     heroDescription: "An unofficial exhibition of school memories, unexpected portraits, and moments too good to leave in the camera roll.",
     tourLink: "TAKE THE TOUR", scribbleOne: "brain cell<br>loading...", scribbleTwo: "← swipe<br>for evidence",
     scrollExhibition: "SCROLL FOR THE EXHIBITION", figureLabel: "FIG. 001 — ∞", collection: "THE PERMANENT COLLECTION",
@@ -31,7 +31,7 @@ const translations = {
     pausedMessage: "المجموعة مغلقة مؤقتاً. ستبقى الإطارات في مكانها وسيعود الأرشيف قريباً.",
     ticker: "★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★ ملفات المدرسة الإماراتية في مدينة زايد ★ عبث مهم جداً ★ التفكير اختياري ★ لا حاجة للسياق ★",
     navGallery: "المعرض", navChat: "غرفة الدردشة", navReport: "إبلاغ", navAbout: "عن الموقع", navOwner: "المالك",
-    heroEyebrow: "أرشيف ENS MBZ · المعرض الحالي", heroTitle: 'الأرشيف<br><span class="headline-last">يبقى</span><br>صاخباً<span class="period">.</span>',
+    heroEyebrow: "أرشيف ENS MBZ · المعرض الحالي", heroTitle: '<span class="hero-line">الأرشيف</span><span class="hero-line headline-last">يبقى</span><span class="hero-line">صاخباً<span class="period">.</span></span>',
     heroDescription: "معرض غير رسمي لذكريات المدرسة وصور غير متوقعة ولحظات أجمل من أن تبقى في ألبوم الكاميرا.",
     tourLink: "ابدأ الجولة", scribbleOne: "خلية دماغية<br>جارٍ التحميل...", scribbleTwo: "← اسحب<br>لرؤية الأدلة",
     scrollExhibition: "مرّر لاستكشاف المعرض", figureLabel: "الصورة ٠٠١ — ∞", collection: "المجموعة الدائمة",
@@ -148,6 +148,48 @@ updateScrollProgress();
 
 const revealTargets = document.querySelectorAll(".section-heading, .gallery-note, .drop-hint, .storage-note, .chat-heading, .chat-layout, footer");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (!reduceMotion && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  const hero = document.querySelector(".hero");
+  let heroFrame = 0;
+  hero?.addEventListener("pointermove", (event) => {
+    if (heroFrame) return;
+    const { clientX, clientY } = event;
+    heroFrame = requestAnimationFrame(() => {
+      const rect = hero.getBoundingClientRect();
+      const x = (clientX - rect.left) / rect.width * 2 - 1;
+      const y = (clientY - rect.top) / rect.height * 2 - 1;
+      hero.style.setProperty("--pointer-x", `${(x * 9).toFixed(1)}px`);
+      hero.style.setProperty("--pointer-y", `${(y * 8).toFixed(1)}px`);
+      hero.style.setProperty("--tilt-x", `${(x * 3).toFixed(1)}deg`);
+      hero.style.setProperty("--tilt-y", `${(-y * 3).toFixed(1)}deg`);
+      heroFrame = 0;
+    });
+  });
+  hero?.addEventListener("pointerleave", () => {
+    cancelAnimationFrame(heroFrame);
+    heroFrame = 0;
+    for (const name of ["--pointer-x", "--pointer-y", "--tilt-x", "--tilt-y"]) hero.style.removeProperty(name);
+  });
+  document.querySelectorAll(".add-button, .photo-picker-button, .submit-button, .request-button, .hero-link").forEach((button) => {
+    let frame = 0;
+    button.addEventListener("pointermove", (event) => {
+      if (frame) return;
+      const { clientX, clientY } = event;
+      frame = requestAnimationFrame(() => {
+        const rect = button.getBoundingClientRect();
+        button.style.setProperty("--magnet-x", `${Math.max(-6, Math.min(6, (clientX - rect.left - rect.width / 2) * .12)).toFixed(1)}px`);
+        button.style.setProperty("--magnet-y", `${Math.max(-6, Math.min(6, (clientY - rect.top - rect.height / 2) * .12)).toFixed(1)}px`);
+        frame = 0;
+      });
+    });
+    button.addEventListener("pointerleave", () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      button.style.removeProperty("--magnet-x");
+      button.style.removeProperty("--magnet-y");
+    });
+  });
+}
 if (reduceMotion || !("IntersectionObserver" in window)) {
   revealTargets.forEach((element) => element.classList.add("scroll-reveal", "is-visible"));
 } else {

@@ -296,7 +296,7 @@ dialog::backdrop { background: #170204d9; backdrop-filter: blur(12px); }
 /* Scroll choreography */
 .topbar nav a.is-current::after { transform: scaleX(1); transform-origin: left; }
 .hero h1 { transform: translateY(var(--hero-lift, 0)); opacity: var(--hero-fade, 1); transition: opacity .1s linear; will-change: transform, opacity; }
-.hero-art { top: calc(50% + var(--hero-art-shift, 0px)); will-change: top; }
+.hero-art { translate: var(--pointer-x, 0px) calc(var(--hero-art-shift, 0px) + var(--pointer-y, 0px)); }
 .hero-description, .hero-link { translate: 0 var(--hero-copy-lift, 0px); opacity: var(--hero-fade, 1); }
 .gallery-section::before { transform: translateY(var(--scene-shift, 0)); will-change: transform; }
 .chat-section::after { transform: translateY(var(--scene-counter-shift, 0px)); will-change: transform; }
@@ -308,7 +308,7 @@ dialog::backdrop { background: #170204d9; backdrop-filter: blur(12px); }
 .chat-heading.scroll-reveal.is-visible > div:first-child,
 .section-heading.scroll-reveal.is-visible > .gallery-tools,
 .chat-heading.scroll-reveal.is-visible > .chat-live { transform: translateX(0); opacity: 1; }
-.photo-card.card-reveal { opacity: 0; animation: none; transition: opacity .75s ease, transform .95s var(--ease-out), filter .35s var(--ease-out); will-change: opacity, transform; }
+.photo-card.card-reveal { opacity: 0; animation: none; transition: opacity .75s ease, transform .95s var(--ease-out), filter .35s var(--ease-out); transition-delay: calc(var(--card-index, 0) * 55ms); }
 .photo-card.card-reveal[data-card-side="left"] { transform: translate3d(-72px, 46px, 0) rotate(-1.4deg); }
 .photo-card.card-reveal[data-card-side="right"] { transform: translate3d(72px, 46px, 0) rotate(1.4deg); }
 .photo-card.card-reveal.is-visible { opacity: 1; transform: translate3d(0, 0, 0) rotate(0); }
@@ -323,4 +323,46 @@ dialog::backdrop { background: #170204d9; backdrop-filter: blur(12px); }
 @media (prefers-reduced-motion: reduce) {
   .hero h1, .hero-art, .hero-description, .hero-link, .gallery-section::before, .chat-section::after { transform: none !important; translate: none !important; opacity: 1 !important; }
   .photo-card.card-reveal, .section-heading > *, .chat-heading > * { opacity: 1 !important; transform: none !important; }
+}
+
+/* Exhibition motion: composited reveals and lightweight pointer response. */
+.hero { animation: none; background-size: auto; }
+.hero::before { background: radial-gradient(ellipse at 50% 46%, #f04a3722, transparent 62%); animation: hero-glow 8s ease-in-out infinite alternate; }
+@keyframes hero-glow { from { opacity: .35; } to { opacity: .8; } }
+.hero-copy.hero-reveal { animation-duration: .7s; }
+.hero h1 .hero-line { display: block; width: max-content; max-width: 100%; margin-inline: auto; clip-path: inset(0 0 100% 0); opacity: 0; animation: title-line-in .95s var(--ease-out) forwards; }
+.hero h1 .hero-line:nth-child(1) { animation-delay: .12s; }
+.hero h1 .hero-line:nth-child(2) { animation-delay: .26s; }
+.hero h1 .hero-line:nth-child(3) { animation-delay: .4s; }
+@keyframes title-line-in { from { clip-path: inset(0 0 100% 0); opacity: 0; translate: 0 18px; } to { clip-path: inset(0); opacity: 1; translate: 0 0; } }
+.hero-copy .eyebrow { animation: detail-in .65s ease .05s backwards; }
+.hero-description { animation: detail-in .8s ease .65s backwards; }
+.hero-link { animation: detail-in .8s ease .8s backwards; }
+@keyframes detail-in { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+.hero-art.hero-reveal { animation: artwork-in 1.1s var(--ease-out) .2s both; }
+@keyframes artwork-in { from { opacity: 0; transform: translate(-50%, -38%) scale(.93) rotate(-3deg); } to { opacity: 1; transform: translate(-50%, -43%) scale(1) rotate(0); } }
+.hero-logo-frame { animation: frame-breathe 8s ease-in-out infinite; transform: rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg)) rotate(-2.5deg); transform-style: preserve-3d; transition: transform .25s ease-out; }
+@keyframes frame-breathe { 50% { translate: 0 -9px; } }
+.sunburst { animation: sunburst-in .9s var(--ease-out) .5s both; }
+@keyframes sunburst-in { from { opacity: 0; transform: rotate(-22deg) translateY(-20px) scale(.85); } to { opacity: 1; transform: rotate(-8deg) translateY(0) scale(1); } }
+.frame-sticker { animation: badge-drift 6s ease-in-out infinite alternate; }
+@keyframes badge-drift { to { translate: 0 -5px; rotate: 4deg; } }
+.topbar nav a::after, .topbar nav .nav-report::after { height: 2px; transition-duration: .38s; }
+.section-heading.scroll-reveal h2, .chat-heading.scroll-reveal h2 { clip-path: inset(0 100% 0 0); transition: clip-path 1s var(--ease-out) .1s; }
+.section-heading.scroll-reveal.is-visible h2, .chat-heading.scroll-reveal.is-visible h2 { clip-path: inset(0); }
+.photo-card.card-reveal .photo-image { clip-path: inset(0 0 100% 0); transition: clip-path .95s var(--ease-out), transform .5s var(--ease-out), box-shadow .5s var(--ease-out); transition-delay: calc(var(--card-index, 0) * 55ms); }
+.photo-card.card-reveal.is-visible .photo-image { clip-path: inset(0); }
+.photo-card.card-reveal .photo-image img, .photo-card.card-reveal .photo-video { scale: 1.06; transition: scale 1.05s var(--ease-out), transform .8s var(--ease-out), filter .5s; }
+.photo-card.card-reveal.is-visible .photo-image img, .photo-card.card-reveal.is-visible .photo-video { scale: 1; }
+.photo-grid:hover .photo-card:not(:hover) { filter: saturate(.93) opacity(.9); }
+.add-button.btn, .photo-picker-button.btn, .submit-button.btn, .request-button.btn { translate: var(--magnet-x, 0px) var(--magnet-y, 0px); transition: translate .24s var(--ease-out), transform .25s, box-shadow .25s, background .25s; }
+.hero-link { translate: var(--magnet-x, 0px) calc(var(--hero-copy-lift, 0px) + var(--magnet-y, 0px)); }
+@media (max-width: 760px) { .hero-art.hero-reveal { animation-name: artwork-in-mobile; } @keyframes artwork-in-mobile { from { opacity: 0; transform: translate(-50%, -37%) scale(.94); } to { opacity: 1; transform: translate(-50%, -43%) scale(1); } } }
+html[dir="rtl"] .section-heading.scroll-reveal h2, html[dir="rtl"] .chat-heading.scroll-reveal h2 { clip-path: inset(0 0 0 100%); }
+html[dir="rtl"] .section-heading.scroll-reveal.is-visible h2, html[dir="rtl"] .chat-heading.scroll-reveal.is-visible h2 { clip-path: inset(0); }
+@media (prefers-reduced-motion: reduce) {
+  .hero::before, .hero-copy.hero-reveal, .hero-art.hero-reveal, .hero h1 .hero-line, .hero-copy .eyebrow, .hero-description, .hero-link, .hero-logo-frame, .sunburst, .frame-sticker { animation: none !important; }
+  .hero h1 .hero-line, .section-heading.scroll-reveal h2, .chat-heading.scroll-reveal h2, .photo-card.card-reveal .photo-image { clip-path: inset(0) !important; opacity: 1 !important; }
+  .photo-card.card-reveal .photo-image img, .photo-card.card-reveal .photo-video { scale: 1 !important; }
+  .add-button.btn, .photo-picker-button.btn, .submit-button.btn, .request-button.btn { translate: none !important; }
 }
