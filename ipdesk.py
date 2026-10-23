@@ -27,16 +27,24 @@ def request_ip(req):
     return forwarded('cf-connecting-ip') or forwarded('x-forwarded-for') or req.get('client_ip') or req.get('remote_ip', '')
 
 def rows():
-    counts, latest = {}, []
+    latest = []
     if LOG.exists():
         for line in LOG.read_text(errors='ignore').splitlines()[-2000:]:
             try:
                 item = json.loads(line); req = item.get('request', {}); ip = request_ip(req)
                 if ip:
-                    counts[ip] = counts.get(ip, 0) + 1
-                    latest.append((ip, req.get('method',''), req.get('uri',''), item.get('status','')))
+                    latest.append((item.get('ts',''), ip, req.get('method',''), req.get('uri',''), item.get('status','')))
             except Exception: pass
-    return sorted(counts.items(), key=lambda x: (-x[1], x[0])), latest[-40:][::-1]
+    return latest[-60:][::-1]
+
+def action_for(uri, method):
+    path = uri.split('?', 1)[0]
+    if path.startswith('/auth/'): return 'AUTHENTICATION'
+    if path.startswith('/functions/'): return 'FUNCTION CALL'
+    if path.startswith('/storage/'): return 'MEDIA ACCESS'
+    if method == 'POST': return 'FORM SUBMIT'
+    if method in ('PUT', 'PATCH', 'DELETE'): return 'DATA CHANGE'
+    return 'PAGE VIEW'
 
 def active_bans():
     now = int(time.time()); current = load_json(BANS, {})
@@ -86,13 +94,12 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path.startswith('/ban'): return self.ban_page()
         if not self.authorized(): return self.login()
-        counts, latest = rows(); bans = active_bans(); appeals = load_json(APPEALS, [])
+        latest = rows(); bans = active_bans(); appeals = load_json(APPEALS, [])
         options = '<option value="300">5 min</option><option value="1800">30 min</option><option value="3600">1 hour</option><option value="86400">1 day</option><option value="604800">7 days</option><option value="0">Permanent</option>'
-        table = ''.join(f'<tr><td>{html.escape(ip)}</td><td>{n}</td><td><form method="post" class="inline"><input type="hidden" name="ip" value="{html.escape(ip)}"><select name="duration">{options}</select><button>BAN</button></form></td></tr>' for ip,n in counts)
-        recent = ''.join(f'<tr><td>{html.escape(ip)}</td><td>{html.escape(method)}</td><td>{html.escape(uri)}</td><td>{status}</td></tr>' for ip,method,uri,status in latest)
+        recent = ''.join(f'<tr><td><b>{html.escape(ip)}</b></td><td>{html.escape(ts.replace("T", " ").replace("Z", " UTC"))}</td><td>{action_for(uri, method)}</td><td><code>{html.escape(method)} {html.escape(uri)}</code></td><td>{status}</td><td><form method="post" class="inline"><input type="hidden" name="ip" value="{html.escape(ip)}"><select name="duration">{options}</select><button>BAN</button></form></td></tr>' for ts,ip,method,uri,status in latest)
         bl = ''.join(f'<tr><td>{html.escape(ip)}</td><td>{remaining(data)}</td><td><form method="post"><input type="hidden" name="unban" value="{html.escape(ip)}"><button>UNBAN</button></form></td></tr>' for ip,data in bans.items()) or '<tr><td colspan="3">None</td></tr>'
         ap = ''.join(f'''<div class="card"><b>{html.escape(a.get('ip',''))}</b><p>{html.escape(a.get('message',''))}</p><p class="muted">{html.escape(a.get('time',''))}</p><form method="post" class="inline"><input type="hidden" name="appeal_ip" value="{html.escape(a.get('ip',''))}"><button name="appeal_action" value="unban">UNBAN + ACCEPT</button><button name="appeal_action" value="dismiss">DISMISS</button></form></div>''' for a in appeals) or '<p>No appeals.</p>'
-        self.send_html(f'''<!doctype html><meta name="viewport" content="width=device-width"><title>ENS MBZ IP Desk</title>{STYLE}<h1>IP DESK</h1><p>Real visitor IPs from Cloudflare.</p><h2>Banned IPs</h2><table><tr><th>IP</th><th>Remaining</th><th></th></tr>{bl}</table><h2>Ban appeals</h2>{ap}<h2>Most frequent IPs</h2><table><tr><th>IP</th><th>Requests</th><th>Ban time</th></tr>{table or '<tr><td colspan="3">No requests yet</td></tr>'}</table><h2>Latest requests</h2><table><tr><th>IP</th><th>Method</th><th>Path</th><th>Status</th></tr>{recent}</table>''')
+        self.send_html(f'''<!doctype html><meta name="viewport" content="width=device-width"><title>ENS MBZ IP Desk</title>{STYLE}<h1>IP DESK</h1><p>Most recent visitor activity, with the real Cloudflare IP and what the visitor tried to do.</p><h2>Banned IPs</h2><table><tr><th>IP</th><th>Remaining</th><th></th></tr>{bl}</table><h2>Ban appeals</h2>{ap}<h2>Most recent activity</h2><table><tr><th>IP</th><th>Time</th><th>Action</th><th>Request</th><th>Status</th><th></th></tr>{recent or '<tr><td colspan="6">No activity yet</td></tr>'}</table>''')
     def do_POST(self):
         data = parse_qs(self.rfile.read(int(self.headers.get('content-length','0'))).decode())
         if self.path.startswith('/ban/appeal'):
