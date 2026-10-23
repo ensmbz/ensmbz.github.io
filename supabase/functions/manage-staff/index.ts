@@ -34,12 +34,16 @@ Deno.serve(async (request) => {
     const email = `${username}@${staffLoginDomain}`;
     const usersResponse = await fetch(`${baseUrl}/auth/v1/admin/users?per_page=1000`, { headers: adminHeaders });
     const usersPayload = await usersResponse.json().catch(() => ({}));
+    if (!usersResponse.ok) return reply({ error: "Could not check existing staff accounts." }, 502);
     const existing = Array.isArray(usersPayload.users) ? usersPayload.users.find((item: Record<string, unknown>) => String(item.email || "").toLowerCase() === email) : null;
 
     if (body.action === "remove") {
-      if (existing?.id) await fetch(`${baseUrl}/auth/v1/admin/users/${existing.id}`, { method: "DELETE", headers: adminHeaders });
       const removed = await fetch(`${baseUrl}/rest/v1/staff_permissions?username=eq.${encodeURIComponent(username)}`, { method: "DELETE", headers: adminHeaders });
       if (!removed.ok) return reply({ error: "Could not remove staff access." }, 502);
+      if (existing?.id) {
+        const deleted = await fetch(`${baseUrl}/auth/v1/admin/users/${existing.id}`, { method: "DELETE", headers: adminHeaders });
+        if (!deleted.ok) return reply({ error: "Staff access was removed, but the login account could not be deleted." }, 502);
+      }
       return reply({ ok: true });
     }
 

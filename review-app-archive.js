@@ -306,14 +306,15 @@ function makeStaffCard(staff) {
   const edit = actionButton("CHANGE ACCESS", "review-approve", () => {
     card.replaceWith(makeStaffEditor(staff));
   });
-  const remove = actionButton("REMOVE STAFF", "review-reject", async () => {
+  const remove = actionButton("DELETE ACCOUNT", "review-reject", async () => {
     if (!confirm(`Delete the staff login and all access for @${staff.username}?`)) return;
     const { data: { session } } = await reviewClient.auth.getSession();
     const response = await fetch(`${reviewConfig.url}/functions/v1/manage-staff`, {
       method: "POST", headers: { apikey: reviewConfig.publishableKey, authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
       body: JSON.stringify({ action: "remove", username: staff.username }),
     });
-    if (!response.ok) return failQueue("Could not remove this staff member.");
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) return failQueue(result.error || "Could not delete this staff account.");
     await loadStaff();
   });
   card.append(label, title, permissions, makeActions([edit, remove]));
